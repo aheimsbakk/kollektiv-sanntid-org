@@ -103,22 +103,7 @@ async function init(){
   gWrap.appendChild(gBtn);
   document.body.appendChild(gWrap);
   ROOT.appendChild(board.el);
-  // Wire up entur debug callback so fetchDepartures can populate the debug panel
-  try{
-    if(board.debug){
-      // export a small global callback used by entur.fetchDepartures
-      window.__ENTUR_DEBUG_PANEL__ = (snapshot) => {
-        // snapshot may contain request, response, variant, error
-        const display = {
-          variant: snapshot && snapshot.variant,
-          request: snapshot && snapshot.request && ({ variant: snapshot.request.variant, query: (snapshot.request.query||'').slice(0,200) }),
-          response: snapshot && snapshot.response && snapshot.response.status,
-          error: snapshot && snapshot.error
-        };
-        board.debug.setDebug(display);
-      };
-    }
-  }catch(e){/*ignore*/}
+  // Debugging is disabled by default. To enable, set `window.__ENTUR_DEBUG_PANEL__ = fn` from the console.
   // Try live data first, fall back to demo
   let data = [];
   try{
