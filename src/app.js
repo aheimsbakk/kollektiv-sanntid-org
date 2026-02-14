@@ -55,10 +55,15 @@ async function init(){
   document.body.appendChild(opts.panel);
   // expose control so header toggle can call opts.open()
   window.__APP_OPTIONS__ = opts;
-  // add a global fixed gear in top-right for easy access
+  // add a global fixed gear in top-right for easy access that toggles the panel
   const gWrap = document.createElement('div'); gWrap.className='global-gear';
   const gBtn = document.createElement('button'); gBtn.className='gear-btn'; gBtn.type='button'; gBtn.innerHTML='&#9881;'; gBtn.title='Settings';
-  gBtn.addEventListener('click', ()=> opts.open());
+  gBtn.addEventListener('click', ()=> {
+    if (opts && typeof opts.open === 'function' && typeof opts.close === 'function'){
+      // toggle based on presence of body class
+      if (document.body.classList.contains('options-open')) opts.close(); else opts.open();
+    } else if (opts && typeof opts.open === 'function') opts.open();
+  });
   gWrap.appendChild(gBtn);
   document.body.appendChild(gWrap);
   ROOT.appendChild(board.el);
