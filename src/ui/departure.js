@@ -49,40 +49,52 @@ export function createDepartureNode(item){
       }
     }
 
-    // search recursively in raw object for any string value or key that matches known tokens
+    // search recursively in raw object for any string value that matches known tokens
     const raw = item.raw;
     if (!raw) return null;
     const tokens = ['bus','tram','metro','rail','train','water','ferry','coach'];
+
+    const matchesToken = (str) => {
+      if (!str || typeof str !== 'string') return null;
+      const low = str.toLowerCase();
+      for (const t of tokens) if (low.includes(t)) return t;
+      return null;
+    };
+
     const seen = new Set();
     const stack = [raw];
     while(stack.length){
       const cur = stack.pop();
       if (!cur || seen.has(cur)) continue;
       seen.add(cur);
+      // direct string
       if (typeof cur === 'string'){
-        const low = cur.toLowerCase();
-        for (const t of tokens) if (low.includes(t)) return t;
+        const m = matchesToken(cur);
+        if (m) return m;
+        continue;
+      }
+      // arrays: enqueue elements
+      if (Array.isArray(cur)){
+        for (const it of cur) stack.push(it);
         continue;
       }
       if (typeof cur === 'object'){
-        // try to normalize object values
-        const norm = normalize(cur);
-        if (norm){
-          const low = norm.toLowerCase();
-          for (const t of tokens) if (low.includes(t)) return t;
+        // check common properties that may hold mode-like values
+        const commonKeys = ['transportMode','mode','serviceType','product','transportSubmode','vehicleMode','type','journeyType'];
+        for (const k of commonKeys){
+          try{
+            const val = cur[k];
+            if (val){
+              const nm = normalize(val);
+              if (nm){ const mm = matchesToken(nm); if (mm) return mm; }
+            }
+          }catch(e){}
         }
-      if (typeof cur === 'object'){
-        if (Array.isArray(cur)){
-          for (const it of cur) stack.push(it);
-        } else {
-          for (const k of Object.keys(cur)){
-            // if key contains a token, prefer that
-            try{
-              const lk = String(k).toLowerCase();
-              for (const t of tokens) if (lk.includes(t)) return t;
-            }catch(e){}
-            try{ stack.push(cur[k]); }catch(e){}
-          }
+        // otherwise inspect keys and values
+        for (const k of Object.keys(cur)){
+          const keyMatch = matchesToken(String(k));
+          if (keyMatch) return keyMatch;
+          try{ stack.push(cur[k]); }catch(e){}
         }
       }
     }
