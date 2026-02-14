@@ -106,10 +106,29 @@ export function createDepartureNode(item){
   try{
     if (!mode && item && item.raw){
       try{
-        const sig = JSON.stringify(Object.keys(item.raw).slice(0,5));
+        const sigKeys = Object.keys(item.raw).slice(0,8);
+        const sig = JSON.stringify(sigKeys);
         if (!_seenRawSignatures.has(sig)){
           _seenRawSignatures.add(sig);
-          console.debug('emoji-detect: no mode found; raw keys sample:', sig);
+          // store a compact diagnostic snapshot on window for later inspection
+          try{
+            if (typeof window !== 'undefined'){
+              window.__EMOJI_DEBUG__ = window.__EMOJI_DEBUG__ || [];
+              const snapshot = {
+                time: (new Date()).toISOString(),
+                destination: item.destination || null,
+                parserMode: item.mode || null,
+                transportModeField: item.transportMode || null,
+                detectedMode: mode || null,
+                rawKeys: sigKeys,
+              };
+              window.__EMOJI_DEBUG__.push(snapshot);
+              // keep array bounded to prevent unbounded memory growth
+              if (window.__EMOJI_DEBUG__.length > 50) window.__EMOJI_DEBUG__.shift();
+            }
+          }catch(e){}
+          // still log a compact console message for immediacy
+          try{ console.warn('emoji-detect: no mode found; raw keys sample:', sigKeys); }catch(e){}
         }
       }catch(e){}
     }

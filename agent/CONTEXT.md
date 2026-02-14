@@ -18,3 +18,5 @@ Debug: runtime Entur debug panel is disabled by default; can be re-enabled manua
 Typography: reduced all defined text-size scales by 20% per request (tiny/small/medium/large/xlarge).
 
 Planned: add transport-type emoji before countdown (UI-only heuristic). Worklog created at agent/worklogs/2026-02-15-add-emoji-mapping.md.
+
+Added runtime emoji detection diagnostics: when detection fails a compact snapshot is appended to `window.__EMOJI_DEBUG__` (bounded array) and a console warning is emitted. See `agent/worklogs/2026-02-15-add-emoji-debugging.md`.
