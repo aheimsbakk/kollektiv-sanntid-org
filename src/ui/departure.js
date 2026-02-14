@@ -35,7 +35,12 @@ export function createDepartureNode(item){
   }
 
   const mode = detectMode();
-  emojiEl.setAttribute('aria-hidden', 'true');
+  if (typeof emojiEl.setAttribute === 'function') {
+    emojiEl.setAttribute('aria-hidden', 'true');
+  } else {
+    // DOM shim fallback for tests: set a usable property
+    try{ emojiEl.ariaHidden = 'true'; }catch(e){}
+  }
   emojiEl.textContent = emojiForMode(mode);
 
   timeWrap.append(emojiEl, time);
