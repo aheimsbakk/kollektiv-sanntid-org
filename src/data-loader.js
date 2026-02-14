@@ -11,12 +11,34 @@ export async function getDemoData(){
       const raw = await fs.readFile(new URL('./demo.json', import.meta.url));
       const j = JSON.parse(raw.toString());
       _demoCache = parseEnturResponse(j);
+      // Normalize demo times: if a demo time is in the past shift it into the future for demo UX
+      const now = Date.now();
+      _demoCache = _demoCache.map((d, i) => {
+        if (!d.expectedDepartureISO) return d;
+        const epoch = Date.parse(d.expectedDepartureISO);
+        if (epoch <= now) {
+          // schedule them offset by 5*(i+1) minutes into the future
+          const offset = (5 * (i+1)) * 60 * 1000;
+          return { ...d, expectedDepartureISO: new Date(now + offset).toISOString() };
+        }
+        return d;
+      });
       return _demoCache;
     }
     // Browser: fetch relative URL
     const res = await fetch(new URL('./demo.json', import.meta.url).href);
     const j = await res.json();
     _demoCache = parseEnturResponse(j);
+    const now = Date.now();
+    _demoCache = _demoCache.map((d, i) => {
+      if (!d.expectedDepartureISO) return d;
+      const epoch = Date.parse(d.expectedDepartureISO);
+      if (epoch <= now) {
+        const offset = (5 * (i+1)) * 60 * 1000;
+        return { ...d, expectedDepartureISO: new Date(now + offset).toISOString() };
+      }
+      return d;
+    });
     return _demoCache;
   }catch(err){
     console.warn('Failed to load demo.json', err);
