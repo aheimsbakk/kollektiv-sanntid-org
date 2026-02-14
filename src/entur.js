@@ -35,7 +35,8 @@ export async function fetchDepartures({stopId, numDepartures=2, modes=['bus'], a
   // unquoted-enum-like form (BUS,TRAM...).
   const modesSingleLiteral = `"${modes.join(', ')}"`;
   const modesQuotedArrayLiteral = modes.map(m => `"${m}"`).join(',');
-  const modesEnumArrayLiteral = modes.map(m => m.toUpperCase()).join(',');
+  // Entur expects lowercase enum tokens; ensure we produce lowercase literal tokens
+  const modesEnumArrayLiteral = modes.map(m => m.toLowerCase()).join(',');
 
   const buildQuery = (opts = {}) => {
     const { includeModes = false, modesLiteral = '' } = opts;
@@ -72,12 +73,23 @@ export async function fetchDepartures({stopId, numDepartures=2, modes=['bus'], a
   // Try multiple query forms until one returns departures: no-filter first,
   // then single-string, then quoted-array, then enum-like array. Capture
   // the last request/response snippet for debug panels when available.
-  const variants = [
-    { name: 'no-filter', opts: { includeModes: false } },
-    { name: 'single-string', opts: { includeModes: true, modesLiteral: modesSingleLiteral } },
-    { name: 'quoted-array', opts: { includeModes: true, modesLiteral: modesQuotedArrayLiteral } },
-    { name: 'enum-array', opts: { includeModes: true, modesLiteral: modesEnumArrayLiteral } }
-  ];
+  // If caller supplied modes, prefer queries that include whiteListedModes
+  let variants;
+  if (Array.isArray(modes) && modes.length > 0){
+    variants = [
+      { name: 'single-string', opts: { includeModes: true, modesLiteral: modesSingleLiteral } },
+      { name: 'quoted-array', opts: { includeModes: true, modesLiteral: modesQuotedArrayLiteral } },
+      { name: 'enum-array', opts: { includeModes: true, modesLiteral: modesEnumArrayLiteral } },
+      { name: 'no-filter', opts: { includeModes: false } }
+    ];
+  } else {
+    variants = [
+      { name: 'no-filter', opts: { includeModes: false } },
+      { name: 'single-string', opts: { includeModes: true, modesLiteral: modesSingleLiteral } },
+      { name: 'quoted-array', opts: { includeModes: true, modesLiteral: modesQuotedArrayLiteral } },
+      { name: 'enum-array', opts: { includeModes: true, modesLiteral: modesEnumArrayLiteral } }
+    ];
+  }
   let json, resp, usedVariant = null;
   // store last request/response for debug UI
   let lastDebug = { request: null, response: null, variant: null };
@@ -88,6 +100,19 @@ export async function fetchDepartures({stopId, numDepartures=2, modes=['bus'], a
     lastDebug.request = { variant: v.name, query: q };
     try{
       ({ json, resp } = await postAndParse(q));
+      // If GraphQL returned an errors array, treat it as a validation/AST
+      // error for this variant and continue to next variant.
+      if (json && Array.isArray(json.errors) && json.errors.length){
+        const errMsg = (json.errors[0] && json.errors[0].message) ? json.errors[0].message : JSON.stringify(json.errors);
+        lastDebug.error = `graphql-errors: ${String(errMsg).slice(0,300)}`;
+        console.debug('fetchDepartures variant returned GraphQL errors, trying next:', v.name, lastDebug.error);
+        // attach response metadata and continue to next variant
+        let hdrs = {};
+        try{ if (resp && resp.headers){ const h = resp.headers; if (typeof h.entries === 'function') hdrs = Object.fromEntries(h.entries()); else if (typeof h.forEach === 'function'){ h.forEach((vv,kk)=>{ hdrs[kk]=vv }) } else if (typeof h === 'object') hdrs = { ...h }; } }catch(e){}
+        lastDebug.response = { status: resp && (resp.status || resp.statusText) ? (resp.status || resp.statusText) : 'unknown', headers: hdrs };
+        lastDebug.variant = v.name;
+        continue;
+      }
       usedVariant = v.name;
       // normalize headers into a plain object for debug UI
       let hdrs = {};
