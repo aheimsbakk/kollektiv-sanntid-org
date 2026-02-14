@@ -6,5 +6,6 @@ Last 3 Changes:
 - agent/worklogs/2026-02-15-01-25-ensure-options-overlay-css.md
 
 Next Steps:
-- Polish header/gear placement and accessibility (done).
-- Persist settings to localStorage and add keyboard/ESC to close options.
+Next Steps:
+- Persist settings to localStorage and add keyboard/ESC to close options (done).
+- Add focus trap and small DOM accessibility improvements (done).

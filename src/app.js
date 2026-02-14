@@ -55,6 +55,15 @@ async function init(){
   document.body.appendChild(opts.panel);
   // expose control so header toggle can call opts.open()
   window.__APP_OPTIONS__ = opts;
+  // load persisted settings (if any)
+  try{
+    const saved = localStorage.getItem('departure:settings');
+    if (saved){
+      const s = JSON.parse(saved);
+      // merge into DEFAULTS to preserve keys
+      Object.assign(DEFAULTS, s);
+    }
+  }catch(e){/*ignore*/}
   // add a global fixed gear in top-right for easy access that toggles the panel
   const gWrap = document.createElement('div'); gWrap.className='global-gear';
   const gBtn = document.createElement('button'); gBtn.className='gear-btn'; gBtn.type='button'; gBtn.innerHTML='&#9881;'; gBtn.title='Settings';
