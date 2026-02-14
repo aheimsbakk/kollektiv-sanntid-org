@@ -16,3 +16,5 @@ Options panel behavior: pressing Enter in text/number fields now applies setting
 UX tweak: small toast is shown when settings are applied; transport-mode checkbox changes are debounced (500ms) to avoid rapid network refreshes.
 Debug: runtime Entur debug panel is disabled by default; can be re-enabled manually via `window.__ENTUR_DEBUG_PANEL__`.
 Typography: reduced all defined text-size scales by 20% per request (tiny/small/medium/large/xlarge).
+
+Planned: add transport-type emoji before countdown (UI-only heuristic). Worklog created at agent/worklogs/2026-02-15-add-emoji-mapping.md.

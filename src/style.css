@@ -34,6 +34,10 @@ html,body{height:100%;margin:0;background:var(--bg);color:var(--fg);font-family:
 
 .empty-state{color:rgba(230,238,248,0.8);font-weight:700;padding:12px 10px;border-radius:6px}
 
+.departure-time-wrap{display:flex;align-items:center;gap:8px}
+.departure-emoji{font-size:1.05em;display:inline-block;line-height:1;width:1.2em;text-align:center}
+.visually-hidden{position:absolute!important;height:1px;width:1px;overflow:hidden;clip:rect(1px,1px,1px,1px);white-space:nowrap}
+
 @media (max-width:600px){
   :root{--large-scale:10vw}
 }
