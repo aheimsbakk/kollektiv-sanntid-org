@@ -83,6 +83,18 @@ export function createDepartureNode(item){
   }
 
   const mode = detectMode();
+  // Diagnostic: if mode not found, log a compact signature of raw once per unique shape
+  try{
+    if (!mode && item && item.raw){
+      try{
+        const sig = JSON.stringify(Object.keys(item.raw).slice(0,5));
+        if (!_seenRawSignatures.has(sig)){
+          _seenRawSignatures.add(sig);
+          console.debug('emoji-detect: no mode found; raw keys sample:', sig);
+        }
+      }catch(e){}
+    }
+  }catch(e){}
   if (typeof emojiEl.setAttribute === 'function') {
     emojiEl.setAttribute('aria-hidden', 'true');
   } else {
