@@ -160,6 +160,37 @@ export async function fetchDepartures({stopId, numDepartures=2, modes=['bus'], a
     throw new SyntaxError(`Non-JSON response: ${String(txt).slice(0,200)}`);
   }
   let parsed = parseEnturResponse(json);
+  // If caller requested modes, apply a client-side permissive filter over the
+  // parsed results to ensure UI matches user selection even when server AST
+  // shapes differ or the server returns unfiltered data. This searches the
+  // raw call object for any string values that match a requested mode.
+  function rawMatchesModes(rawObj, modesArr){
+    if (!rawObj) return false;
+    const lowerModes = modesArr.map(m=>String(m).toLowerCase());
+    const stack = [rawObj];
+    while(stack.length){
+      const cur = stack.pop();
+      if (cur == null) continue;
+      if (typeof cur === 'string'){
+        const v = cur.toLowerCase();
+        for (const mm of lowerModes) if (v === mm) return true;
+        continue;
+      }
+      if (typeof cur === 'object'){
+        if (Array.isArray(cur)){
+          for (const it of cur) stack.push(it);
+        } else {
+          for (const k of Object.keys(cur)) stack.push(cur[k]);
+        }
+      }
+    }
+    return false;
+  }
+  if (Array.isArray(modes) && modes.length>0){
+    try{
+      parsed = parsed.filter(p => rawMatchesModes(p.raw, modes));
+    }catch(e){/* ignore filtering errors */}
+  }
   if (usedVariant) console.debug('fetchDepartures used variant:', usedVariant);
   // attach a debug snapshot to global so UI can pick it up (if present)
   try{ if (typeof window !== 'undefined' && window.__ENTUR_DEBUG_PANEL__) window.__ENTUR_DEBUG_PANEL__(lastDebug); }catch(e){}
