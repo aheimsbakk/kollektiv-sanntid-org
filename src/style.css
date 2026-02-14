@@ -1,0 +1,20 @@
+:root{
+  --bg: linear-gradient(180deg,#0b0f1a,#081021);
+  --fg: #e6eef8;
+  --accent: #72e0a1;
+  --danger: #ff6b6b;
+  --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, 'Roboto Mono', 'Courier New', monospace;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;background:var(--bg);color:var(--fg);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial}
+.app-root{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+.board{display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center}
+.station-header{font-weight:700;letter-spacing:1px}
+.destination{font-family:var(--mono);font-weight:800;font-size:6vw;line-height:0.9;text-shadow:0 2px 0 rgba(0,0,0,.6), 0 6px 20px rgba(0,0,0,.6)}
+.time{font-family:var(--mono);font-weight:900;font-size:5vw}
+.situation{background:var(--danger);color:white;padding:6px 12px;border-radius:8px}
+
+@media (max-width:600px){
+  .destination{font-size:10vw}
+  .time{font-size:8vw}
+}
