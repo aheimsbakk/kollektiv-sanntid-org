@@ -32,6 +32,8 @@ html,body{height:100%;margin:0;background:var(--bg);color:var(--fg);font-family:
 .departure-situations{color:var(--danger);font-weight:700}
 .situation-banner{background:var(--danger);color:white;padding:6px 12px;border-radius:8px;margin-bottom:6px}
 
+.empty-state{color:rgba(230,238,248,0.8);font-weight:700;padding:12px 10px;border-radius:6px}
+
 @media (max-width:600px){
   :root{--large-scale:10vw}
 }

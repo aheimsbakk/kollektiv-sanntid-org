@@ -11,6 +11,12 @@ const ROOT = document.getElementById('app');
 
 function renderDepartures(listEl, items){
   clearList(listEl);
+  if (!items || items.length === 0){
+    const empty = document.createElement('div'); empty.className = 'empty-state';
+    empty.textContent = 'No departures...';
+    listEl.appendChild(empty);
+    return;
+  }
   items.forEach(it => {
     const node = createDepartureNode(it);
     // initial countdown
@@ -49,8 +55,9 @@ async function init(){
         if(stopId){
           fresh = await fetchDepartures({ stopId, numDepartures: DEFAULTS.NUM_DEPARTURES, modes: DEFAULTS.TRANSPORT_MODES, apiUrl: DEFAULTS.API_URL, clientName: DEFAULTS.CLIENT_NAME });
         }
-        if(!fresh || !fresh.length) fresh = await getDemoData();
-        renderDepartures(board.list, fresh);
+    // If API returns no departures, show an explicit empty state instead of demo data
+    if(!fresh || !fresh.length) fresh = [];
+    renderDepartures(board.list, fresh);
       }catch(e){ console.warn('Manual refresh failed', e); }
     })();
     // apply text size immediately
@@ -125,7 +132,8 @@ async function init(){
     if(board.status){ board.status.style.display='inline-block'; board.status.textContent = 'Demo'; }
   }
   if(!data || !data.length){
-    data = await getDemoData();
+    // Don't auto-fallback to demo here; show an explicit empty state handled by renderDepartures
+    data = [];
   }
   renderDepartures(board.list, data);
   // Start per-second countdown updates (keeps DOM nodes, avoids full re-render)
