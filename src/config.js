@@ -4,4 +4,5 @@ export const DEFAULTS = {
   FETCH_INTERVAL: 60,
   TRANSPORT_MODES: ['bus','tram','metro','rail','water'],
   CLIENT_NAME: 'personal-js-app'
+  ,API_URL: 'https://api.entur.io/journey-planner/v3/graphql'
 };
