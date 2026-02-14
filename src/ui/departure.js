@@ -21,21 +21,9 @@ export function createDepartureNode(item){
   // detect mode from various possible fields in the parsed item/raw payload
   const detectMode = () => {
     if (!item) return null;
-    // quick checks first; normalize candidates to strings when possible
-    const normalize = (v) => {
-      if (v == null) return null;
-      if (typeof v === 'string') return v;
-      if (typeof v === 'object'){
-        if (typeof v.value === 'string') return v.value;
-        if (typeof v.id === 'string') return v.id;
-        if (typeof v.name === 'string') return v.name;
-      }
-      return null;
-    };
-    const nm = normalize(item.mode);
-    if (nm) return nm;
-    const nt = normalize(item.transportMode);
-    if (nt) return nt;
+    // prefer parser-provided normalized mode if available
+    if (item.mode) return item.mode;
+    if (item.transportMode) return item.transportMode;
     // inspect common shallow fields that may be objects
     const shallowCandidates = ['transportMode','serviceType','product','transportSubmode'];
     for (const k of shallowCandidates){
