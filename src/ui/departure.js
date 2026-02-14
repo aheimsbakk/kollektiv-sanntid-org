@@ -21,7 +21,20 @@ export function createDepartureNode(item){
     // quick checks first
     if (item.mode) return item.mode;
     if (item.transportMode) return item.transportMode;
-    // search recursively in raw object for any string value that matches known tokens
+    // inspect common shallow fields that may be objects
+    const shallowCandidates = ['transportMode','serviceType','product','transportSubmode'];
+    for (const k of shallowCandidates){
+      const v = item.raw && item.raw[k];
+      if (!v) continue;
+      if (typeof v === 'string') return v;
+      if (typeof v === 'object'){
+        if (typeof v.value === 'string') return v.value;
+        if (typeof v.id === 'string') return v.id;
+        if (typeof v.name === 'string') return v.name;
+      }
+    }
+
+    // search recursively in raw object for any string value or key that matches known tokens
     const raw = item.raw;
     if (!raw) return null;
     const tokens = ['bus','tram','metro','rail','train','water','ferry','coach'];
@@ -34,11 +47,18 @@ export function createDepartureNode(item){
       if (typeof cur === 'string'){
         const low = cur.toLowerCase();
         for (const t of tokens) if (low.includes(t)) return t;
-      } else if (typeof cur === 'object'){
+        continue;
+      }
+      if (typeof cur === 'object'){
         if (Array.isArray(cur)){
           for (const it of cur) stack.push(it);
         } else {
           for (const k of Object.keys(cur)){
+            // if key contains a token, prefer that
+            try{
+              const lk = String(k).toLowerCase();
+              for (const t of tokens) if (lk.includes(t)) return t;
+            }catch(e){}
             try{ stack.push(cur[k]); }catch(e){}
           }
         }
