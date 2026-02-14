@@ -97,13 +97,33 @@ export function createOptionsPanel(defaults, onApply){
     });
   });
 
-  // apply immediately when a transport mode checkbox is toggled
+  // small visual confirmation (toast) when applying settings
+  const toast = document.createElement('div'); toast.className = 'options-toast'; toast.style.display='none'; panel.appendChild(toast);
+  function showToast(msg){
+    try{
+      toast.textContent = msg || 'Settings applied';
+      toast.style.display = 'block';
+      toast.style.opacity = '1';
+      clearTimeout(showToast._t);
+      showToast._t = setTimeout(()=>{
+        toast.style.opacity = '0';
+        // hide after transition
+        setTimeout(()=>{ toast.style.display='none'; }, 300);
+      }, 1400);
+    }catch(e){/*ignore*/}
+  }
+
+  // apply on checkbox toggles but debounce rapid toggles to avoid frequent fetches
+  let modesDebounceTimer = null;
   modesWrap.addEventListener('change', (e)=>{
-    if (e.target && e.target.type === 'checkbox') applyChanges(false);
+    if (e.target && e.target.type === 'checkbox'){
+      clearTimeout(modesDebounceTimer);
+      modesDebounceTimer = setTimeout(()=>{ applyChanges(false); showToast('Filters updated'); }, 500);
+    }
   });
 
   // apply immediately when text size selection changes
-  selSize.addEventListener('change', ()=> applyChanges(false));
+  selSize.addEventListener('change', ()=>{ applyChanges(false); showToast('Text size updated'); });
 
   // when opening/closing, toggle a body class so we can shift the app content
   const origOpen = open;
