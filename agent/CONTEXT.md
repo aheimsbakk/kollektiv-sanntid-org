@@ -10,3 +10,5 @@ Next Steps:
 - Add focus trap and small DOM accessibility improvements (done).
 
 Recent UI tweak: moved status chip below station title so "Live"/"Demo" appears under the station name.
+
+Options panel behavior: pressing Enter in text/number fields now applies settings immediately without closing the panel; toggling transport mode checkboxes and changing text size select also apply immediately.

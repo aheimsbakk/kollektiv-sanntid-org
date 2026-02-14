@@ -68,8 +68,8 @@ export function createOptionsPanel(defaults, onApply){
   function open(){ panel.classList.add('open'); }
   function close(){ panel.classList.remove('open'); }
 
-  btnClose.addEventListener('click', ()=> close());
-  btnSave.addEventListener('click', ()=>{
+  // apply changes without closing the panel unless shouldClose === true
+  function applyChanges(shouldClose){
     const chosen = Array.from(modesWrap.querySelectorAll('input[type=checkbox]:checked')).map(i=>i.value);
     const newOpts = {
       STATION_NAME: inpStation.value || defaults.STATION_NAME,
@@ -78,11 +78,32 @@ export function createOptionsPanel(defaults, onApply){
       TRANSPORT_MODES: chosen.length ? chosen : defaults.TRANSPORT_MODES,
       TEXT_SIZE: selSize.value || (defaults.TEXT_SIZE || 'large')
     };
-    onApply && onApply(newOpts);
-    // persist settings
+    try{ onApply && onApply(newOpts); }catch(e){ console.warn('onApply failed', e); }
+    // persist settings immediately
     try{ localStorage.setItem('departure:settings', JSON.stringify(newOpts)); }catch(e){}
-    close();
+    if (shouldClose) close();
+  }
+
+  btnClose.addEventListener('click', ()=> close());
+  btnSave.addEventListener('click', ()=> applyChanges(true));
+
+  // apply on Enter in text inputs without closing the panel
+  [inpStation, inpNum, inpInt].forEach(inp => {
+    inp.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter'){
+        e.preventDefault();
+        applyChanges(false);
+      }
+    });
   });
+
+  // apply immediately when a transport mode checkbox is toggled
+  modesWrap.addEventListener('change', (e)=>{
+    if (e.target && e.target.type === 'checkbox') applyChanges(false);
+  });
+
+  // apply immediately when text size selection changes
+  selSize.addEventListener('change', ()=> applyChanges(false));
 
   // when opening/closing, toggle a body class so we can shift the app content
   const origOpen = open;
