@@ -63,7 +63,7 @@ export function createOptionsPanel(defaults, onApply){
   const btnClose = document.createElement('button'); btnClose.type='button'; btnClose.textContent = 'Close';
   actions.append(btnClose, btnSave);
 
-  panel.append(rowStation, rowNum, rowInt, rowModes, actions);
+  panel.append(rowStation, rowNum, rowInt, rowSize, rowModes, actions);
 
   function open(){ panel.classList.add('open'); }
   function close(){ panel.classList.remove('open'); }
