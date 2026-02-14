@@ -33,6 +33,21 @@ html,body{height:100%;margin:0;background:var(--bg);color:var(--fg);font-family:
   :root{--large-scale:10vw}
 }
 
+/* Text size utility classes */
+:root{--scale-tiny:0.5;--scale-small:0.75;--scale-medium:0.9;--scale-large:1;--scale-xlarge:1.25}
+.text-size-tiny .departure-destination{font-size:calc(var(--large-scale) * var(--scale-tiny))}
+.text-size-small .departure-destination{font-size:calc(var(--large-scale) * var(--scale-small))}
+.text-size-medium .departure-destination{font-size:calc(var(--large-scale) * var(--scale-medium))}
+.text-size-large .departure-destination{font-size:calc(var(--large-scale) * var(--scale-large))}
+.text-size-xlarge .departure-destination{font-size:calc(var(--large-scale) * var(--scale-xlarge))}
+
+.text-size-tiny .departure-time{font-size:calc(var(--large-scale) * 0.8 * var(--scale-tiny))}
+.text-size-small .departure-time{font-size:calc(var(--large-scale) * 0.8 * var(--scale-small))}
+.text-size-medium .departure-time{font-size:calc(var(--large-scale) * 0.8 * var(--scale-medium))}
+.text-size-large .departure-time{font-size:calc(var(--large-scale) * 0.8 * var(--scale-large))}
+.text-size-xlarge .departure-time{font-size:calc(var(--large-scale) * 0.8 * var(--scale-xlarge))}
+
+
 /* When options panel is open shift the app content left to make room */
 body.options-open .app-root{transform:translateX(-360px);transition:transform 280ms ease-in-out}
 

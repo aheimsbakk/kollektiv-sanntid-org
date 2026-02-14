@@ -22,6 +22,14 @@ export function createOptionsPanel(defaults, onApply){
   const inpInt = document.createElement('input'); inpInt.type='number'; inpInt.min=5; inpInt.value = defaults.FETCH_INTERVAL || 60;
   rowInt.append(lblInt, inpInt);
 
+  // text size option
+  const rowSize = document.createElement('div'); rowSize.className='options-row';
+  const lblSize = document.createElement('label'); lblSize.textContent = 'Text size';
+  const selSize = document.createElement('select');
+  ['tiny','small','medium','large','xlarge'].forEach(s=>{ const o=document.createElement('option'); o.value=s; o.textContent=s; selSize.appendChild(o); });
+  selSize.value = defaults.TEXT_SIZE || 'large';
+  rowSize.append(lblSize, selSize);
+
   // transport modes (multiple checkboxes)
   const rowModes = document.createElement('div'); rowModes.className='options-row';
   const lblModes = document.createElement('label'); lblModes.textContent = 'Transport modes (filter)';
@@ -45,6 +53,7 @@ export function createOptionsPanel(defaults, onApply){
       if (s.STATION_NAME) inpStation.value = s.STATION_NAME;
       if (s.NUM_DEPARTURES) inpNum.value = s.NUM_DEPARTURES;
       if (s.FETCH_INTERVAL) inpInt.value = s.FETCH_INTERVAL;
+      if (s.TEXT_SIZE) selSize.value = s.TEXT_SIZE;
     }
   }catch(e){}
   rowModes.append(lblModes, modesWrap);
@@ -66,7 +75,8 @@ export function createOptionsPanel(defaults, onApply){
       STATION_NAME: inpStation.value || defaults.STATION_NAME,
       NUM_DEPARTURES: Number(inpNum.value) || defaults.NUM_DEPARTURES,
       FETCH_INTERVAL: Number(inpInt.value) || defaults.FETCH_INTERVAL,
-      TRANSPORT_MODES: chosen.length ? chosen : defaults.TRANSPORT_MODES
+      TRANSPORT_MODES: chosen.length ? chosen : defaults.TRANSPORT_MODES,
+      TEXT_SIZE: selSize.value || (defaults.TEXT_SIZE || 'large')
     };
     onApply && onApply(newOpts);
     // persist settings

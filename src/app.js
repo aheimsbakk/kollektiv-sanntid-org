@@ -51,6 +51,10 @@ async function init(){
         renderDepartures(board.list, fresh);
       }catch(e){ console.warn('Manual refresh failed', e); }
     })();
+    // apply text size immediately
+    try{ document.documentElement.classList.remove('text-size-tiny','text-size-small','text-size-medium','text-size-large','text-size-xlarge');
+      document.documentElement.classList.add('text-size-'+(newOpts.TEXT_SIZE || 'large'));
+    }catch(e){}
   });
   document.body.appendChild(opts.panel);
   // expose control so header toggle can call opts.open()
@@ -61,9 +65,23 @@ async function init(){
     if (saved){
       const s = JSON.parse(saved);
       // merge into DEFAULTS to preserve keys
-      Object.assign(DEFAULTS, s);
+    Object.assign(DEFAULTS, s);
     }
   }catch(e){/*ignore*/}
+  // apply text size class
+  try{ document.documentElement.classList.remove('text-size-tiny','text-size-small','text-size-medium','text-size-large','text-size-xlarge');
+    const size = DEFAULTS.TEXT_SIZE || 'large'; document.documentElement.classList.add('text-size-'+size);
+  }catch(e){}
+  // listen for settings changes to update class immediately
+  window.__APP_OPTIONS__ = window.__APP_OPTIONS__ || {};
+  const prevApply = window.__APP_OPTIONS__.onApply;
+  window.__APP_OPTIONS__.onApply = (s)=>{
+    try{ document.documentElement.classList.remove('text-size-tiny','text-size-small','text-size-medium','text-size-large','text-size-xlarge');
+      const size = s && s.TEXT_SIZE ? s.TEXT_SIZE : (DEFAULTS.TEXT_SIZE || 'large');
+      document.documentElement.classList.add('text-size-'+size);
+    }catch(e){}
+    if(typeof prevApply === 'function') prevApply(s);
+  };
   // add a global fixed gear in top-right for easy access that toggles the panel
   const gWrap = document.createElement('div'); gWrap.className='global-gear';
   const gBtn = document.createElement('button'); gBtn.className='gear-btn'; gBtn.type='button'; gBtn.innerHTML='&#9881;'; gBtn.title='Settings';
