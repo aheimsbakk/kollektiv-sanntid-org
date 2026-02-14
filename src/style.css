@@ -1,20 +1,28 @@
+
 :root{
   --bg: linear-gradient(180deg,#0b0f1a,#081021);
   --fg: #e6eef8;
   --accent: #72e0a1;
   --danger: #ff6b6b;
   --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, 'Roboto Mono', 'Courier New', monospace;
+  --large-scale: 6vw;
 }
+
 *{box-sizing:border-box}
 html,body{height:100%;margin:0;background:var(--bg);color:var(--fg);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial}
 .app-root{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
-.board{display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center}
+.board{display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center;max-width:90vw}
 .station-header{font-weight:700;letter-spacing:1px}
-.destination{font-family:var(--mono);font-weight:800;font-size:6vw;line-height:0.9;text-shadow:0 2px 0 rgba(0,0,0,.6), 0 6px 20px rgba(0,0,0,.6)}
-.time{font-family:var(--mono);font-weight:900;font-size:5vw}
-.situation{background:var(--danger);color:white;padding:6px 12px;border-radius:8px}
+.departures{display:flex;flex-direction:column;gap:8px;width:100%;align-items:center}
+.departure{display:flex;flex-direction:column;align-items:center;padding:8px 12px;border-radius:6px;min-width:60%}
+.departure-destination{font-family:var(--mono);font-weight:900;font-size:var(--large-scale);line-height:0.9;color:var(--accent);
+  /* layered text-shadow to emulate chunky figlet look */
+  text-shadow: 0 1px 0 rgba(0,0,0,0.6), 0 2px 0 rgba(0,0,0,0.55), 0 4px 12px rgba(0,0,0,0.6);
+}
+.departure-time{font-family:var(--mono);font-weight:800;font-size:calc(var(--large-scale) * 0.8)}
+.departure-situations{color:var(--danger);font-weight:700}
+.situation-banner{background:var(--danger);color:white;padding:6px 12px;border-radius:8px;margin-bottom:6px}
 
 @media (max-width:600px){
-  .destination{font-size:10vw}
-  .time{font-size:8vw}
+  :root{--large-scale:10vw}
 }
