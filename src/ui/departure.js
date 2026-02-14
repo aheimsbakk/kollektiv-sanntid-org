@@ -18,8 +18,33 @@ export function createDepartureNode(item){
   // detect mode from various possible fields in the parsed item/raw payload
   const detectMode = () => {
     if (!item) return null;
-    const cand = item.mode || item.transportMode || (item.raw && (item.raw.transportMode || item.raw.serviceType || item.raw.product || item.raw.transportSubmode));
-    return cand || null;
+    // quick checks first
+    if (item.mode) return item.mode;
+    if (item.transportMode) return item.transportMode;
+    // search recursively in raw object for any string value that matches known tokens
+    const raw = item.raw;
+    if (!raw) return null;
+    const tokens = ['bus','tram','metro','rail','train','water','ferry','coach'];
+    const seen = new Set();
+    const stack = [raw];
+    while(stack.length){
+      const cur = stack.pop();
+      if (!cur || seen.has(cur)) continue;
+      seen.add(cur);
+      if (typeof cur === 'string'){
+        const low = cur.toLowerCase();
+        for (const t of tokens) if (low.includes(t)) return t;
+      } else if (typeof cur === 'object'){
+        if (Array.isArray(cur)){
+          for (const it of cur) stack.push(it);
+        } else {
+          for (const k of Object.keys(cur)){
+            try{ stack.push(cur[k]); }catch(e){}
+          }
+        }
+      }
+    }
+    return null;
   };
 
   function emojiForMode(mode){
