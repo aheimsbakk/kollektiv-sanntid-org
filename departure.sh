@@ -267,11 +267,39 @@ while true; do
             fi
 
             # --- Time Calculation ---
-            if date --version >/dev/null 2>&1; then
-                 DEP_SEC=$(date -d "$ISO_TIME" +%s)
-            else
-                 DEP_SEC=$(date -j -f "%Y-%m-%dT%H:%M:%S" "${ISO_TIME%.*}" +%s 2>/dev/null)
-            fi
+            # Parse ISO time robustly across environments. Prefer python3, then node, then GNU date, then BSD date.
+            iso_to_epoch_sec() {
+                local iso="$1"
+                # Try python3
+                if command -v python3 >/dev/null 2>&1; then
+                    python3 - <<PY_EOF
+import sys,datetime
+try:
+  s=sys.argv[1]
+  # fromisoformat doesn't accept Z, convert
+  s=s.replace('Z','+00:00')
+  t=datetime.datetime.fromisoformat(s)
+  print(int(t.timestamp()))
+except Exception:
+  sys.exit(2)
+PY_EOF
+                    return $?
+                fi
+                # Try node if available
+                if command -v node >/dev/null 2>&1; then
+                    node -e "const d=new Date(process.argv[1]); if(isNaN(d)){process.exit(2)}; console.log(Math.floor(d.getTime()/1000))" "$iso" 2>/dev/null
+                    return $?
+                fi
+                # GNU date
+                if date --version >/dev/null 2>&1; then
+                    date -d "$iso" +%s 2>/dev/null || return 2
+                    return $?
+                fi
+                # BSD date (macOS) fallback: strip fractional seconds and timezone Z
+                date -j -f "%Y-%m-%dT%H:%M:%S" "${iso%.*}" +%s 2>/dev/null || return 2
+            }
+
+            DEP_SEC=$(iso_to_epoch_sec "$ISO_TIME")
 
             if [ -n "$DEP_SEC" ]; then
                 DIFF_SEC=$((DEP_SEC - NOW_SEC))

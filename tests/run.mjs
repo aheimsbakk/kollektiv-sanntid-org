@@ -1,4 +1,9 @@
 import './time.test.mjs';
 import './entur.parse.test.mjs';
 import './entur.fetch.test.mjs';
+import './data-loader.test.mjs';
+import './ui.diff.test.mjs';
+import './entur.lookup.test.mjs';
+import './entur.empty.test.mjs';
+import './ui.tick.test.mjs';
 console.log('All tests completed');

@@ -12,3 +12,10 @@ const formatted = formatCountdown(epoch, now);
 assert(/^[0-9]{2}:[0-9]{2}$/.test(formatted) || formatted === 'Now', 'format should produce MM:SS or Now');
 
 console.log('time.test.mjs OK');
+
+// Additional: when hours > 0 include HH:MM:SS
+const longEpoch = now + (2 * 3600 + 5 * 60 + 7) * 1000; // 2:05:07
+const longFmt = formatCountdown(longEpoch, now);
+assert(/^[0-9]{2}:[0-9]{2}:[0-9]{2}$/.test(longFmt), 'format should produce HH:MM:SS when hours>0');
+
+console.log('time.hours.test OK');

@@ -12,6 +12,12 @@
 html,body{height:100%;margin:0;background:var(--bg);color:var(--fg);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial}
 .app-root{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
 .board{display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center;max-width:90vw}
+.header-wrap{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.header-controls{display:flex;align-items:center;gap:8px}
+.gear-btn{background:transparent;border:0;color:var(--fg);font-size:20px;cursor:pointer}
+/* global fixed gear in top-right */
+.global-gear{position:fixed;right:18px;top:18px;z-index:1300;background:rgba(0,0,0,0.35);border-radius:999px;padding:8px;display:flex;align-items:center;justify-content:center}
+.global-gear .gear-btn{font-size:26px;padding:6px;color:var(--fg)}
 .station-header{font-weight:700;letter-spacing:1px}
 .departures{display:flex;flex-direction:column;gap:8px;width:100%;align-items:center}
 .departure{display:flex;flex-direction:column;align-items:center;padding:8px 12px;border-radius:6px;min-width:60%}
@@ -26,3 +32,10 @@ html,body{height:100%;margin:0;background:var(--bg);color:var(--fg);font-family:
 @media (max-width:600px){
   :root{--large-scale:10vw}
 }
+
+/* When options panel is open shift the app content left to make room */
+body.options-open .app-root{transform:translateX(-360px);transition:transform 280ms ease-in-out}
+
+/* Ensure options panel overlays content and stays on top */
+.options-panel{position:fixed;right:0;top:0;height:100vh;width:360px;z-index:1200}
+.options-panel.open{transform:translateX(0)}

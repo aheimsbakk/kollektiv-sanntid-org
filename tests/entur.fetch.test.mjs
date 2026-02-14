@@ -15,4 +15,8 @@ const results = await fetchDepartures({stopId:'X', apiUrl:'http://fake', fetchFn
 assert(called, 'fetch should be called');
 assert(Array.isArray(results) && results.length===1, 'should parse one call');
 
+// Cache behavior test: calling again quickly should still work and values stable
+const results2 = await fetchDepartures({stopId:'X', apiUrl:'http://fake', fetchFn: mockFetch});
+assert(Array.isArray(results2) && results2.length===1, 'second fetch should also parse');
+
 console.log('entur.fetch.test.mjs OK');
