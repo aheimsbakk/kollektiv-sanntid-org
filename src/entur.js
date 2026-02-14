@@ -15,7 +15,60 @@ export function parseEnturResponse(json){
         }
       });
     }
-    return {destination, expectedDepartureISO, situations, raw: call};
+    // attempt to normalize a transport mode token from the raw call for UI convenience
+    const detectModeFromRaw = (raw) => {
+      if (!raw) return null;
+      const normalize = (v) => {
+        if (v == null) return null;
+        if (typeof v === 'string') return v;
+        if (typeof v === 'object'){
+          if (typeof v.value === 'string') return v.value;
+          if (typeof v.id === 'string') return v.id;
+          if (typeof v.name === 'string') return v.name;
+        }
+        return null;
+      };
+      const tokens = ['bus','buss','tram','trikk','metro','t-bane','tbane','subway','underground','rail','train','tog','s-tog','water','ferry','ferje','boat','ship','coach'];
+      // shallow fields
+      const shallow = ['transportMode','mode','serviceType','product','transportSubmode','vehicleMode','type'];
+      for (const k of shallow){
+        try{
+          const v = raw[k];
+          const n = normalize(v);
+          if (n){
+            const low = n.toLowerCase();
+            for (const t of tokens) if (low.includes(t)) return t;
+          }
+        }catch(e){}
+      }
+      // recursive scan for token in keys/values
+      const seen = new Set();
+      const stack = [raw];
+      while(stack.length){
+        const cur = stack.pop();
+        if (!cur || seen.has(cur)) continue;
+        seen.add(cur);
+        if (typeof cur === 'string'){
+          const low = cur.toLowerCase();
+          for (const t of tokens) if (low.includes(t)) return t;
+          continue;
+        }
+        if (Array.isArray(cur)){
+          for (const it of cur) stack.push(it);
+          continue;
+        }
+        if (typeof cur === 'object'){
+          for (const k of Object.keys(cur)){
+            try{ const lk = String(k).toLowerCase(); for (const t of tokens) if (lk.includes(t)) return t; }catch(e){}
+            try{ stack.push(cur[k]); }catch(e){}
+          }
+        }
+      }
+      return null;
+    };
+
+    const mode = detectModeFromRaw(call);
+    return {destination, expectedDepartureISO, situations, raw: call, mode};
   });
 }
 
