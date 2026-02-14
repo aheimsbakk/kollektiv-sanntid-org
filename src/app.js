@@ -23,9 +23,11 @@ async function init(){
   const board = createBoardElements(DEFAULTS.STATION_NAME);
   // header controls with gear
   const headerControls = createHeaderToggle(()=>{ opts.open(); });
-  // attach header controls into header-wrap; fall back to append if structure differs
+  // attach header controls into header-wrap; place controls to the right without affecting centering
   const headerWrap = board.el.headerWrap || board.el.querySelector('.header-wrap') || board.el;
-  headerWrap.appendChild(headerControls.el);
+  // create a right-side container that will be positioned absolutely so the title remains centered
+  const headerRight = document.createElement('div'); headerRight.className='header-right'; headerRight.appendChild(headerControls.el);
+  headerWrap.appendChild(headerRight);
 
   // options panel
   const opts = createOptionsPanel(DEFAULTS, (newOpts)=>{

@@ -35,13 +35,21 @@ export async function fetchDepartures({stopId, numDepartures=2, modes=['bus'], a
   // unquoted-enum-like form (BUS,TRAM...).
   const modesSingleLiteral = `"${modes.join(', ')}"`;
   const modesQuotedArrayLiteral = modes.map(m => `"${m}"`).join(',');
-  // Entur expects lowercase enum tokens; ensure we produce lowercase literal tokens
-  const modesEnumArrayLiteral = modes.map(m => m.toLowerCase()).join(',');
+  // Prepare variables and enum literal forms (lower and upper) to try.
+  const modesVarsLower = modes.map(m => String(m).toLowerCase());
+  const modesVarsUpper = modes.map(m => String(m).toUpperCase());
+  const modesEnumArrayLiteralLower = modesVarsLower.join(',');
+  const modesEnumArrayLiteralUpper = modesVarsUpper.join(',');
 
+  // Build GraphQL operation. If opts.useVariables is true we inject a $modes
+  // variable into the operation signature and reference it in place of an
+  // inline literal. We always return { query, variables } where variables may
+  // be null.
   const buildQuery = (opts = {}) => {
-    const { includeModes = false, modesLiteral = '' } = opts;
-    const modesPart = includeModes ? `, whiteListedModes: [${modesLiteral}]` : '';
-    return `{
+    const { includeModes = false, modesLiteral = '', useVariables = false, variableValues = null } = opts;
+    const modesPart = includeModes ? (useVariables ? `, whiteListedModes: $modes` : `, whiteListedModes: [${modesLiteral}]`) : '';
+    const varSig = useVariables && includeModes ? '($modes: [TransportMode!])' : '';
+    const query = `query ${varSig} {
     stopPlace(id: "${stopId}") {
       estimatedCalls(numberOfDepartures: ${numDepartures}${modesPart}) {
         expectedDepartureTime
@@ -50,11 +58,13 @@ export async function fetchDepartures({stopId, numDepartures=2, modes=['bus'], a
       }
     }
   }`;
+    return { query, variables: useVariables && variableValues ? { modes: variableValues } : null };
   };
 
   // helper to POST and parse safely
-  async function postAndParse(q){
-    const resp = await fetchFn(apiUrl, {method:'POST', headers:{'Content-Type':'application/json','ET-Client-Name':clientName}, body: JSON.stringify({query: q})});
+  async function postAndParse(q, variables = null){
+    const payload = variables ? { query: q, variables } : { query: q };
+    const resp = await fetchFn(apiUrl, {method:'POST', headers:{'Content-Type':'application/json','ET-Client-Name':clientName}, body: JSON.stringify(payload)});
     if (!resp) throw new Error('Empty response from fetch');
     if (typeof resp.ok !== 'undefined' && resp.ok === false) {
       const txt = typeof resp.text === 'function' ? await resp.text().catch(()=>'<no body>') : '<no body>';
@@ -73,21 +83,29 @@ export async function fetchDepartures({stopId, numDepartures=2, modes=['bus'], a
   // Try multiple query forms until one returns departures: no-filter first,
   // then single-string, then quoted-array, then enum-like array. Capture
   // the last request/response snippet for debug panels when available.
-  // If caller supplied modes, prefer queries that include whiteListedModes
+  // If caller supplied modes, prefer queries that include whiteListedModes.
+  // Try variable-based forms first (lowercase then uppercase), then inline
+  // literal forms. Finally fall back to no-filter.
   let variants;
   if (Array.isArray(modes) && modes.length > 0){
     variants = [
+      { name: 'vars-lower', opts: { includeModes: true, useVariables: true, variableValues: modesVarsLower } },
+      { name: 'vars-upper', opts: { includeModes: true, useVariables: true, variableValues: modesVarsUpper } },
       { name: 'single-string', opts: { includeModes: true, modesLiteral: modesSingleLiteral } },
       { name: 'quoted-array', opts: { includeModes: true, modesLiteral: modesQuotedArrayLiteral } },
-      { name: 'enum-array', opts: { includeModes: true, modesLiteral: modesEnumArrayLiteral } },
+      { name: 'enum-array-lower', opts: { includeModes: true, modesLiteral: modesEnumArrayLiteralLower } },
+      { name: 'enum-array-upper', opts: { includeModes: true, modesLiteral: modesEnumArrayLiteralUpper } },
       { name: 'no-filter', opts: { includeModes: false } }
     ];
   } else {
     variants = [
       { name: 'no-filter', opts: { includeModes: false } },
+      { name: 'vars-lower', opts: { includeModes: true, useVariables: true, variableValues: modesVarsLower } },
+      { name: 'vars-upper', opts: { includeModes: true, useVariables: true, variableValues: modesVarsUpper } },
       { name: 'single-string', opts: { includeModes: true, modesLiteral: modesSingleLiteral } },
       { name: 'quoted-array', opts: { includeModes: true, modesLiteral: modesQuotedArrayLiteral } },
-      { name: 'enum-array', opts: { includeModes: true, modesLiteral: modesEnumArrayLiteral } }
+      { name: 'enum-array-lower', opts: { includeModes: true, modesLiteral: modesEnumArrayLiteralLower } },
+      { name: 'enum-array-upper', opts: { includeModes: true, modesLiteral: modesEnumArrayLiteralUpper } }
     ];
   }
   let json, resp, usedVariant = null;
@@ -96,10 +114,12 @@ export async function fetchDepartures({stopId, numDepartures=2, modes=['bus'], a
   // iterate variants, but propagate network/parsing errors (e.g. 5xx) only if they
   // are not recoverable; for validation errors we continue to next variant.
   for (const v of variants){
-    const q = buildQuery(v.opts);
-    lastDebug.request = { variant: v.name, query: q };
+    const built = buildQuery(v.opts);
+    const q = built.query;
+    const variables = built.variables;
+    lastDebug.request = { variant: v.name, query: q, variables };
     try{
-      ({ json, resp } = await postAndParse(q));
+      ({ json, resp } = await postAndParse(q, variables));
       // If GraphQL returned an errors array, treat it as a validation/AST
       // error for this variant and continue to next variant.
       if (json && Array.isArray(json.errors) && json.errors.length){
@@ -186,7 +206,10 @@ export async function fetchDepartures({stopId, numDepartures=2, modes=['bus'], a
     }
     return false;
   }
-  if (Array.isArray(modes) && modes.length>0){
+  // Only apply client-side filtering when we fell back to a no-filter query on
+  // the server. If the usedVariant already included a modes filter, trust the
+  // server results.
+  if (Array.isArray(modes) && modes.length>0 && usedVariant === 'no-filter'){
     try{
       parsed = parsed.filter(p => rawMatchesModes(p.raw, modes));
     }catch(e){/* ignore filtering errors */}

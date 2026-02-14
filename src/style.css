@@ -12,13 +12,16 @@
 html,body{height:100%;margin:0;background:var(--bg);color:var(--fg);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial}
 .app-root{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
 .board{display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center;max-width:90vw}
-.header-wrap{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.header-wrap{display:flex;align-items:center;justify-content:center;margin-bottom:12px;width:100%;position:relative}
+.header-left{display:flex;flex-direction:column;align-items:center}
 .header-controls{display:flex;align-items:center;gap:8px}
+.header-right{position:absolute;right:0;top:0;display:flex;align-items:center}
 .gear-btn{background:transparent;border:0;color:var(--fg);font-size:20px;cursor:pointer}
 /* global fixed gear in top-right */
 .global-gear{position:fixed;right:18px;top:18px;z-index:1300;background:rgba(0,0,0,0.35);border-radius:999px;padding:8px;display:flex;align-items:center;justify-content:center}
 .global-gear .gear-btn{font-size:26px;padding:6px;color:var(--fg)}
-.station-header{font-weight:700;letter-spacing:1px}
+.station-title{font-weight:700;letter-spacing:1px}
+.status-chip{font-size:12px;padding:4px 8px;border-radius:999px;background:rgba(255,255,255,0.06);display:inline-block;margin-top:6px}
 .departures{display:flex;flex-direction:column;gap:8px;width:100%;align-items:center}
 .departure{display:flex;flex-direction:column;align-items:center;padding:8px 12px;border-radius:6px;min-width:60%}
 .departure-destination{font-family:var(--mono);font-weight:900;font-size:var(--large-scale);line-height:0.9;color:var(--accent);

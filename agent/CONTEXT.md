@@ -6,6 +6,7 @@ Last 3 Changes:
 - agent/worklogs/2026-02-15-01-25-ensure-options-overlay-css.md
 
 Next Steps:
-Next Steps:
 - Persist settings to localStorage and add keyboard/ESC to close options (done).
 - Add focus trap and small DOM accessibility improvements (done).
+
+Recent UI tweak: moved status chip below station title so "Live"/"Demo" appears under the station name.

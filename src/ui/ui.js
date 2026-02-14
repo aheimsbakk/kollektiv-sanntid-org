@@ -1,12 +1,17 @@
 // Minimal UI helpers: create container and manage departure list
 export function createBoardElements(stationName){
   const el = document.createElement('div'); el.className='board';
-  const header = document.createElement('div'); header.className='station-header'; header.textContent = stationName || '';
+  // station title (used by app.js as .station-title)
+  const header = document.createElement('div'); header.className='station-title'; header.textContent = stationName || '';
+  // status chip (Live / Demo) should appear under the station title
   const status = document.createElement('div'); status.className='status-chip'; status.style.display='none';
   const banner = document.createElement('div'); banner.className='situation-banner'; banner.style.display='none';
   const list = document.createElement('div'); list.className='departures';
   const headerWrap = document.createElement('div'); headerWrap.className='header-wrap';
-  headerWrap.append(header, status);
+  // header-left stacks title and status vertically; header-controls (gear) live to the right
+  const headerLeft = document.createElement('div'); headerLeft.className = 'header-left';
+  headerLeft.append(header, status);
+  headerWrap.append(headerLeft);
   el.append(headerWrap, banner, list);
   // expose header-wrap for other modules to attach controls
   el.headerWrap = headerWrap;
