@@ -14,3 +14,5 @@ Recent UI tweak: moved status chip below station title so "Live"/"Demo" appears 
 Options panel behavior: pressing Enter in text/number fields now applies settings immediately without closing the panel; toggling transport mode checkboxes and changing text size select also apply immediately.
 
 UX tweak: small toast is shown when settings are applied; transport-mode checkbox changes are debounced (500ms) to avoid rapid network refreshes.
+
+Typography: reduced all defined text-size scales by 20% per request (tiny/small/medium/large/xlarge).
