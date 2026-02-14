@@ -69,3 +69,6 @@ body.options-open .app-root{transform:translateX(-360px);transition:transform 28
 
 /* toast for small visual confirmation inside options panel */
 .options-toast{position:absolute;left:12px;right:12px;bottom:18px;padding:8px 12px;background:rgba(0,0,0,0.6);color:var(--fg);border-radius:6px;transition:opacity 240ms ease-in-out}
+
+.emoji-debug-btn{position:fixed;left:18px;bottom:18px;z-index:1400;background:rgba(0,0,0,0.5);border:0;color:var(--fg);padding:8px 10px;border-radius:8px;cursor:pointer}
+.emoji-debug-panel{box-shadow:0 6px 18px rgba(0,0,0,0.6)}

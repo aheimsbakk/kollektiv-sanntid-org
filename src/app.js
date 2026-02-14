@@ -103,6 +103,25 @@ async function init(){
   gWrap.appendChild(gBtn);
   document.body.appendChild(gWrap);
   ROOT.appendChild(board.el);
+  // Expose a small debug button that shows emoji detection snapshots for easier discovery
+  try{
+    const dbgBtn = document.createElement('button'); dbgBtn.className='emoji-debug-btn'; dbgBtn.type='button'; dbgBtn.textContent = '🐞 Debug';
+    dbgBtn.title = 'Show emoji detection diagnostics';
+    dbgBtn.addEventListener('click', ()=>{
+      const existing = document.querySelector('.emoji-debug-panel');
+      if (existing){ existing.remove(); return; }
+      const panel = document.createElement('div'); panel.className='emoji-debug-panel';
+      panel.style.position = 'fixed'; panel.style.left='12px'; panel.style.bottom='12px'; panel.style.zIndex='1400'; panel.style.maxWidth='40vw'; panel.style.maxHeight='40vh'; panel.style.overflow='auto'; panel.style.background='rgba(0,0,0,0.7)'; panel.style.color='var(--fg)'; panel.style.padding='8px'; panel.style.borderRadius='8px';
+      const title = document.createElement('div'); title.textContent = 'Emoji diagnostics'; title.style.fontWeight='700'; title.style.marginBottom='6px'; panel.appendChild(title);
+      const list = document.createElement('pre'); list.style.whiteSpace='pre-wrap'; list.style.fontSize='12px'; list.style.lineHeight='1.2';
+      const snapshots = (typeof window !== 'undefined' && window.__EMOJI_DEBUG__) ? window.__EMOJI_DEBUG__ : [];
+      list.textContent = snapshots.length ? JSON.stringify(snapshots, null, 2) : 'No snapshots yet. Reproduce by letting the app fetch live departures.';
+      panel.appendChild(list);
+      document.body.appendChild(panel);
+    });
+    // place near gear
+    document.body.appendChild(dbgBtn);
+  }catch(e){}
   // Debugging is disabled by default. To enable, set `window.__ENTUR_DEBUG_PANEL__ = fn` from the console.
   // Try live data first, fall back to demo
   let data = [];

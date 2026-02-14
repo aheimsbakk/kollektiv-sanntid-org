@@ -20,3 +20,5 @@ Typography: reduced all defined text-size scales by 20% per request (tiny/small/
 Planned: add transport-type emoji before countdown (UI-only heuristic). Worklog created at agent/worklogs/2026-02-15-add-emoji-mapping.md.
 
 Added runtime emoji detection diagnostics: when detection fails a compact snapshot is appended to `window.__EMOJI_DEBUG__` (bounded array) and a console warning is emitted. See `agent/worklogs/2026-02-15-add-emoji-debugging.md`.
+
+Added a visible "🐞 Debug" button in the lower-left that opens a panel showing `window.__EMOJI_DEBUG__` snapshots for easy inspection.
