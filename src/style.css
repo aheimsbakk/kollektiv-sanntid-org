@@ -34,6 +34,7 @@ html,body{height:100%;margin:0;background:var(--bg);color:var(--fg);font-family:
 }
 
 /* Text size utility classes */
+.text-size-defaults:root{--scale-tiny:0.5;--scale-small:0.75;--scale-medium:0.9;--scale-large:1;--scale-xlarge:1.25}
 :root{--scale-tiny:0.5;--scale-small:0.75;--scale-medium:0.9;--scale-large:1;--scale-xlarge:1.25}
 .text-size-tiny .departure-destination{font-size:calc(var(--large-scale) * var(--scale-tiny))}
 .text-size-small .departure-destination{font-size:calc(var(--large-scale) * var(--scale-small))}

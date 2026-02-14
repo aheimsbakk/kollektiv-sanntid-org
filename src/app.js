@@ -70,14 +70,14 @@ async function init(){
   }catch(e){/*ignore*/}
   // apply text size class
   try{ document.documentElement.classList.remove('text-size-tiny','text-size-small','text-size-medium','text-size-large','text-size-xlarge');
-    const size = DEFAULTS.TEXT_SIZE || 'large'; document.documentElement.classList.add('text-size-'+size);
+    const size = DEFAULTS.TEXT_SIZE || 'medium'; document.documentElement.classList.add('text-size-'+size);
   }catch(e){}
   // listen for settings changes to update class immediately
   window.__APP_OPTIONS__ = window.__APP_OPTIONS__ || {};
   const prevApply = window.__APP_OPTIONS__.onApply;
   window.__APP_OPTIONS__.onApply = (s)=>{
     try{ document.documentElement.classList.remove('text-size-tiny','text-size-small','text-size-medium','text-size-large','text-size-xlarge');
-      const size = s && s.TEXT_SIZE ? s.TEXT_SIZE : (DEFAULTS.TEXT_SIZE || 'large');
+    const size = s && s.TEXT_SIZE ? s.TEXT_SIZE : (DEFAULTS.TEXT_SIZE || 'medium');
       document.documentElement.classList.add('text-size-'+size);
     }catch(e){}
     if(typeof prevApply === 'function') prevApply(s);

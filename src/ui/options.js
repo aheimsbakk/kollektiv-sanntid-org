@@ -27,7 +27,7 @@ export function createOptionsPanel(defaults, onApply){
   const lblSize = document.createElement('label'); lblSize.textContent = 'Text size';
   const selSize = document.createElement('select');
   ['tiny','small','medium','large','xlarge'].forEach(s=>{ const o=document.createElement('option'); o.value=s; o.textContent=s; selSize.appendChild(o); });
-  selSize.value = defaults.TEXT_SIZE || 'large';
+  selSize.value = defaults.TEXT_SIZE || 'medium';
   rowSize.append(lblSize, selSize);
 
   // transport modes (multiple checkboxes)
