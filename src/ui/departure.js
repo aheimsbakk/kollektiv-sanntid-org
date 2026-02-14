@@ -1,11 +1,12 @@
 export function createDepartureNode(item){
   const container = document.createElement('div'); container.className='departure';
   const dest = document.createElement('div'); dest.className='departure-destination'; dest.textContent = item.destination || '—';
-  // time and emoji
+
+  // time and emoji container
   const time = document.createElement('div'); time.className='departure-time';
   const timeWrap = document.createElement('div'); timeWrap.className = 'departure-time-wrap';
   const emojiEl = document.createElement('span'); emojiEl.className = 'departure-emoji';
-  // compute epoch ms robustly; store as dataset string only when valid
+
   // compute epoch ms robustly; store as dataset string only when valid
   const epochMs = (item && item.expectedDepartureISO) ? Date.parse(item.expectedDepartureISO) : NaN;
   if (Number.isFinite(epochMs)) {
@@ -14,7 +15,9 @@ export function createDepartureNode(item){
     time.dataset.epochMs = '';
     time.textContent = '—';
   }
+
   const situ = document.createElement('div'); situ.className='departure-situations'; situ.textContent = (item.situations || []).join('; ');
+
   // detect mode from various possible fields in the parsed item/raw payload
   const detectMode = () => {
     if (!item) return null;
