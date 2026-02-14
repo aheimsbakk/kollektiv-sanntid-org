@@ -21,9 +21,21 @@ export function createDepartureNode(item){
   // detect mode from various possible fields in the parsed item/raw payload
   const detectMode = () => {
     if (!item) return null;
-    // quick checks first
-    if (item.mode) return item.mode;
-    if (item.transportMode) return item.transportMode;
+    // quick checks first; normalize candidates to strings when possible
+    const normalize = (v) => {
+      if (v == null) return null;
+      if (typeof v === 'string') return v;
+      if (typeof v === 'object'){
+        if (typeof v.value === 'string') return v.value;
+        if (typeof v.id === 'string') return v.id;
+        if (typeof v.name === 'string') return v.name;
+      }
+      return null;
+    };
+    const nm = normalize(item.mode);
+    if (nm) return nm;
+    const nt = normalize(item.transportMode);
+    if (nt) return nt;
     // inspect common shallow fields that may be objects
     const shallowCandidates = ['transportMode','serviceType','product','transportSubmode'];
     for (const k of shallowCandidates){
@@ -52,6 +64,13 @@ export function createDepartureNode(item){
         for (const t of tokens) if (low.includes(t)) return t;
         continue;
       }
+      if (typeof cur === 'object'){
+        // try to normalize object values
+        const norm = normalize(cur);
+        if (norm){
+          const low = norm.toLowerCase();
+          for (const t of tokens) if (low.includes(t)) return t;
+        }
       if (typeof cur === 'object'){
         if (Array.isArray(cur)){
           for (const it of cur) stack.push(it);
