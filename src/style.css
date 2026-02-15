@@ -6,12 +6,17 @@
   --danger: #ff6b6b;
   --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, 'Roboto Mono', 'Courier New', monospace;
   --large-scale: 6vw;
+  /* spacing tokens to keep vertical rhythm consistent */
+  --vertical-gap: 12px;
+  --header-gap: 6px;
+  --departure-padding: 6px 10px;
+  --departure-max-width: 720px;
 }
 
 *{box-sizing:border-box}
 html,body{height:100%;margin:0;background:var(--bg);color:var(--fg);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial}
 .app-root{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
-.board{display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;max-width:90vw}
+.board{display:flex;flex-direction:column;align-items:center;gap:var(--header-gap);text-align:center;max-width:90vw}
 .header-wrap{display:flex;align-items:center;justify-content:center;margin-bottom:6px;width:100%;position:relative}
 .header-left{display:flex;flex-direction:column;align-items:center}
 .header-controls{display:flex;align-items:center;gap:8px}
@@ -23,17 +28,26 @@ html,body{height:100%;margin:0;background:var(--bg);color:var(--fg);font-family:
 .station-title{font-weight:700;letter-spacing:1px;/* shrink station title by 20% */ font-size:0.8em}
 .status-chip{font-size:12px;padding:4px 8px;border-radius:999px;background:rgba(255,255,255,0.06);display:inline-block;margin-top:6px}
 .departures{
-  /* SPACE BETWEEN STATION ROWS
-     Adjust this `gap` to change vertical spacing between each station row
-     e.g. `gap: 8px` (tighter) → `gap: 16px` (looser) */
-  display:flex;flex-direction:column;gap:0px;width:100%;align-items:center
+  /* SPACE BETWEEN STATION ROWS — use single vertical spacing token */
+  display:flex;
+  flex-direction:column;
+  gap:var(--vertical-gap);
+  width:100%;
+  align-items:center;
 }
 .departure{
   /* SPACE BETWEEN DESTINATION AND COUNTDOWN
-     Adjust this `row-gap` to change spacing between the destination line
-     and the countdown within a station row. Keep this equal to `.departures gap`
-     to make internal spacing match inter-station spacing. */
-  display:flex;flex-direction:column;align-items:center;border-radius:6px;min-width:60%;row-gap:12px
+     Use a single `gap` value and constrain width instead of forcing min-width.
+     This keeps rows compact and predictable across viewports. */
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:var(--vertical-gap);
+  padding:var(--departure-padding);
+  border-radius:6px;
+  width:100%;
+  max-width:var(--departure-max-width);
+  box-sizing:border-box;
 }
 .departure-destination{
   /* use the app's proportional UI font here; reserve monospace for timers */
@@ -42,17 +56,19 @@ html,body{height:100%;margin:0;background:var(--bg);color:var(--fg);font-family:
   font-size:calc(var(--large-scale) * 0.8);
   line-height:0.95;
   color:var(--accent);
-  /* inline so emoji stays with text and wraps naturally on narrow screens */
-  display:inline-block;
+  /* make destination a block so it wraps cleanly and doesn't introduce baseline gaps */
+  display:block;
+  margin:0;
+  padding:0;
   white-space:normal;
   word-break:break-word;
   text-align:center;
   /* layered text-shadow to emulate chunky figlet look */
   text-shadow: 0 1px 0 rgba(0,0,0,0.6), 0 2px 0 rgba(0,0,0,0.55), 0 4px 12px rgba(0,0,0,0.6);
 }
-.departure-time{font-family:var(--mono);font-weight:800}
+.departure-time{font-family:var(--mono);font-weight:800;margin:0;padding:0}
 .departure-time-wrap{font-family:var(--mono);font-weight:800;font-size:calc(var(--large-scale) * 0.8 * 0.8)}
-.departure-situations{color:var(--danger);font-weight:700}
+.departure-situations{color:var(--danger);font-weight:700;margin:0;padding:0}
 .situation-banner{display:none} /* removed: global banner no longer used */
 
 .empty-state{color:rgba(230,238,248,0.8);font-weight:700;padding:12px 10px;border-radius:6px}
