@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Pre-commit hook: validate worklogs before allowing a commit
+# This hook expects the repository to include scripts/validate_worklogs.sh
+# and will run it with no arguments (so it validates staged files in the index).
+
+echo "Running worklog validator (scripts/validate_worklogs.sh)"
+./scripts/validate_worklogs.sh
+
+if [ $? -ne 0 ]; then
+  echo "Worklog validation failed. Fix worklogs or move invalid files to agent/worklogs/archived/ before committing." >&2
+  exit 1
+fi
+
+exit 0
