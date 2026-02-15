@@ -26,6 +26,17 @@ function renderDepartures(listEl, items){
 }
 
 async function init(){
+  // load persisted settings (if any) BEFORE building the UI so the station
+  // title and options panel reflect saved preferences on startup
+  try{
+    const saved = localStorage.getItem('departure:settings');
+    if (saved){
+      const s = JSON.parse(saved);
+      // merge into DEFAULTS to preserve keys
+      Object.assign(DEFAULTS, s);
+    }
+  }catch(e){/*ignore*/}
+
   const board = createBoardElements(DEFAULTS.STATION_NAME);
   // header controls with gear
   const headerControls = createHeaderToggle(()=>{ opts.open(); });
@@ -68,15 +79,6 @@ async function init(){
   document.body.appendChild(opts.panel);
   // expose control so header toggle can call opts.open()
   window.__APP_OPTIONS__ = opts;
-  // load persisted settings (if any)
-  try{
-    const saved = localStorage.getItem('departure:settings');
-    if (saved){
-      const s = JSON.parse(saved);
-      // merge into DEFAULTS to preserve keys
-    Object.assign(DEFAULTS, s);
-    }
-  }catch(e){/*ignore*/}
   // apply text size class
   try{ document.documentElement.classList.remove('text-size-tiny','text-size-small','text-size-medium','text-size-large','text-size-xlarge');
     const size = DEFAULTS.TEXT_SIZE || 'medium'; document.documentElement.classList.add('text-size-'+size);
