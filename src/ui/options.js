@@ -34,7 +34,7 @@ export function createOptionsPanel(defaults, onApply){
   const rowModes = document.createElement('div'); rowModes.className='options-row';
   const lblModes = document.createElement('label'); lblModes.textContent = 'Transport modes (filter)';
   const modesWrap = document.createElement('div'); modesWrap.className='modes-checkboxes';
-  const POSSIBLE = ['bus','tram','metro','rail','water','coach'];
+  const POSSIBLE = ['bus','tram','metro','rail','water'];
   // helper to map mode -> emoji used in the UI
   const emojiForMode = (mode) => {
     if(!mode) return '🚆';
@@ -52,7 +52,7 @@ export function createOptionsPanel(defaults, onApply){
     const lab = document.createElement('label'); lab.className = 'mode-checkbox-label';
     const icon = document.createElement('span'); icon.className = 'mode-icon'; icon.setAttribute('aria-hidden','true'); icon.textContent = emojiForMode(m);
     const cb = document.createElement('input'); cb.type='checkbox'; cb.value = m; cb.checked = (defaults.TRANSPORT_MODES || []).includes(m);
-    const span = document.createElement('span'); span.textContent = m; span.style.marginLeft = '6px';
+    const span = document.createElement('span'); span.textContent = m.charAt(0).toUpperCase() + m.slice(1); span.style.marginLeft = '6px';
     lab.append(icon, cb, span);
     modesWrap.append(lab);
   });
