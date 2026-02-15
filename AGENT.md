@@ -39,7 +39,7 @@
 3. **Test:** Create, and run unit tests.
     - **Test fail**: Problem solve, code and test until success.
     - **Improve unit tests:** (Optional) Improve edge case testing.
-4. **Create:** Generate the worklog file BEFORE committing.
+4. **Create:** Generate the worklog file BEFORE committing. Validate worklog file.
 5. **Commit:** Commit changes + worklog.
    - **Commit message:** Conventional commit message format. 
 
