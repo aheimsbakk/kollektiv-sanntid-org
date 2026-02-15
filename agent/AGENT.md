@@ -18,6 +18,8 @@
   ```
 - **Body:** 1–3 sentences summarizing changes and files touched.
 - **Safety:** NO secrets, API keys, or prompt text.
+- **Template:** agent/WORKLOG_TEMPLATE.md
+- **Validate:** ALWAYS validate the worklog with scripts/validate_worklogs.sh
 
 ### 1.2. State Compaction (Short-term Memory)
 - **Action:** Immediately after creating a granular log, create or update `agent/CONTEXT.md`.
