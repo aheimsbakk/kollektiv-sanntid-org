@@ -44,3 +44,4 @@ This repository is a small, dependency-free departure board implemented with van
 
 ## License
 - MIT
+
