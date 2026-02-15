@@ -8,7 +8,7 @@ set -euo pipefail
 # If no files are provided the script validates staged files in the git index
 # (original behavior). Supports -h/--help and -v/--version.
 
-VERSION="0.2.0"
+VERSION="0.2.1"
 REQUIRED_SEQ="when,why,what,model,tags"
 
 print_help() {
