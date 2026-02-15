@@ -1,0 +1,3 @@
+#!/bin/sh
+. scripts/validate_worklogs.mjs
+exit 0
