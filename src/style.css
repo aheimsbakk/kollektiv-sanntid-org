@@ -26,14 +26,14 @@ html,body{height:100%;margin:0;background:var(--bg);color:var(--fg);font-family:
   /* SPACE BETWEEN STATION ROWS
      Adjust this `gap` to change vertical spacing between each station row
      e.g. `gap: 8px` (tighter) → `gap: 16px` (looser) */
-  display:flex;flex-direction:column;gap:12px;width:100%;align-items:center
+  display:flex;flex-direction:column;gap:0px;width:100%;align-items:center
 }
 .departure{
   /* SPACE BETWEEN DESTINATION AND COUNTDOWN
      Adjust this `row-gap` to change spacing between the destination line
      and the countdown within a station row. Keep this equal to `.departures gap`
      to make internal spacing match inter-station spacing. */
-  display:flex;flex-direction:column;align-items:center;padding:6px 10px;border-radius:6px;min-width:60%;row-gap:12px
+  display:flex;flex-direction:column;align-items:center;border-radius:6px;min-width:60%;row-gap:12px
 }
 .departure-destination{
   /* use the app's proportional UI font here; reserve monospace for timers */
@@ -53,7 +53,7 @@ html,body{height:100%;margin:0;background:var(--bg);color:var(--fg);font-family:
 .departure-time{font-family:var(--mono);font-weight:800}
 .departure-time-wrap{font-family:var(--mono);font-weight:800;font-size:calc(var(--large-scale) * 0.8 * 0.8)}
 .departure-situations{color:var(--danger);font-weight:700}
-.situation-banner{background:var(--danger);color:white;padding:6px 12px;border-radius:8px;margin-bottom:6px}
+.situation-banner{display:none} /* removed: global banner no longer used */
 
 .empty-state{color:rgba(230,238,248,0.8);font-weight:700;padding:12px 10px;border-radius:6px}
 

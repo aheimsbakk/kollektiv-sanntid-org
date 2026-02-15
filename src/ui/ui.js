@@ -5,14 +5,13 @@ export function createBoardElements(stationName){
   const header = document.createElement('div'); header.className='station-title'; header.textContent = stationName || '';
   // status chip (Live / Demo) should appear under the station title
   const status = document.createElement('div'); status.className='status-chip'; status.style.display='none';
-  const banner = document.createElement('div'); banner.className='situation-banner'; banner.style.display='none';
   const list = document.createElement('div'); list.className='departures';
   const headerWrap = document.createElement('div'); headerWrap.className='header-wrap';
   // header-left stacks title and status vertically; header-controls (gear) live to the right
   const headerLeft = document.createElement('div'); headerLeft.className = 'header-left';
   headerLeft.append(header, status);
   headerWrap.append(headerLeft);
-  el.append(headerWrap, banner, list);
+  el.append(headerWrap, list);
   // expose header-wrap for other modules to attach controls
   el.headerWrap = headerWrap;
   const debug = document.createElement('pre'); debug.className='debug-panel'; debug.style.display='none'; debug.style.maxWidth='90vw'; debug.style.overflow='auto'; debug.style.padding='8px'; debug.style.background='rgba(0,0,0,0.4)'; debug.style.borderRadius='6px'; debug.style.color='var(--fg)';
@@ -24,7 +23,7 @@ export function createBoardElements(stationName){
     }catch(e){ debug.textContent = String(obj); }
   };
   el.append(debug);
-  return {el, header, list, banner, status, debug};
+  return {el, header, list, status, debug};
 }
 
 export function clearList(listEl){

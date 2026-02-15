@@ -138,9 +138,7 @@ async function init(){
   }
   tickCountdowns();
   setInterval(tickCountdowns, 1000);
-  // if any situation exists show single banner
-  const anySitu = data.find(d=>Array.isArray(d.situations) && d.situations.length);
-  if(anySitu && board.banner){ board.banner.textContent = anySitu.situations.join('; '); board.banner.style.display = 'block'; }
+  // departure-specific situation lines are shown per-item; global banner removed
   // show diagnostics when live fetch returned empty results
   if(board.debug){
     if(board.status && board.status.textContent === 'Live' && data.length===0){
