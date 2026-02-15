@@ -7,10 +7,20 @@ set -euo pipefail
 
 echo "Running worklog auto-fixer and validator"
 # First, attempt to auto-fix any invalid worklogs staged for commit
-./scripts/fix_worklogs.sh
+# Run scripts via the interpreter to avoid requiring the executable bit on
+# the script files (some checkouts may not preserve file mode).
+if [ -x ./scripts/fix_worklogs.sh ]; then
+  ./scripts/fix_worklogs.sh
+else
+  bash ./scripts/fix_worklogs.sh
+fi
 
 # Then run validator on staged files
-./scripts/validate_worklogs.sh
+if [ -x ./scripts/validate_worklogs.sh ]; then
+  ./scripts/validate_worklogs.sh
+else
+  bash ./scripts/validate_worklogs.sh
+fi
 
 if [ $? -ne 0 ]; then
   echo "Worklog validation failed and auto-fix could not repair all files. Abort commit." >&2
