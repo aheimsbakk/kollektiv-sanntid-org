@@ -14,11 +14,12 @@ export function createBoardElements(stationName){
   el.append(headerWrap, list);
   // expose header-wrap for other modules to attach controls
   el.headerWrap = headerWrap;
-  const debug = document.createElement('pre'); debug.className='debug-panel'; debug.style.display='none'; debug.style.maxWidth='90vw'; debug.style.overflow='auto'; debug.style.padding='8px'; debug.style.background='rgba(0,0,0,0.4)'; debug.style.borderRadius='6px'; debug.style.color='var(--fg)';
+  const debug = document.createElement('pre'); debug.className='debug-panel';
   // expose helper to set debug content; keep it minimal so callers can append
   debug.setDebug = (obj) => {
     try{
-      debug.style.display = 'block';
+      // Use CSS class to control visibility so theming via CSS variables works
+      debug.classList.add('open');
       debug.textContent = typeof obj === 'string' ? obj : JSON.stringify(obj, null, 2);
     }catch(e){ debug.textContent = String(obj); }
   };

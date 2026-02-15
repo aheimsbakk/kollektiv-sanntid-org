@@ -2,10 +2,19 @@
 :root{
   --bg: linear-gradient(180deg,#0b0f1a,#081021);
   --fg: #e6eef8;
+  --fg-dim: rgba(230,238,248,0.8);
   --accent: #72e0a1;
   --danger: #ff6b6b;
   --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, 'Roboto Mono', 'Courier New', monospace;
   --large-scale: 6vw;
+  /* overlay / shadow tokens to replace rgba literals */
+  --overlay-weak: rgba(0,0,0,0.35);
+  --overlay-strong: rgba(0,0,0,0.6);
+  --overlay-shadow-color: rgba(0,0,0,0.35);
+  --shadow-1: rgba(0,0,0,0.6);
+  --shadow-2: rgba(0,0,0,0.55);
+  --shadow-3: rgba(0,0,0,0.6);
+  --border-muted: rgba(255,255,255,0.08);
   /* spacing tokens to keep vertical rhythm consistent */
   /* --vertical-gap: 12px;
   --header-gap: 6px;
@@ -29,10 +38,10 @@ html,body{height:100%;margin:0;background:var(--bg);color:var(--fg);font-family:
 .header-right{position:absolute;right:0;top:0;display:flex;align-items:center}
 .gear-btn{background:transparent;border:0;color:var(--fg);font-size:20px;cursor:pointer}
 /* global fixed gear in top-right */
-.global-gear{position:fixed;right:18px;top:18px;z-index:1300;background:rgba(0,0,0,0.35);border-radius:999px;padding:8px;display:flex;align-items:center;justify-content:center}
+.global-gear{position:fixed;right:18px;top:18px;z-index:1300;background:var(--overlay-weak);border-radius:999px;padding:8px;display:flex;align-items:center;justify-content:center}
 .global-gear .gear-btn{font-size:26px;padding:6px;color:var(--fg)}
 .station-title{font-weight:700;letter-spacing:1px;/* shrink station title by 20% */ font-size:0.8em}
-.status-chip{font-size:12px;padding:4px 8px;border-radius:999px;background:rgba(255,255,255,0.06);display:inline-block;margin-top:6px}
+.status-chip{font-size:12px;padding:4px 8px;border-radius:999px;background:var(--overlay-weak);display:inline-block;margin-top:6px}
 .departures{
   /* SPACE BETWEEN STATION ROWS — use single vertical spacing token */
   display:flex;
@@ -70,18 +79,22 @@ html,body{height:100%;margin:0;background:var(--bg);color:var(--fg);font-family:
   word-break:break-word;
   text-align:center;
   /* layered text-shadow to emulate chunky figlet look */
-  text-shadow: 0 1px 0 rgba(0,0,0,0.6), 0 2px 0 rgba(0,0,0,0.55), 0 4px 12px rgba(0,0,0,0.6);
+  text-shadow: 0 1px 0 var(--shadow-1), 0 2px 0 var(--shadow-2), 0 4px 12px var(--shadow-3);
 }
 .departure-time{font-family:var(--mono);font-weight:800;margin:0;padding:0}
 .departure-time-wrap{font-family:var(--mono);font-weight:800;font-size:calc(var(--large-scale) * 0.8 * 0.8)}
 .departure-situations{color:var(--danger);font-weight:700;margin:0;padding:0}
 .situation-banner{display:none} /* removed: global banner no longer used */
 
-.empty-state{color:rgba(230,238,248,0.8);font-weight:700;padding:12px 10px;border-radius:6px}
+.empty-state{color:var(--fg-dim);font-weight:700;padding:12px 10px;border-radius:6px}
 
 .departure-time-wrap{display:flex;align-items:baseline;gap:14px}
 .departure-emoji{ /* removed: emoji is now inline text in .departure-destination; keep placeholder for backward compatibility */ }
 .visually-hidden{position:absolute!important;height:1px;width:1px;overflow:hidden;clip:rect(1px,1px,1px,1px);white-space:nowrap}
+
+/* Debug panel styling: visibility controlled via `open` class to avoid inline styles */
+.debug-panel{display:none;max-width:90vw;overflow:auto;padding:8px;border-radius:6px;background:var(--overlay-strong);color:var(--fg);font-family:var(--mono);font-size:0.9em}
+.debug-panel.open{display:block}
 
 @media (max-width:600px){
   :root{--large-scale:10vw}
@@ -115,7 +128,7 @@ body.options-open .app-root{transform:translateX(calc(-1 * var(--options-panel-w
   height:100vh;
   width:var(--options-panel-width);
   background:var(--bg);
-  box-shadow:-8px 0 24px rgba(0,0,0,0.35);
+  box-shadow:-8px 0 24px var(--overlay-shadow-color);
   transform:translateX(100%); /* hidden by default */
   transition:transform 280ms ease-in-out;
   padding:20px;
@@ -129,7 +142,7 @@ body.options-open .app-root{transform:translateX(calc(-1 * var(--options-panel-w
 .options-row{display:flex;flex-direction:column;margin-bottom:12px}
 .options-row label{font-size:0.9rem;margin-bottom:6px}
 .options-row input[type='text'],.options-row input[type='number'],.options-row select{
-  padding:8px;border-radius:6px;border:1px solid rgba(255,255,255,0.08);background:transparent;color:var(--fg)
+  padding:8px;border-radius:6px;border:1px solid var(--border-muted);background:transparent;color:var(--fg)
 }
 .modes-checkboxes{display:flex;flex-wrap:wrap;gap:6px}
 .modes-checkboxes label{display:flex;align-items:center;gap:6px}
@@ -137,7 +150,7 @@ body.options-open .app-root{transform:translateX(calc(-1 * var(--options-panel-w
 .options-actions button{padding:8px 12px;border-radius:6px}
 
 /* toast for small visual confirmation inside options panel */
-.options-toast{position:absolute;left:12px;right:12px;bottom:18px;padding:8px 12px;background:rgba(0,0,0,0.6);color:var(--fg);border-radius:6px;transition:opacity 240ms ease-in-out}
+.options-toast{position:absolute;left:12px;right:12px;bottom:18px;padding:8px 12px;background:var(--overlay-strong);color:var(--fg);border-radius:6px;transition:opacity 240ms ease-in-out}
 
 /* emoji debug UI removed */
 
