@@ -1,26 +1,21 @@
-Current Goal: Implement dependency-free pure JS+CSS departure board, add Node-local tests, and enable interactive options + diagnostics.
+Current Goal: Implement dependency-free pure JS+CSS departure board, add Node-local tests, and surface reliable transport-mode info so the UI shows correct transport emojis.
 
 Last 3 Changes:
-- agent/worklogs/2026-02-15-02-05-remove-header-gear-and-toggle.md
-- agent/worklogs/2026-02-15-01-55-place-gear-top-right-and-worklog.md
-- agent/worklogs/2026-02-15-01-25-ensure-options-overlay-css.md
+- agent/worklogs/2026-02-15-request-mode-fields.md
+- agent/worklogs/2026-02-15-compact-mode-checkboxes.md
+- agent/worklogs/2026-02-15-shrink-station-and-countdown.md
 
 Next Steps:
-- Persist settings to localStorage and add keyboard/ESC to close options (done).
-- Add focus trap and small DOM accessibility improvements (done).
+- Prefer explicit parsing of `serviceJourney.journeyPattern.line.transportMode` when present; keep recursive fallback for robustness.
+- If server responses omit mode for a stop, consider a conservative heuristic mapping from `line.publicCode`/destination strings.
 
-Recent UI tweak: moved status chip below station title so "Live"/"Demo" appears under the station name.
+Recent UI changes:
+- moved transport emoji to follow the station/destination name (was before countdown); added matching icons in Settings.
+- compacted transport-mode checkboxes (row-wrapping) and reduced station/countdown/icon sizes by 20%.
+- removed the floating emoji debug UI and no longer write snapshots to `window.__EMOJI_DEBUG__` by default.
 
-Options panel behavior: pressing Enter in text/number fields now applies settings immediately without closing the panel; toggling transport mode checkboxes and changing text size select also apply immediately.
+Debugging: debug hook remains opt-in — set `window.__ENTUR_DEBUG_PANEL__ = fn` to receive request/response metadata from `fetchDepartures`.
 
-UX tweak: small toast is shown when settings are applied; transport-mode checkbox changes are debounced (500ms) to avoid rapid network refreshes.
-Debug: runtime Entur debug panel is disabled by default; can be re-enabled manually via `window.__ENTUR_DEBUG_PANEL__`.
-Typography: reduced all defined text-size scales by 20% per request (tiny/small/medium/large/xlarge).
+Tests: added `tests/entur.query.line.test.mjs` (query shape) and `tests/entur.parse.mode.test.mjs` (parsing/normalization).
 
-Planned: add transport-type emoji before countdown (UI-only heuristic). Worklog created at agent/worklogs/2026-02-15-add-emoji-mapping.md.
-
-Added runtime emoji detection diagnostics: when detection fails a compact snapshot is appended to `window.__EMOJI_DEBUG__` (bounded array) and a console warning is emitted. See `agent/worklogs/2026-02-15-add-emoji-debugging.md`.
-
-Added a visible "🐞 Debug" button in the lower-left that opens a panel showing `window.__EMOJI_DEBUG__` snapshots for easy inspection.
-
-Added "Capture now" and "Dump raw response" controls in the debug panel to force fetches and inspect the parsed items or full server JSON respectively.
+Primary files changed: `src/entur.js`, `src/ui/departure.js`, `src/ui/options.js`, `src/style.css`, tests/*
