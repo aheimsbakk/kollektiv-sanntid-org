@@ -138,7 +138,8 @@ export function createDepartureNode(item){
   try{ dest.setAttribute('aria-label', destinationText + (readableMode(mode) ? (' ' + readableMode(mode)) : '')); }catch(e){}
 
   timeWrap.append(time);
-  container.append(dest, timeWrap, situ);
+  // place situation between destination and countdown so alerts are read in context
+  container.append(dest, situ, timeWrap);
   // store references for quick updates
   return {container, dest, time, situ, epochMs: Number.isFinite(epochMs) ? epochMs : null};
 }
