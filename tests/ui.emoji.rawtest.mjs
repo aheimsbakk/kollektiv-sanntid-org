@@ -9,7 +9,7 @@ const nested1 = {
   raw: { service: { info: { type: 'bus' } } }
 };
 const n1 = createDepartureNode(nested1);
-assertEqual(n1.container.querySelector('.departure-emoji').textContent, '🚌', 'nested bus detection');
+assertEqual(n1.container.querySelector('.departure-destination').textContent.trim().startsWith('🚌'), true, 'nested bus detection');
 
 // nested raw where token appears in key name
 const nested2 = {
@@ -18,6 +18,6 @@ const nested2 = {
   raw: { transportMode_bus: { code: 'XYZ' } }
 };
 const n2 = createDepartureNode(nested2);
-assertEqual(n2.container.querySelector('.departure-emoji').textContent, '🚌', 'key-detect bus');
+assertEqual(n2.container.querySelector('.departure-destination').textContent.trim().startsWith('🚌'), true, 'key-detect bus');
 
 console.log('ui.emoji.rawtest passed');

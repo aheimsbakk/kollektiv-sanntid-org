@@ -35,7 +35,17 @@ html,body{height:100%;margin:0;background:var(--bg);color:var(--fg);font-family:
      to make internal spacing match inter-station spacing. */
   display:flex;flex-direction:column;align-items:center;padding:6px 10px;border-radius:6px;min-width:60%;row-gap:12px
 }
-.departure-destination{font-family:var(--mono);font-weight:900;font-size:calc(var(--large-scale) * 0.8);line-height:0.95;color:var(--accent);display:flex;align-items:center;gap:8px}
+.departure-destination{
+  font-family:var(--mono);
+  font-weight:900;
+  font-size:calc(var(--large-scale) * 0.8);
+  line-height:0.95;
+  color:var(--accent);
+  /* inline so emoji stays with text and wraps naturally on narrow screens */
+  display:inline-block;
+  white-space:normal;
+  word-break:break-word;
+  text-align:center;
   /* layered text-shadow to emulate chunky figlet look */
   text-shadow: 0 1px 0 rgba(0,0,0,0.6), 0 2px 0 rgba(0,0,0,0.55), 0 4px 12px rgba(0,0,0,0.6);
 }
@@ -47,7 +57,7 @@ html,body{height:100%;margin:0;background:var(--bg);color:var(--fg);font-family:
 .empty-state{color:rgba(230,238,248,0.8);font-weight:700;padding:12px 10px;border-radius:6px}
 
 .departure-time-wrap{display:flex;align-items:baseline;gap:14px}
-.departure-emoji{font-size:1em;display:inline-block;line-height:1;width:auto;text-align:center;margin-right:2px;transform:scale(0.8);}
+.departure-emoji{ /* removed: emoji is now inline text in .departure-destination; keep placeholder for backward compatibility */ }
 .visually-hidden{position:absolute!important;height:1px;width:1px;overflow:hidden;clip:rect(1px,1px,1px,1px);white-space:nowrap}
 
 @media (max-width:600px){

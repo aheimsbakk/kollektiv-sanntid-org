@@ -1,12 +1,10 @@
 export function createDepartureNode(item){
   const container = document.createElement('div'); container.className='departure';
-  const dest = document.createElement('div'); dest.className='departure-destination'; dest.textContent = item.destination || '—';
+  const dest = document.createElement('div'); dest.className='departure-destination';
 
-  // time container (emoji moved to follow the destination name)
+  // time container (countdown separate)
   const time = document.createElement('div'); time.className='departure-time';
   const timeWrap = document.createElement('div'); timeWrap.className = 'departure-time-wrap';
-  // emoji element now appears after the destination text
-  const emojiEl = document.createElement('span'); emojiEl.className = 'departure-emoji';
 
   // compute epoch ms robustly; store as dataset string only when valid
   const epochMs = (item && item.expectedDepartureISO) ? Date.parse(item.expectedDepartureISO) : NaN;
@@ -119,16 +117,23 @@ export function createDepartureNode(item){
       }catch(e){}
     }
   }catch(e){}
-  if (typeof emojiEl.setAttribute === 'function') {
-    emojiEl.setAttribute('aria-hidden', 'true');
-  } else {
-    // DOM shim fallback for tests: set a usable property
-    try{ emojiEl.ariaHidden = 'true'; }catch(e){}
-  }
-  emojiEl.textContent = emojiForMode(mode);
-
-  // place the emoji after the destination name for each departure
-  try{ dest.appendChild(emojiEl); }catch(e){ /* ignore DOM shim issues */ }
+  // render emoji inline with destination text so it wraps naturally on small screens
+  const emoji = emojiForMode(mode);
+  const destinationText = (item && item.destination) ? String(item.destination) : '—';
+  try{ dest.textContent = emoji + ' ' + destinationText; }catch(e){ dest.textContent = destinationText; }
+  // provide an accessible textual label (mode + destination) for screen readers
+  const readableMode = (m) => {
+    if(!m) return '';
+    const mm = String(m).toLowerCase();
+    if(mm.includes('bus')) return 'Bus';
+    if(mm.includes('tram') || mm.includes('trikk')) return 'Tram';
+    if(mm.includes('metro') || mm.includes('t-bane') || mm.includes('tbane')) return 'Metro';
+    if(mm.includes('rail') || mm.includes('train') || mm.includes('tog')) return 'Train';
+    if(mm.includes('water') || mm.includes('ferry') || mm.includes('ferje') || mm.includes('boat')) return 'Ferry';
+    if(mm.includes('coach')) return 'Coach';
+    return '';
+  };
+  try{ dest.setAttribute('aria-label', (readableMode(mode) ? (readableMode(mode) + ' ') : '') + destinationText); }catch(e){}
 
   timeWrap.append(time);
   container.append(dest, timeWrap, situ);
