@@ -36,7 +36,8 @@ html,body{height:100%;margin:0;background:var(--bg);color:var(--fg);font-family:
   display:flex;flex-direction:column;align-items:center;padding:6px 10px;border-radius:6px;min-width:60%;row-gap:12px
 }
 .departure-destination{
-  font-family:var(--mono);
+  /* use the app's proportional UI font here; reserve monospace for timers */
+  font-family:inherit;
   font-weight:900;
   font-size:calc(var(--large-scale) * 0.8);
   line-height:0.95;
