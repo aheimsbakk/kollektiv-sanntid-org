@@ -117,6 +117,32 @@ async function init(){
       const snapshots = (typeof window !== 'undefined' && window.__EMOJI_DEBUG__) ? window.__EMOJI_DEBUG__ : [];
       list.textContent = snapshots.length ? JSON.stringify(snapshots, null, 2) : 'No snapshots yet. Reproduce by letting the app fetch live departures.';
       panel.appendChild(list);
+      // Capture now control to force an immediate fetch and populate debug snapshots
+      const capRow = document.createElement('div'); capRow.style.display='flex'; capRow.style.gap='8px'; capRow.style.marginTop='8px';
+      const capBtn = document.createElement('button'); capBtn.type='button'; capBtn.textContent='Capture now'; capBtn.style.cursor='pointer';
+      const capStatus = document.createElement('span'); capStatus.style.fontSize='12px'; capStatus.style.opacity='0.9';
+      capRow.appendChild(capBtn); capRow.appendChild(capStatus); panel.appendChild(capRow);
+      capBtn.addEventListener('click', async ()=>{
+        try{
+          capStatus.textContent = 'Capturing...';
+          // attempt to lookup stop and fetch parsed departures
+          const stopId = await lookupStopId({ stationName: DEFAULTS.STATION_NAME, clientName: DEFAULTS.CLIENT_NAME });
+          if (!stopId) { capStatus.textContent = 'No stopId found'; return; }
+          const items = await fetchDepartures({ stopId, numDepartures: DEFAULTS.NUM_DEPARTURES, modes: DEFAULTS.TRANSPORT_MODES, apiUrl: DEFAULTS.API_URL, clientName: DEFAULTS.CLIENT_NAME });
+          // ensure window.__EMOJI_DEBUG__ exists
+          if (typeof window !== 'undefined') window.__EMOJI_DEBUG__ = window.__EMOJI_DEBUG__ || [];
+          const snaps = items && items.length ? items.map(it=>({ time: (new Date()).toISOString(), destination: it.destination || null, parserMode: it.mode || null, transportModeField: it.transportMode || null, detectedMode: null, rawKeys: it.raw ? Object.keys(it.raw).slice(0,8) : [] })) : [];
+          if (snaps.length){
+            window.__EMOJI_DEBUG__.push(...snaps);
+            if (window.__EMOJI_DEBUG__.length > 50) window.__EMOJI_DEBUG__ = window.__EMOJI_DEBUG__.slice(-50);
+            list.textContent = JSON.stringify(window.__EMOJI_DEBUG__, null, 2);
+            capStatus.textContent = `Captured ${snaps.length}`;
+          } else {
+            capStatus.textContent = 'No departures returned';
+            list.textContent = 'No snapshots yet. Reproduce by letting the app fetch live departures.';
+          }
+        }catch(err){ capStatus.textContent = 'Capture failed'; list.textContent = String(err); }
+      });
       document.body.appendChild(panel);
     });
     // place near gear

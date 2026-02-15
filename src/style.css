@@ -72,3 +72,4 @@ body.options-open .app-root{transform:translateX(-360px);transition:transform 28
 
 .emoji-debug-btn{position:fixed;left:18px;bottom:18px;z-index:1400;background:rgba(0,0,0,0.5);border:0;color:var(--fg);padding:8px 10px;border-radius:8px;cursor:pointer}
 .emoji-debug-panel{box-shadow:0 6px 18px rgba(0,0,0,0.6)}
+.emoji-debug-panel button{background:rgba(255,255,255,0.06);border:0;color:var(--fg);padding:6px 10px;border-radius:6px}
