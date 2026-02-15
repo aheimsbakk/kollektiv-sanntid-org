@@ -5,11 +5,15 @@ set -euo pipefail
 # This hook expects the repository to include scripts/validate_worklogs.sh
 # and will run it with no arguments (so it validates staged files in the index).
 
-echo "Running worklog validator (scripts/validate_worklogs.sh)"
+echo "Running worklog auto-fixer and validator"
+# First, attempt to auto-fix any invalid worklogs staged for commit
+./scripts/fix_worklogs.sh
+
+# Then run validator on staged files
 ./scripts/validate_worklogs.sh
 
 if [ $? -ne 0 ]; then
-  echo "Worklog validation failed. Fix worklogs or move invalid files to agent/worklogs/archived/ before committing." >&2
+  echo "Worklog validation failed and auto-fix could not repair all files. Abort commit." >&2
   exit 1
 fi
 
