@@ -143,6 +143,32 @@ async function init(){
           }
         }catch(err){ capStatus.textContent = 'Capture failed'; list.textContent = String(err); }
       });
+      // Dump raw GraphQL response for current stop
+      const dumpRow = document.createElement('div'); dumpRow.style.display='flex'; dumpRow.style.gap='8px'; dumpRow.style.marginTop='8px';
+      const dumpBtn = document.createElement('button'); dumpBtn.type='button'; dumpBtn.textContent='Dump raw response'; dumpBtn.style.cursor='pointer';
+      const dumpStatus = document.createElement('span'); dumpStatus.style.fontSize='12px'; dumpStatus.style.opacity='0.9';
+      dumpRow.appendChild(dumpBtn); dumpRow.appendChild(dumpStatus); panel.appendChild(dumpRow);
+      dumpBtn.addEventListener('click', async ()=>{
+        try{
+          dumpStatus.textContent = 'Fetching raw...';
+          const stopId = await lookupStopId({ stationName: DEFAULTS.STATION_NAME, clientName: DEFAULTS.CLIENT_NAME });
+          if (!stopId){ dumpStatus.textContent = 'No stopId found'; return; }
+          // simple no-filter query to inspect server response
+          const q = `query { stopPlace(id: "${stopId}") { estimatedCalls(numberOfDepartures: ${DEFAULTS.NUM_DEPARTURES}) { expectedDepartureTime destinationDisplay { frontText } situations { description { value language } } } } }`;
+          const resp = await fetch(DEFAULTS.API_URL, { method: 'POST', headers: { 'Content-Type': 'application/json', 'ET-Client-Name': DEFAULTS.CLIENT_NAME }, body: JSON.stringify({ query: q }) });
+          if (!resp) { dumpStatus.textContent = 'No response'; return; }
+          const ct = resp.headers && typeof resp.headers.get === 'function' ? resp.headers.get('content-type') : (resp.headers && (resp.headers['content-type']||resp.headers['Content-Type'])) || '';
+          if (ct && !/application\/json/i.test(ct)){
+            const txt = await resp.text().catch(()=>'<no body>');
+            list.textContent = `Non-JSON response:\n${String(txt).slice(0,2000)}`;
+            dumpStatus.textContent = 'Done';
+            return;
+          }
+          const j = await resp.json().catch(async (e)=>{ const t = await resp.text().catch(()=>'<no body>'); throw new Error('JSON parse failed: '+String(t)); });
+          list.textContent = JSON.stringify(j, null, 2);
+          dumpStatus.textContent = 'Done';
+        }catch(err){ dumpStatus.textContent = 'Dump failed'; list.textContent = String(err); }
+      });
       document.body.appendChild(panel);
     });
     // place near gear

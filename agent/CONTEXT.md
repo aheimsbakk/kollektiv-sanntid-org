@@ -22,3 +22,5 @@ Planned: add transport-type emoji before countdown (UI-only heuristic). Worklog 
 Added runtime emoji detection diagnostics: when detection fails a compact snapshot is appended to `window.__EMOJI_DEBUG__` (bounded array) and a console warning is emitted. See `agent/worklogs/2026-02-15-add-emoji-debugging.md`.
 
 Added a visible "🐞 Debug" button in the lower-left that opens a panel showing `window.__EMOJI_DEBUG__` snapshots for easy inspection.
+
+Added "Capture now" and "Dump raw response" controls in the debug panel to force fetches and inspect the parsed items or full server JSON respectively.
