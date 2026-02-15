@@ -40,6 +40,10 @@ async function init(){
   const board = createBoardElements(DEFAULTS.STATION_NAME);
   // ensure the browser page title matches the current station name for clarity
   try{ document.title = DEFAULTS.STATION_NAME || document.title; }catch(e){}
+  // register service worker if available so the app becomes installable
+  if('serviceWorker' in navigator){
+    try{ navigator.serviceWorker.register('./sw.js').catch(()=>{}); }catch(e){}
+  }
   // header controls with gear
   const headerControls = createHeaderToggle(()=>{ opts.open(); });
   // attach header controls into header-wrap; place controls to the right without affecting centering
