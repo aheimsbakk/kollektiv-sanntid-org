@@ -52,3 +52,4 @@
 ## 4. Enforcement
 - Worklogs must validate against the schema above.
 - If `scripts/bump-version.sh` exists, use it. Otherwise, update manually.
+- Do not create Github Actions, or any CI/CD under `.github`.
