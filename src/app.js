@@ -103,78 +103,7 @@ async function init(){
   gWrap.appendChild(gBtn);
   document.body.appendChild(gWrap);
   ROOT.appendChild(board.el);
-  // Expose a small debug button that shows emoji detection snapshots for easier discovery
-  try{
-    const dbgBtn = document.createElement('button'); dbgBtn.className='emoji-debug-btn'; dbgBtn.type='button'; dbgBtn.textContent = '🐞 Debug';
-    dbgBtn.title = 'Show emoji detection diagnostics';
-    dbgBtn.addEventListener('click', ()=>{
-      const existing = document.querySelector('.emoji-debug-panel');
-      if (existing){ existing.remove(); return; }
-      const panel = document.createElement('div'); panel.className='emoji-debug-panel';
-      panel.style.position = 'fixed'; panel.style.left='12px'; panel.style.bottom='12px'; panel.style.zIndex='1400'; panel.style.maxWidth='40vw'; panel.style.maxHeight='40vh'; panel.style.overflow='auto'; panel.style.background='rgba(0,0,0,0.7)'; panel.style.color='var(--fg)'; panel.style.padding='8px'; panel.style.borderRadius='8px';
-      const title = document.createElement('div'); title.textContent = 'Emoji diagnostics'; title.style.fontWeight='700'; title.style.marginBottom='6px'; panel.appendChild(title);
-      const list = document.createElement('pre'); list.style.whiteSpace='pre-wrap'; list.style.fontSize='12px'; list.style.lineHeight='1.2';
-      const snapshots = (typeof window !== 'undefined' && window.__EMOJI_DEBUG__) ? window.__EMOJI_DEBUG__ : [];
-      list.textContent = snapshots.length ? JSON.stringify(snapshots, null, 2) : 'No snapshots yet. Reproduce by letting the app fetch live departures.';
-      panel.appendChild(list);
-      // Capture now control to force an immediate fetch and populate debug snapshots
-      const capRow = document.createElement('div'); capRow.style.display='flex'; capRow.style.gap='8px'; capRow.style.marginTop='8px';
-      const capBtn = document.createElement('button'); capBtn.type='button'; capBtn.textContent='Capture now'; capBtn.style.cursor='pointer';
-      const capStatus = document.createElement('span'); capStatus.style.fontSize='12px'; capStatus.style.opacity='0.9';
-      capRow.appendChild(capBtn); capRow.appendChild(capStatus); panel.appendChild(capRow);
-      capBtn.addEventListener('click', async ()=>{
-        try{
-          capStatus.textContent = 'Capturing...';
-          // attempt to lookup stop and fetch parsed departures
-          const stopId = await lookupStopId({ stationName: DEFAULTS.STATION_NAME, clientName: DEFAULTS.CLIENT_NAME });
-          if (!stopId) { capStatus.textContent = 'No stopId found'; return; }
-          const items = await fetchDepartures({ stopId, numDepartures: DEFAULTS.NUM_DEPARTURES, modes: DEFAULTS.TRANSPORT_MODES, apiUrl: DEFAULTS.API_URL, clientName: DEFAULTS.CLIENT_NAME });
-          // ensure window.__EMOJI_DEBUG__ exists
-          if (typeof window !== 'undefined') window.__EMOJI_DEBUG__ = window.__EMOJI_DEBUG__ || [];
-          const snaps = items && items.length ? items.map(it=>({ time: (new Date()).toISOString(), destination: it.destination || null, parserMode: it.mode || null, transportModeField: it.transportMode || null, detectedMode: null, rawKeys: it.raw ? Object.keys(it.raw).slice(0,8) : [] })) : [];
-          if (snaps.length){
-            window.__EMOJI_DEBUG__.push(...snaps);
-            if (window.__EMOJI_DEBUG__.length > 50) window.__EMOJI_DEBUG__ = window.__EMOJI_DEBUG__.slice(-50);
-            list.textContent = JSON.stringify(window.__EMOJI_DEBUG__, null, 2);
-            capStatus.textContent = `Captured ${snaps.length}`;
-          } else {
-            capStatus.textContent = 'No departures returned';
-            list.textContent = 'No snapshots yet. Reproduce by letting the app fetch live departures.';
-          }
-        }catch(err){ capStatus.textContent = 'Capture failed'; list.textContent = String(err); }
-      });
-      // Dump raw GraphQL response for current stop
-      const dumpRow = document.createElement('div'); dumpRow.style.display='flex'; dumpRow.style.gap='8px'; dumpRow.style.marginTop='8px';
-      const dumpBtn = document.createElement('button'); dumpBtn.type='button'; dumpBtn.textContent='Dump raw response'; dumpBtn.style.cursor='pointer';
-      const dumpStatus = document.createElement('span'); dumpStatus.style.fontSize='12px'; dumpStatus.style.opacity='0.9';
-      dumpRow.appendChild(dumpBtn); dumpRow.appendChild(dumpStatus); panel.appendChild(dumpRow);
-      dumpBtn.addEventListener('click', async ()=>{
-        try{
-          dumpStatus.textContent = 'Fetching raw...';
-          const stopId = await lookupStopId({ stationName: DEFAULTS.STATION_NAME, clientName: DEFAULTS.CLIENT_NAME });
-          if (!stopId){ dumpStatus.textContent = 'No stopId found'; return; }
-          // simple no-filter query to inspect server response
-          const q = `query { stopPlace(id: "${stopId}") { estimatedCalls(numberOfDepartures: ${DEFAULTS.NUM_DEPARTURES}) { expectedDepartureTime destinationDisplay { frontText } situations { description { value language } } } } }`;
-          const resp = await fetch(DEFAULTS.API_URL, { method: 'POST', headers: { 'Content-Type': 'application/json', 'ET-Client-Name': DEFAULTS.CLIENT_NAME }, body: JSON.stringify({ query: q }) });
-          if (!resp) { dumpStatus.textContent = 'No response'; return; }
-          const ct = resp.headers && typeof resp.headers.get === 'function' ? resp.headers.get('content-type') : (resp.headers && (resp.headers['content-type']||resp.headers['Content-Type'])) || '';
-          if (ct && !/application\/json/i.test(ct)){
-            const txt = await resp.text().catch(()=>'<no body>');
-            list.textContent = `Non-JSON response:\n${String(txt).slice(0,2000)}`;
-            dumpStatus.textContent = 'Done';
-            return;
-          }
-          const j = await resp.json().catch(async (e)=>{ const t = await resp.text().catch(()=>'<no body>'); throw new Error('JSON parse failed: '+String(t)); });
-          list.textContent = JSON.stringify(j, null, 2);
-          dumpStatus.textContent = 'Done';
-        }catch(err){ dumpStatus.textContent = 'Dump failed'; list.textContent = String(err); }
-      });
-      document.body.appendChild(panel);
-    });
-    // place near gear
-    document.body.appendChild(dbgBtn);
-  }catch(e){}
-  // Debugging is disabled by default. To enable, set `window.__ENTUR_DEBUG_PANEL__ = fn` from the console.
+  // Debugging was removed: emoji debug panel and floating debug button are no longer added to the UI.
   // Try live data first, fall back to demo
   let data = [];
   try{

@@ -34,12 +34,26 @@ export function createOptionsPanel(defaults, onApply){
   const rowModes = document.createElement('div'); rowModes.className='options-row';
   const lblModes = document.createElement('label'); lblModes.textContent = 'Transport modes (filter)';
   const modesWrap = document.createElement('div'); modesWrap.className='modes-checkboxes';
-  const POSSIBLE = ['bus','tram','metro','rail','water'];
+  const POSSIBLE = ['bus','tram','metro','rail','water','coach'];
+  // helper to map mode -> emoji used in the UI
+  const emojiForMode = (mode) => {
+    if(!mode) return '🚆';
+    const m = String(mode).toLowerCase();
+    if(m.includes('bus')) return '🚌';
+    if(m.includes('tram') || m.includes('trikk')) return '🚋';
+    if(m.includes('metro') || m.includes('t-bane') || m.includes('tbane')) return '🚇';
+    if(m.includes('rail') || m.includes('train') || m.includes('tog')) return '🚅';
+    if(m.includes('water') || m.includes('ferry') || m.includes('ferje') || m.includes('boat')) return '🛳️';
+    if(m.includes('coach')) return '🚐';
+    return '🚆';
+  };
+
   POSSIBLE.forEach(m => {
-    const lab = document.createElement('label');
+    const lab = document.createElement('label'); lab.className = 'mode-checkbox-label';
+    const icon = document.createElement('span'); icon.className = 'mode-icon'; icon.setAttribute('aria-hidden','true'); icon.textContent = emojiForMode(m);
     const cb = document.createElement('input'); cb.type='checkbox'; cb.value = m; cb.checked = (defaults.TRANSPORT_MODES || []).includes(m);
     const span = document.createElement('span'); span.textContent = m; span.style.marginLeft = '6px';
-    lab.append(cb, span);
+    lab.append(icon, cb, span);
     modesWrap.append(lab);
   });
   // restore saved choices (if localStorage contains them)

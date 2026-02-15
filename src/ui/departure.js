@@ -2,9 +2,10 @@ export function createDepartureNode(item){
   const container = document.createElement('div'); container.className='departure';
   const dest = document.createElement('div'); dest.className='departure-destination'; dest.textContent = item.destination || '—';
 
-  // time and emoji container
+  // time container (emoji moved to follow the destination name)
   const time = document.createElement('div'); time.className='departure-time';
   const timeWrap = document.createElement('div'); timeWrap.className = 'departure-time-wrap';
+  // emoji element now appears after the destination text
   const emojiEl = document.createElement('span'); emojiEl.className = 'departure-emoji';
 
   // compute epoch ms robustly; store as dataset string only when valid
@@ -111,22 +112,7 @@ export function createDepartureNode(item){
         if (!_seenRawSignatures.has(sig)){
           _seenRawSignatures.add(sig);
           // store a compact diagnostic snapshot on window for later inspection
-          try{
-            if (typeof window !== 'undefined'){
-              window.__EMOJI_DEBUG__ = window.__EMOJI_DEBUG__ || [];
-              const snapshot = {
-                time: (new Date()).toISOString(),
-                destination: item.destination || null,
-                parserMode: item.mode || null,
-                transportModeField: item.transportMode || null,
-                detectedMode: mode || null,
-                rawKeys: sigKeys,
-              };
-              window.__EMOJI_DEBUG__.push(snapshot);
-              // keep array bounded to prevent unbounded memory growth
-              if (window.__EMOJI_DEBUG__.length > 50) window.__EMOJI_DEBUG__.shift();
-            }
-          }catch(e){}
+              // debug snapshots removed — no-op
           // still log a compact console message for immediacy
           try{ console.warn('emoji-detect: no mode found; raw keys sample:', sigKeys); }catch(e){}
         }
@@ -141,7 +127,10 @@ export function createDepartureNode(item){
   }
   emojiEl.textContent = emojiForMode(mode);
 
-  timeWrap.append(emojiEl, time);
+  // place the emoji after the destination name for each departure
+  try{ dest.appendChild(emojiEl); }catch(e){ /* ignore DOM shim issues */ }
+
+  timeWrap.append(time);
   container.append(dest, timeWrap, situ);
   // store references for quick updates
   return {container, dest, time, situ, epochMs: Number.isFinite(epochMs) ? epochMs : null};

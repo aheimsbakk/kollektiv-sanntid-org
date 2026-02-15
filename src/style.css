@@ -20,22 +20,23 @@ html,body{height:100%;margin:0;background:var(--bg);color:var(--fg);font-family:
 /* global fixed gear in top-right */
 .global-gear{position:fixed;right:18px;top:18px;z-index:1300;background:rgba(0,0,0,0.35);border-radius:999px;padding:8px;display:flex;align-items:center;justify-content:center}
 .global-gear .gear-btn{font-size:26px;padding:6px;color:var(--fg)}
-.station-title{font-weight:700;letter-spacing:1px}
+.station-title{font-weight:700;letter-spacing:1px;/* shrink station title by 20% */ font-size:0.8em}
 .status-chip{font-size:12px;padding:4px 8px;border-radius:999px;background:rgba(255,255,255,0.06);display:inline-block;margin-top:6px}
 .departures{display:flex;flex-direction:column;gap:8px;width:100%;align-items:center}
 .departure{display:flex;flex-direction:column;align-items:center;padding:8px 12px;border-radius:6px;min-width:60%}
-.departure-destination{font-family:var(--mono);font-weight:900;font-size:var(--large-scale);line-height:0.9;color:var(--accent);
+.departure-destination{font-family:var(--mono);font-weight:900;font-size:calc(var(--large-scale) * 0.8);line-height:0.9;color:var(--accent);display:flex;align-items:center;gap:8px}
   /* layered text-shadow to emulate chunky figlet look */
   text-shadow: 0 1px 0 rgba(0,0,0,0.6), 0 2px 0 rgba(0,0,0,0.55), 0 4px 12px rgba(0,0,0,0.6);
 }
-.departure-time{font-family:var(--mono);font-weight:800;font-size:calc(var(--large-scale) * 0.8)}
+.departure-time{font-family:var(--mono);font-weight:800}
+.departure-time-wrap{font-family:var(--mono);font-weight:800;font-size:calc(var(--large-scale) * 0.8 * 0.8)}
 .departure-situations{color:var(--danger);font-weight:700}
 .situation-banner{background:var(--danger);color:white;padding:6px 12px;border-radius:8px;margin-bottom:6px}
 
 .empty-state{color:rgba(230,238,248,0.8);font-weight:700;padding:12px 10px;border-radius:6px}
 
-.departure-time-wrap{display:flex;align-items:center;gap:8px}
-.departure-emoji{font-size:1.05em;display:inline-block;line-height:1;width:1.2em;text-align:center}
+.departure-time-wrap{display:flex;align-items:baseline;gap:8px}
+.departure-emoji{font-size:1em;display:inline-block;line-height:1;width:auto;text-align:center;margin-right:4px;transform:scale(0.8);}
 .visually-hidden{position:absolute!important;height:1px;width:1px;overflow:hidden;clip:rect(1px,1px,1px,1px);white-space:nowrap}
 
 @media (max-width:600px){
@@ -53,11 +54,11 @@ html,body{height:100%;margin:0;background:var(--bg);color:var(--fg);font-family:
 .text-size-xlarge .departure-destination{font-size:calc(var(--large-scale) * (var(--scale-xlarge) * 0.8))}
 
 
-.text-size-tiny .departure-time{font-size:calc(var(--large-scale) * 0.8 * (var(--scale-tiny) * 0.8))}
-.text-size-small .departure-time{font-size:calc(var(--large-scale) * 0.8 * (var(--scale-small) * 0.8))}
-.text-size-medium .departure-time{font-size:calc(var(--large-scale) * 0.8 * (var(--scale-medium) * 0.8))}
-.text-size-large .departure-time{font-size:calc(var(--large-scale) * 0.8 * (var(--scale-large) * 0.8))}
-.text-size-xlarge .departure-time{font-size:calc(var(--large-scale) * 0.8 * (var(--scale-xlarge) * 0.8))}
+.text-size-tiny .departure-time-wrap{font-size:calc(var(--large-scale) * 0.8 * (var(--scale-tiny) * 0.8))}
+.text-size-small .departure-time-wrap{font-size:calc(var(--large-scale) * 0.8 * (var(--scale-small) * 0.8))}
+.text-size-medium .departure-time-wrap{font-size:calc(var(--large-scale) * 0.8 * (var(--scale-medium) * 0.8))}
+.text-size-large .departure-time-wrap{font-size:calc(var(--large-scale) * 0.8 * (var(--scale-large) * 0.8))}
+.text-size-xlarge .departure-time-wrap{font-size:calc(var(--large-scale) * 0.8 * (var(--scale-xlarge) * 0.8))}
 
 
 /* When options panel is open shift the app content left to make room */
@@ -70,6 +71,10 @@ body.options-open .app-root{transform:translateX(-360px);transition:transform 28
 /* toast for small visual confirmation inside options panel */
 .options-toast{position:absolute;left:12px;right:12px;bottom:18px;padding:8px 12px;background:rgba(0,0,0,0.6);color:var(--fg);border-radius:6px;transition:opacity 240ms ease-in-out}
 
-.emoji-debug-btn{position:fixed;left:18px;bottom:18px;z-index:1400;background:rgba(0,0,0,0.5);border:0;color:var(--fg);padding:8px 10px;border-radius:8px;cursor:pointer}
-.emoji-debug-panel{box-shadow:0 6px 18px rgba(0,0,0,0.6)}
-.emoji-debug-panel button{background:rgba(255,255,255,0.06);border:0;color:var(--fg);padding:6px 10px;border-radius:6px}
+/* emoji debug UI removed */
+
+/* mode checkbox label styling */
+.modes-checkboxes { display:flex;flex-direction:row;flex-wrap:wrap;gap:6px;margin-top:8px }
+.mode-checkbox-label{display:inline-flex;align-items:center;gap:6px;padding:4px 6px;border-radius:6px;font-size:0.92em}
+.mode-icon{font-size:1em;display:inline-block;width:1.3em;text-align:center}
+.mode-checkbox-label input[type=checkbox]{margin-left:4px;width:14px;height:14px}

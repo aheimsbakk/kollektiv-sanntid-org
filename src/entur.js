@@ -18,7 +18,7 @@ export function parseEnturResponse(json){
     // attempt to normalize a transport mode token from the raw call for UI convenience
     const detectModeFromRaw = (raw) => {
       if (!raw) return null;
-      const normalize = (v) => {
+      const extractString = (v) => {
         if (v == null) return null;
         if (typeof v === 'string') return v;
         if (typeof v === 'object'){
@@ -28,20 +28,32 @@ export function parseEnturResponse(json){
         }
         return null;
       };
-      const tokens = ['bus','buss','tram','trikk','metro','t-bane','tbane','subway','underground','rail','train','tog','s-tog','water','ferry','ferje','boat','ship','coach'];
-      // shallow fields
+
+      // map many possible tokens to a small set of canonical modes used by the UI
+      const canonicalMap = new Map([
+        ['bus', 'bus'], ['buss', 'bus'], ['coach', 'coach'],
+        ['tram', 'tram'], ['trikk', 'tram'],
+        ['metro', 'metro'], ['t-bane', 'metro'], ['tbane', 'metro'], ['subway', 'metro'], ['underground', 'metro'],
+        ['rail', 'rail'], ['train', 'rail'], ['tog', 'rail'], ['s-tog', 'rail'],
+        ['water', 'water'], ['ferry', 'water'], ['ferje', 'water'], ['boat', 'water'], ['ship', 'water']
+      ]);
+
+      const tokens = Array.from(canonicalMap.keys());
       const shallow = ['transportMode','mode','serviceType','product','transportSubmode','vehicleMode','type'];
+
+      // check explicit likely fields first
       for (const k of shallow){
         try{
           const v = raw[k];
-          const n = normalize(v);
-          if (n){
-            const low = n.toLowerCase();
-            for (const t of tokens) if (low.includes(t)) return t;
+          const s = extractString(v);
+          if (s){
+            const low = s.toLowerCase();
+            for (const t of tokens) if (low.includes(t)) return canonicalMap.get(t);
           }
         }catch(e){}
       }
-      // recursive scan for token in keys/values
+
+      // recursive scan for token in keys/values (fallback)
       const seen = new Set();
       const stack = [raw];
       while(stack.length){
@@ -50,7 +62,7 @@ export function parseEnturResponse(json){
         seen.add(cur);
         if (typeof cur === 'string'){
           const low = cur.toLowerCase();
-          for (const t of tokens) if (low.includes(t)) return t;
+          for (const t of tokens) if (low.includes(t)) return canonicalMap.get(t);
           continue;
         }
         if (Array.isArray(cur)){
@@ -59,7 +71,7 @@ export function parseEnturResponse(json){
         }
         if (typeof cur === 'object'){
           for (const k of Object.keys(cur)){
-            try{ const lk = String(k).toLowerCase(); for (const t of tokens) if (lk.includes(t)) return t; }catch(e){}
+            try{ const lk = String(k).toLowerCase(); for (const t of tokens) if (lk.includes(t)) return canonicalMap.get(t); }catch(e){}
             try{ stack.push(cur[k]); }catch(e){}
           }
         }
@@ -67,7 +79,42 @@ export function parseEnturResponse(json){
       return null;
     };
 
-    const mode = detectModeFromRaw(call);
+    // Prefer explicit server-provided fields when present (explicit path checks)
+    const mapTokenToCanonical = (tok) => {
+      if (!tok) return null;
+      const s = String(tok).toLowerCase();
+      if (s.includes('bus') || s === 'bus') return 'bus';
+      if (s.includes('tram') || s === 'trikk' || s === 'tram') return 'tram';
+      if (s.includes('metro') || s.includes('t-bane') || s === 'metro') return 'metro';
+      if (s.includes('rail') || s.includes('train') || s === 'rail') return 'rail';
+      if (s.includes('ferry') || s.includes('water') || s === 'ferry') return 'water';
+      if (s.includes('coach') || s === 'coach') return 'coach';
+      return null;
+    };
+
+    // explicit paths to check (preferred)
+    let explicitMode = null;
+    try{
+      const sj = call.serviceJourney;
+      if (sj){
+        // path: serviceJourney.journeyPattern.line.transportMode
+        const jpLineMode = sj.journeyPattern && sj.journeyPattern.line && sj.journeyPattern.line.transportMode;
+        if (jpLineMode) explicitMode = mapTokenToCanonical(jpLineMode);
+        // path: serviceJourney.journey.transportMode
+        if (!explicitMode && sj.journey){
+          const jMode = sj.journey.transportMode || (sj.journey.transport && sj.journey.transport.transportMode) || null;
+          if (jMode) explicitMode = mapTokenToCanonical(jMode);
+        }
+        // path: serviceJourney.journeyPattern.line.publicCode -> sometimes indicates tram/metro by line prefixes
+        if (!explicitMode && sj.journeyPattern && sj.journeyPattern.line && sj.journeyPattern.line.publicCode){
+          const pc = String(sj.journeyPattern.line.publicCode).toLowerCase();
+          // heuristics: numeric lines > 10 often buses/coaches, short codes like T or M might indicate metro/tram
+          if (pc.startsWith('t') || pc.startsWith('m')) explicitMode = pc.startsWith('t') ? 'tram' : 'metro';
+        }
+      }
+    }catch(e){ explicitMode = null; }
+
+    const mode = explicitMode || detectModeFromRaw(call);
     return {destination, expectedDepartureISO, situations, raw: call, mode};
   });
 }
@@ -99,15 +146,25 @@ export async function fetchDepartures({stopId, numDepartures=2, modes=['bus'], a
   // inline literal. We always return { query, variables } where variables may
   // be null.
   const buildQuery = (opts = {}) => {
-    const { includeModes = false, modesLiteral = '', useVariables = false, variableValues = null } = opts;
+    const { includeModes = false, modesLiteral = '', useVariables = false, variableValues = null, includeModeFields = false } = opts;
     const modesPart = includeModes ? (useVariables ? `, whiteListedModes: $modes` : `, whiteListedModes: [${modesLiteral}]`) : '';
     const varSig = useVariables && includeModes ? '($modes: [TransportMode!])' : '';
+    // additional candidate fields that may contain transport mode info.
+    // Keep this minimal to avoid schema validation errors on some deployments:
+    // request only the journeyPattern.line transportMode and publicCode which
+    // has proven to be supported and useful for mode detection.
+    const modeFields = includeModeFields ? `
+        serviceJourney {
+          journeyPattern { 
+            line { publicCode transportMode }
+          }
+        }` : '';
     const query = `query ${varSig} {
     stopPlace(id: "${stopId}") {
       estimatedCalls(numberOfDepartures: ${numDepartures}${modesPart}) {
         expectedDepartureTime
         destinationDisplay { frontText }
-        situations { description { value language } }
+        situations { description { value language } }${modeFields}
       }
     }
   }`;
@@ -133,13 +190,13 @@ export async function fetchDepartures({stopId, numDepartures=2, modes=['bus'], a
     return { json, resp };
   }
 
-  // Try multiple query forms until one returns departures: no-filter first,
-  // then single-string, then quoted-array, then enum-like array. Capture
+   // Try multiple query forms until one returns departures: no-filter first,
+   // then single-string, then quoted-array, then enum-like array. Capture
   // the last request/response snippet for debug panels when available.
   // If caller supplied modes, prefer queries that include whiteListedModes.
   // Try variable-based forms first (lowercase then uppercase), then inline
   // literal forms. Finally fall back to no-filter.
-  let variants;
+   let variants;
   if (Array.isArray(modes) && modes.length > 0){
     variants = [
       { name: 'vars-lower', opts: { includeModes: true, useVariables: true, variableValues: modesVarsLower } },
@@ -161,9 +218,14 @@ export async function fetchDepartures({stopId, numDepartures=2, modes=['bus'], a
       { name: 'enum-array-upper', opts: { includeModes: true, modesLiteral: modesEnumArrayLiteralUpper } }
     ];
   }
+  // Also try extended selection variants that request candidate transport-mode fields.
+  // These are tried first; if the server rejects them we fall back to the simpler selection.
+  const extendedVariants = variants.map(v => ({ name: 'ext-'+v.name, opts: Object.assign({}, v.opts, { includeModeFields: true }) }));
+  // Final ordered list: extended variants first, then base variants
+  variants = extendedVariants.concat(variants);
   let json, resp, usedVariant = null;
-  // store last request/response for debug UI
-  let lastDebug = { request: null, response: null, variant: null };
+   // store last request/response for optional external debug hooks
+   let lastDebug = { request: null, response: null, variant: null };
   // iterate variants, but propagate network/parsing errors (e.g. 5xx) only if they
   // are not recoverable; for validation errors we continue to next variant.
   for (const v of variants){
@@ -268,8 +330,8 @@ export async function fetchDepartures({stopId, numDepartures=2, modes=['bus'], a
     }catch(e){/* ignore filtering errors */}
   }
   if (usedVariant) console.debug('fetchDepartures used variant:', usedVariant);
-  // attach a debug snapshot to global so UI can pick it up (if present)
-  try{ if (typeof window !== 'undefined' && window.__ENTUR_DEBUG_PANEL__) window.__ENTUR_DEBUG_PANEL__(lastDebug); }catch(e){}
+   // attach a debug snapshot to a developer-provided hook if present
+   try{ if (typeof window !== 'undefined' && window.__ENTUR_DEBUG_PANEL__) window.__ENTUR_DEBUG_PANEL__(lastDebug); }catch(e){}
   if(Array.isArray(parsed) && parsed.length===0){
     try{
       const txt = typeof resp.text === 'function' ? await resp.text().catch(()=>'<no body>') : '<no body>';
