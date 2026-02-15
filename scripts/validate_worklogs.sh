@@ -32,7 +32,8 @@ for path in $STAGED; do
       fi
 
       # extract front-matter between the first pair of --- markers
-      front=$(printf '%s' "$content" | awk 'BEGIN{in=0} /^---$/ { if(in==0){in=1; next} else {exit} } in==1{print}')
+      # use a safer variable name in awk ('ins') to avoid reserved word conflicts
+      front=$(printf '%s' "$content" | awk 'BEGIN{ins=0} /^---$/ { if(ins==0){ins=1; next} else {exit} } ins==1{print}')
       if [ -z "$front" ]; then
         ERRS+=("$path: missing required YAML front-matter (--- ... ---)")
         ERR=1
