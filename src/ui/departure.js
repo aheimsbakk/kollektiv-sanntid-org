@@ -121,7 +121,9 @@ export function createDepartureNode(item){
   const emoji = emojiForMode(mode);
   const destinationText = (item && item.destination) ? String(item.destination) : '—';
   try{ dest.textContent = emoji + ' ' + destinationText; }catch(e){ dest.textContent = destinationText; }
-  // provide an accessible textual label (mode + destination) for screen readers
+  // now place the emoji at the end of the destination text (visual change requested)
+  try{ dest.textContent = destinationText + ' ' + emoji; }catch(e){ dest.textContent = destinationText; }
+  // provide an accessible textual label matching the visual order (destination + mode)
   const readableMode = (m) => {
     if(!m) return '';
     const mm = String(m).toLowerCase();
@@ -133,7 +135,7 @@ export function createDepartureNode(item){
     if(mm.includes('coach')) return 'Coach';
     return '';
   };
-  try{ dest.setAttribute('aria-label', (readableMode(mode) ? (readableMode(mode) + ' ') : '') + destinationText); }catch(e){}
+  try{ dest.setAttribute('aria-label', destinationText + (readableMode(mode) ? (' ' + readableMode(mode)) : '')); }catch(e){}
 
   timeWrap.append(time);
   container.append(dest, timeWrap, situ);
