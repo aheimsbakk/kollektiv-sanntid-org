@@ -16,7 +16,7 @@
   tags: [list, of, tags]
   ---
   ```
-- **Body:** 1–3 sentences summarizing changes and files touched.
+- **Body:** 1–3 sentences summarizing changes and files touched, and don't add redundant information about creating worklog.
 - **Safety:** NO secrets, API keys, or prompt text.
 - **Template:** agent/WORKLOG_TEMPLATE.md
 - **Validate:** ALWAYS validate the worklog with scripts/validate_worklogs.sh
@@ -34,13 +34,14 @@
 - **Safety:** Never include raw code snippets or secrets in these files; use descriptive summaries only.
 
 ## 2. Workflow
-1. **Context:** Read recent logs in `agent/worklogs/`.
-2. **Create:** Generate the worklog file BEFORE committing.
-3. **Commit:** Push changes + worklog.
+1. **Context:** Read recent logs in `agent/CONTEXT.md`.
+2. **Code:** Reach the goal of instructions.
+3. **Test:** Create, and run unit tests.
+    - **Test fail**: Problem solve, code and test until success.
+    - **Improve unit tests:** (Optional) Improve edge case testing.
+4. **Create:** Generate the worklog file BEFORE committing.
+5. **Commit:** Commit changes + worklog.
    - **Commit message:** Conventional commit message format. 
-4. **Diary (Optional):** If compressing context, append to `DIARY.md`:
-   - Header: `## YYYY-MM-DD HH:mm`
-   - Content: Bulleted summary of the session.
 
 ## 3. Versioning
 - **Rule:** If a file contains `VERSION="x.y.z"`, you MUST update it (SemVer).

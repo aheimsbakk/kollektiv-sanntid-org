@@ -15,7 +15,7 @@ tags: [list, of, tags]
 ```
 
 Body
-- 1–3 sentences summarizing the change and files touched. No extra YAML, no secrets, no prompts.
+- 1–3 sentences summarizing the change and files touched. No extra YAML, no secrets, no prompts. Don't add redundant information about creating worklog.
 
 Guidance
 - Create this file before making code edits. Keep it short and factual. This file is the canonical record of intent for the upcoming change and is required by AGENT.md.
