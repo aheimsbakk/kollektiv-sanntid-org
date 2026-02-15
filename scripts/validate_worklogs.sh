@@ -48,6 +48,14 @@ for path in $STAGED; do
         continue
       fi
 
+      # ensure each front-matter line matches key: value (no empty values)
+      nonconforming=$(printf '%s' "$front" | sed -n '1,120p' | awk 'NF{ if ($0 !~ /^[A-Za-z0-9_-]+:\s*.+$/) print NR ": " $0 }')
+      if [ -n "$nonconforming" ]; then
+        ERRS+=("$path: front-matter contains malformed lines: $nonconforming")
+        ERR=1
+        continue
+      fi
+
       # basic ISO timestamp check for when field
       whenVal=$(printf '%s' "$front" | sed -n 's/^\s*when:\s*\(.*\)/\1/p' | head -n1 | tr -d '\r')
       if [ -z "$whenVal" ]; then
@@ -70,6 +78,22 @@ for path in $STAGED; do
           ERRS+=("$path: 'tags' must be a list-like value, e.g. [a,b] (found: $tagsVal)")
           ERR=1
         fi
+      fi
+
+      # validate body: must be present and be 1-3 sentences (heuristic)
+      body=$(printf '%s' "$content" | awk 'BEGIN{ins=0} /^---$/ { if(ins==0){ins=1; next} else {ins=2; next}} ins==2{print}')
+      body_trim=$(printf '%s' "$body" | sed 's/^\s\+//;s/\s\+$//')
+      if [ -z "$body_trim" ]; then
+        ERRS+=("$path: body is empty; worklog body must be 1-3 sentences after front-matter")
+        ERR=1
+        continue
+      fi
+      # count sentence terminators as a rough sentence count
+      sentence_count=$(printf '%s' "$body_trim" | grep -o '[\.\!?]' | wc -l | tr -d ' ')
+      if [ "$sentence_count" -lt 1 ] || [ "$sentence_count" -gt 3 ]; then
+        ERRS+=("$path: body should contain 1-3 sentences (found $sentence_count). Keep summary concise.")
+        ERR=1
+        continue
       fi
       ;;
     *)
