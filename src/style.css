@@ -7,10 +7,16 @@
   --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, 'Roboto Mono', 'Courier New', monospace;
   --large-scale: 6vw;
   /* spacing tokens to keep vertical rhythm consistent */
-  --vertical-gap: 12px;
+  /* --vertical-gap: 12px;
   --header-gap: 6px;
   --departure-padding: 6px 10px;
-  --departure-max-width: 720px;
+  --departure-max-width: 720px; */
+  --vertical-gap: 0em;
+  --header-gap: 0.5em;
+  --departure-padding: 0px 0px;
+  --departure-max-width: 100vw;
+  /* options panel responsive width: 360px but never wider than viewport */
+  --options-panel-width: min(360px, 100vw);
 }
 
 *{box-sizing:border-box}
@@ -54,7 +60,7 @@ html,body{height:100%;margin:0;background:var(--bg);color:var(--fg);font-family:
   font-family:inherit;
   font-weight:900;
   font-size:calc(var(--large-scale) * 0.8);
-  line-height:0.95;
+  /* line-height:0.95; */
   color:var(--accent);
   /* make destination a block so it wraps cleanly and doesn't introduce baseline gaps */
   display:block;
@@ -98,10 +104,11 @@ html,body{height:100%;margin:0;background:var(--bg);color:var(--fg);font-family:
 
 
 /* When options panel is open shift the app content left to make room */
-body.options-open .app-root{transform:translateX(-360px);transition:transform 280ms ease-in-out}
+/* shift the app content left to make room for the options panel; value is responsive */
+body.options-open .app-root{transform:translateX(calc(-1 * var(--options-panel-width)));transition:transform 280ms ease-in-out}
 
 /* Ensure options panel overlays content and stays on top */
-.options-panel{position:fixed;right:0;top:0;height:100vh;width:360px;z-index:1200}
+.options-panel{position:fixed;right:0;top:0;height:100vh;width:var(--options-panel-width);z-index:1200}
 .options-panel.open{transform:translateX(0)}
 
 /* toast for small visual confirmation inside options panel */
