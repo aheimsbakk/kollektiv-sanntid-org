@@ -33,7 +33,7 @@ This repository is a small, dependency-free departure board implemented with van
 - Parsing logic is in `src/entur.js`; tests in `tests/` exercise this code.
 
 ## Agents
-- If you are contributing as an agent (automated or human-following-agent rules), read `agent/AGENT.md` for the agent protocol, required worklog format, and workflow expectations before making edits.
+- If you are contributing as an agent (automated or human-following-agent rules), read `AGENT.md` for the agent protocol, required worklog format, and workflow expectations before making edits.
 
 ## Committing
 - The repo includes a local pre-commit hook at `.githooks/pre-commit`. Enable it locally with `git config core.hooksPath .githooks`.
