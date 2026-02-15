@@ -38,6 +38,8 @@ async function init(){
   }catch(e){/*ignore*/}
 
   const board = createBoardElements(DEFAULTS.STATION_NAME);
+  // ensure the browser page title matches the current station name for clarity
+  try{ document.title = DEFAULTS.STATION_NAME || document.title; }catch(e){}
   // header controls with gear
   const headerControls = createHeaderToggle(()=>{ opts.open(); });
   // attach header controls into header-wrap; place controls to the right without affecting centering
@@ -57,6 +59,7 @@ async function init(){
     // update header title (station displayed in header element)
     const headerTitle = board.el.querySelector('.station-title');
     if (headerTitle) headerTitle.textContent = DEFAULTS.STATION_NAME;
+    try{ document.title = DEFAULTS.STATION_NAME || document.title; }catch(e){}
     // trigger a manual refresh
     (async ()=>{
       try{
