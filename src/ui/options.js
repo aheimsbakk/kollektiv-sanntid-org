@@ -15,7 +15,11 @@ export function createOptionsPanel(defaults, onApply){
   // Autocomplete wrapper & list (visual rules moved to CSS)
   const acWrap = document.createElement('div'); acWrap.className = 'station-autocomplete-wrap';
   const acList = document.createElement('ul'); acList.className = 'station-autocomplete-list';
+  acList.id = 'station-autocomplete-list';
   acList.setAttribute('role','listbox');
+  // hidden by default so it's removed from layout and not exposed to AT
+  acList.hidden = true;
+  acList.setAttribute('aria-hidden', 'true');
   // Replace the plain input with the wrapper that contains it + the floating list
   rowStation.replaceChild(acWrap, inpStation);
   acWrap.appendChild(inpStation);
@@ -127,7 +131,7 @@ export function createOptionsPanel(defaults, onApply){
   let lastQuery = '';
   let highlighted = -1;
   let lastCandidates = [];
-  function clearAutocomplete(){ acList.innerHTML = ''; acList.classList.remove('open'); highlighted = -1; lastCandidates = []; }
+  function clearAutocomplete(){ acList.innerHTML = ''; acList.classList.remove('open'); acList.hidden = true; acList.setAttribute('aria-hidden', 'true'); highlighted = -1; lastCandidates = []; }
   function selectCandidateIndex(idx){
     if (!Array.isArray(lastCandidates) || idx == null || idx < 0 || idx >= lastCandidates.length) return;
     const c = lastCandidates[idx];
@@ -154,6 +158,8 @@ export function createOptionsPanel(defaults, onApply){
     });
     highlighted = -1;
     acList.classList.add('open');
+    acList.hidden = false;
+    acList.removeAttribute('aria-hidden');
   }
 
   inpStation.addEventListener('input', (e) => {
@@ -172,7 +178,7 @@ export function createOptionsPanel(defaults, onApply){
 
   // keyboard navigation for autocomplete
   inpStation.addEventListener('keydown', (e) => {
-    if (!acList.classList.contains('open')) return;
+    if (acList.hidden) return;
     const items = Array.from(acList.children);
     if (e.key === 'ArrowDown'){
       e.preventDefault(); highlighted = Math.min(items.length - 1, highlighted + 1);
