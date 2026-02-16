@@ -14,16 +14,11 @@ export function createOptionsPanel(defaults, onApply){
 
   // Autocomplete wrapper & list (visual rules moved to CSS)
   const acWrap = document.createElement('div'); acWrap.className = 'station-autocomplete-wrap';
-  const acList = document.createElement('ul'); acList.className = 'station-autocomplete-list';
-  acList.id = 'station-autocomplete-list';
-  acList.setAttribute('role','listbox');
-  // hidden by default so it's removed from layout and not exposed to AT
-  acList.hidden = true;
-  acList.setAttribute('aria-hidden', 'true');
-  // Replace the plain input with the wrapper that contains it + the floating list
+  // we'll create the list only when needed so it is not in the DOM when unused
+  let acList = null;
+  // Replace the plain input with the wrapper that contains it + the floating list (list appended on demand)
   rowStation.replaceChild(acWrap, inpStation);
   acWrap.appendChild(inpStation);
-  acWrap.appendChild(acList);
 
   // number of departures
   const rowNum = document.createElement('div'); rowNum.className='options-row';
@@ -131,7 +126,14 @@ export function createOptionsPanel(defaults, onApply){
   let lastQuery = '';
   let highlighted = -1;
   let lastCandidates = [];
-  function clearAutocomplete(){ acList.innerHTML = ''; acList.classList.remove('open'); acList.hidden = true; acList.setAttribute('aria-hidden', 'true'); highlighted = -1; lastCandidates = []; }
+  function clearAutocomplete(){
+    try{
+      if (acList && acList.parentElement) acList.parentElement.removeChild(acList);
+    }catch(e){}
+    acList = null;
+    highlighted = -1;
+    lastCandidates = [];
+  }
   function selectCandidateIndex(idx){
     if (!Array.isArray(lastCandidates) || idx == null || idx < 0 || idx >= lastCandidates.length) return;
     const c = lastCandidates[idx];
@@ -142,9 +144,17 @@ export function createOptionsPanel(defaults, onApply){
     applyChanges(false);
   }
   function showCandidates(cands){
-    acList.innerHTML = '';
     lastCandidates = Array.isArray(cands) ? cands.slice(0) : [];
     if (!Array.isArray(lastCandidates) || lastCandidates.length === 0){ clearAutocomplete(); return; }
+    // create list if needed
+    if (!acList){
+      acList = document.createElement('ul');
+      acList.className = 'station-autocomplete-list';
+      acList.id = 'station-autocomplete-list';
+      acList.setAttribute('role','listbox');
+      acWrap.appendChild(acList);
+    }
+    acList.innerHTML = '';
     lastCandidates.forEach((c, idx) => {
       const li = document.createElement('li'); li.textContent = c.title || c.id || '';
       li.setAttribute('role','option'); li.setAttribute('data-id', String(c.id || ''));
@@ -158,8 +168,8 @@ export function createOptionsPanel(defaults, onApply){
     });
     highlighted = -1;
     acList.classList.add('open');
-    acList.hidden = false;
-    acList.removeAttribute('aria-hidden');
+    // manage ARIA on the input
+    try{ inpStation.setAttribute('aria-expanded','true'); }catch(e){}
   }
 
   inpStation.addEventListener('input', (e) => {
@@ -178,8 +188,8 @@ export function createOptionsPanel(defaults, onApply){
 
   // keyboard navigation for autocomplete
   inpStation.addEventListener('keydown', (e) => {
-    if (acList.hidden) return;
-    const items = Array.from(acList.children);
+    if (!acList || !acList.classList.contains('open')) return;
+    const items = Array.from(acList.children || []);
     if (e.key === 'ArrowDown'){
       e.preventDefault(); highlighted = Math.min(items.length - 1, highlighted + 1);
       items.forEach(it => it.classList.remove('highlighted'));
