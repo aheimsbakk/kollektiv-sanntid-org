@@ -361,3 +361,22 @@ export async function lookupStopId({stationName, apiUrl='https://api.entur.io/jo
     return null;
   }
 }
+
+// New helper: search geocoder and return up to `limit` candidate feature objects
+export async function searchStations({text, limit = 5, fetchFn = fetch, clientName = 'personal-js-app', geocodeUrl='https://api.entur.io/geocoder/v1/autocomplete'}){
+  if(!text || String(text).trim().length < 1) return [];
+  const url = `${geocodeUrl}?text=${encodeURIComponent(text)}&lang=no&size=${limit}`;
+  try{
+    const r = await fetchFn(url, { headers: { 'ET-Client-Name': clientName } });
+    if (!r) return [];
+    if (typeof r.ok !== 'undefined' && r.ok === false) return [];
+    const contentType = (r.headers && (typeof r.headers.get === 'function')) ? r.headers.get('content-type') : (r.headers && (r.headers['content-type'] || r.headers['Content-Type'])) || '';
+    if (contentType && !/application\/json/i.test(contentType)) return [];
+    const j = await r.json();
+    if (!j || !Array.isArray(j.features)) return [];
+    // Map features into a lightweight candidate shape consumed by the UI
+    return j.features.slice(0, limit).map(f => ({ id: f && f.properties && f.properties.id ? f.properties.id : null, title: f && f.properties && (f.properties.label || f.properties.name || f.properties.title) ? (f.properties.label || f.properties.name || f.properties.title) : (f && f.text ? f.text : ''), raw: f }));
+  }catch(e){
+    return [];
+  }
+}

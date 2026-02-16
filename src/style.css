@@ -331,6 +331,15 @@ body.options-open .app-root {
   color: var(--fg);
 }
 
+/* Station autocomplete styles */
+.station-autocomplete-wrap { position: relative; width: 100%; }
+.station-autocomplete-wrap > input[type='text'] { width: 100%; box-sizing: border-box; }
+.station-autocomplete-list { position: absolute; left: 0; right: 0; z-index: 2000; list-style: none; margin: 6px 0 0 0; padding: 0; display: none; border-radius: 6px; overflow: hidden; }
+.station-autocomplete-list.open { display: block; }
+.station-autocomplete-list li { padding: 8px; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.03); background: var(--bg); color: var(--fg); }
+.station-autocomplete-list li.highlighted { background: rgba(255,255,255,0.03); }
+
+
 .options-actions {
   display: flex;
   justify-content: space-between;

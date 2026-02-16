@@ -1,4 +1,6 @@
 // Options panel UI: slide-in from right with controls to update DEFAULTS
+import { searchStations } from '../entur.js';
+
 export function createOptionsPanel(defaults, onApply){
   const panel = document.createElement('aside'); panel.className = 'options-panel';
   const title = document.createElement('h3'); title.textContent = 'Settings';
@@ -7,8 +9,17 @@ export function createOptionsPanel(defaults, onApply){
   // station name
   const rowStation = document.createElement('div'); rowStation.className='options-row';
   const lblStation = document.createElement('label'); lblStation.textContent = 'Station name';
-  const inpStation = document.createElement('input'); inpStation.type='text'; inpStation.value = defaults.STATION_NAME || '';
+  const inpStation = document.createElement('input'); inpStation.type='text'; inpStation.autocomplete='off'; inpStation.setAttribute('aria-autocomplete','list'); inpStation.value = defaults.STATION_NAME || '';
   rowStation.append(lblStation, inpStation);
+
+  // Autocomplete wrapper & list (visual rules moved to CSS)
+  const acWrap = document.createElement('div'); acWrap.className = 'station-autocomplete-wrap';
+  const acList = document.createElement('ul'); acList.className = 'station-autocomplete-list';
+  acList.setAttribute('role','listbox');
+  // Replace the plain input with the wrapper that contains it + the floating list
+  rowStation.replaceChild(acWrap, inpStation);
+  acWrap.appendChild(inpStation);
+  acWrap.appendChild(acList);
 
   // number of departures
   const rowNum = document.createElement('div'); rowNum.className='options-row';
@@ -101,8 +112,8 @@ export function createOptionsPanel(defaults, onApply){
   btnClose.addEventListener('click', ()=> close());
   btnSave.addEventListener('click', ()=> applyChanges(true));
 
-  // apply on Enter in text inputs without closing the panel
-  [inpStation, inpNum, inpInt].forEach(inp => {
+  // apply on Enter in non-station text inputs without closing the panel
+  [inpNum, inpInt].forEach(inp => {
     inp.addEventListener('keydown', (e) => {
       if (e.key === 'Enter'){
         e.preventDefault();
@@ -110,6 +121,62 @@ export function createOptionsPanel(defaults, onApply){
       }
     });
   });
+
+  // Station autocomplete behaviour: query after 3 characters and show up to 5 matches
+  let acTimer = null;
+  let lastQuery = '';
+  let highlighted = -1;
+  function clearAutocomplete(){ acList.innerHTML = ''; acList.classList.remove('open'); highlighted = -1; }
+  function showCandidates(cands){
+    acList.innerHTML = '';
+    if (!Array.isArray(cands) || cands.length === 0){ clearAutocomplete(); return; }
+    cands.forEach((c, idx) => {
+      const li = document.createElement('li'); li.textContent = c.title || c.id || '';
+      li.setAttribute('role','option'); li.setAttribute('data-id', String(c.id || ''));
+      li.addEventListener('mousedown', (e) => { // use mousedown to handle selection before blur
+        e.preventDefault();
+        inpStation.value = li.textContent || '';
+        inpStation.dataset.stopId = li.getAttribute('data-id') || '';
+        clearAutocomplete();
+        applyChanges(false);
+      });
+      li.addEventListener('mouseover', () => { Array.from(acList.children).forEach(ch => ch.classList.remove('highlighted')); li.classList.add('highlighted'); highlighted = idx; });
+      acList.appendChild(li);
+    });
+    acList.classList.add('open');
+  }
+
+  inpStation.addEventListener('input', (e) => {
+    const v = String(inpStation.value || '');
+    if (v === lastQuery) return;
+    lastQuery = v;
+    clearTimeout(acTimer);
+    if (v.trim().length < 3){ clearAutocomplete(); return; }
+    acTimer = setTimeout(async () => {
+      try{
+        const cands = await searchStations({ text: v, limit: 5, fetchFn: window.fetch });
+        showCandidates(cands);
+      }catch(err){ clearAutocomplete(); }
+    }, 250);
+  });
+
+  // keyboard navigation for autocomplete
+  inpStation.addEventListener('keydown', (e) => {
+    if (!acList.classList.contains('open')) return;
+    const items = Array.from(acList.children);
+    if (e.key === 'ArrowDown'){
+      e.preventDefault(); highlighted = Math.min(items.length - 1, highlighted + 1); items.forEach(it => it.classList.remove('highlighted')); if (items[highlighted]) items[highlighted].classList.add('highlighted');
+    } else if (e.key === 'ArrowUp'){
+      e.preventDefault(); highlighted = Math.max(0, highlighted - 1); items.forEach(it => it.classList.remove('highlighted')); if (items[highlighted]) items[highlighted].classList.add('highlighted');
+    } else if (e.key === 'Enter'){
+      if (highlighted >= 0 && items[highlighted]){ e.preventDefault(); items[highlighted].dispatchEvent(new Event('mousedown')); }
+    } else if (e.key === 'Escape'){
+      clearAutocomplete();
+    }
+  });
+
+  // hide autocomplete shortly after blur so clicks on list are handled
+  inpStation.addEventListener('blur', () => { setTimeout(() => { clearAutocomplete(); }, 150); });
 
   // small visual confirmation (toast) when applying settings
   const toast = document.createElement('div'); toast.className = 'options-toast'; toast.style.display='none'; panel.appendChild(toast);
