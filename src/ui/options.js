@@ -181,7 +181,9 @@ export function createOptionsPanel(defaults, onApply){
     // debounce queries to avoid overloading backend; reset on every keypress
     acTimer = setTimeout(async () => {
       try{
-        const cands = await searchStations({ text: v, limit: 5, fetchFn: window.fetch });
+        // Get currently selected transport modes for filtering autocomplete
+        const selectedModes = Array.from(modesWrap.querySelectorAll('input[type=checkbox]:checked')).map(i=>i.value);
+        const cands = await searchStations({ text: v, limit: 5, modes: selectedModes.length > 0 ? selectedModes : null, fetchFn: window.fetch });
         showCandidates(cands);
       }catch(err){ clearAutocomplete(); }
     }, 500);

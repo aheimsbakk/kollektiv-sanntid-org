@@ -5,12 +5,29 @@ export function parseEnturResponse(json){
   return calls.map(call => {
     const destination = call.destinationDisplay && call.destinationDisplay.frontText ? call.destinationDisplay.frontText : '';
     const expectedDepartureISO = call.expectedDepartureTime || null;
-    // Extract situation text (prefer Norwegian 'no'/'nob')
+    // Parse realtime fields per docs/journyplanner.md
+    const realtime = call.realtime === true;
+    const aimedDepartureISO = call.aimedDepartureTime || null;
+    const actualDepartureISO = call.actualDepartureTime || null;
+    const cancellation = call.cancellation === true;
+    const predictionInaccurate = call.predictionInaccurate === true;
+    // Extract quay/platform information
+    const quay = call.quay ? {
+      id: call.quay.id || null,
+      publicCode: call.quay.publicCode || null
+    } : null;
+    // Extract situation text (prefer Norwegian 'no'/'nob', also check summary field)
     const situations = [];
     if (Array.isArray(call.situations) && call.situations.length){
       call.situations.forEach(s => {
+        // Check description first (more detailed)
         if (s && Array.isArray(s.description)){
           const found = s.description.find(d => d.language === 'no' || d.language === 'nob') || s.description[0];
+          if(found && found.value) situations.push(found.value);
+        }
+        // Also check summary if no description was found
+        else if (s && Array.isArray(s.summary)){
+          const found = s.summary.find(d => d.language === 'no' || d.language === 'nob') || s.summary[0];
           if(found && found.value) situations.push(found.value);
         }
       });
@@ -115,7 +132,20 @@ export function parseEnturResponse(json){
     }catch(e){ explicitMode = null; }
 
     const mode = explicitMode || detectModeFromRaw(call);
-    return {destination, expectedDepartureISO, situations, raw: call, mode};
+    return {
+      destination, 
+      expectedDepartureISO, 
+      situations, 
+      raw: call, 
+      mode,
+      // New realtime fields
+      realtime,
+      aimedDepartureISO,
+      actualDepartureISO,
+      cancellation,
+      predictionInaccurate,
+      quay
+    };
   });
 }
 
@@ -149,10 +179,9 @@ export async function fetchDepartures({stopId, numDepartures=2, modes=['bus'], a
     const { includeModes = false, modesLiteral = '', useVariables = false, variableValues = null, includeModeFields = false } = opts;
     const modesPart = includeModes ? (useVariables ? `, whiteListedModes: $modes` : `, whiteListedModes: [${modesLiteral}]`) : '';
     const varSig = useVariables && includeModes ? '($modes: [TransportMode!])' : '';
-    // additional candidate fields that may contain transport mode info.
-    // Keep this minimal to avoid schema validation errors on some deployments:
-    // request only the journeyPattern.line transportMode and publicCode which
-    // has proven to be supported and useful for mode detection.
+    // Request all real-time fields per docs/journyplanner.md:
+    // realtime, aimedDepartureTime, expectedDepartureTime, actualDepartureTime,
+    // cancellation, predictionInaccurate, quay info, and situations
     const modeFields = includeModeFields ? `
         serviceJourney {
           journeyPattern { 
@@ -161,10 +190,30 @@ export async function fetchDepartures({stopId, numDepartures=2, modes=['bus'], a
         }` : '';
     const query = `query ${varSig} {
     stopPlace(id: "${stopId}") {
-      estimatedCalls(numberOfDepartures: ${numDepartures}${modesPart}) {
+      id
+      name
+      estimatedCalls(numberOfDepartures: ${numDepartures}${modesPart}, includeCancelledTrips: true) {
+        realtime
+        aimedDepartureTime
         expectedDepartureTime
+        actualDepartureTime
+        cancellation
+        predictionInaccurate
         destinationDisplay { frontText }
-        situations { description { value language } }${modeFields}
+        quay {
+          id
+          publicCode
+        }
+        situations {
+          summary {
+            value
+            language
+          }
+          description {
+            value
+            language
+          }
+        }${modeFields}
       }
     }
   }`;
@@ -362,10 +411,37 @@ export async function lookupStopId({stationName, apiUrl='https://api.entur.io/jo
   }
 }
 
+// Helper: map transport modes to geocoder categories per docs/geocoder.md
+function mapModesToGeocoderCategories(modes){
+  if (!Array.isArray(modes) || modes.length === 0) return null;
+  const categoryMap = {
+    'bus': ['onstreetBus', 'busStation', 'coachStation'],
+    'tram': ['onstreetTram', 'tramStation'],
+    'metro': ['metroStation'],
+    'rail': ['railStation'],
+    'water': ['harbourPort', 'ferryPort', 'ferryStop']
+  };
+  const categories = new Set();
+  modes.forEach(mode => {
+    const m = String(mode).toLowerCase();
+    if (categoryMap[m]) {
+      categoryMap[m].forEach(cat => categories.add(cat));
+    }
+  });
+  return categories.size > 0 ? Array.from(categories).join(',') : null;
+}
+
 // New helper: search geocoder and return up to `limit` candidate feature objects
-export async function searchStations({text, limit = 5, fetchFn = fetch, clientName = 'personal-js-app', geocodeUrl='https://api.entur.io/geocoder/v1/autocomplete'}){
+// Optionally filter by transport modes using the categories parameter
+export async function searchStations({text, limit = 5, modes = null, fetchFn = fetch, clientName = 'personal-js-app', geocodeUrl='https://api.entur.io/geocoder/v1/autocomplete'}){
   if(!text || String(text).trim().length < 1) return [];
-  const url = `${geocodeUrl}?text=${encodeURIComponent(text)}&lang=no&size=${limit}`;
+  // Build URL with layers=venue to restrict to transport stops/stations
+  let url = `${geocodeUrl}?text=${encodeURIComponent(text)}&lang=no&size=${limit}&layers=venue`;
+  // Add categories filter if modes are provided
+  const categories = mapModesToGeocoderCategories(modes);
+  if (categories) {
+    url += `&categories=${encodeURIComponent(categories)}`;
+  }
   try{
     const r = await fetchFn(url, { headers: { 'ET-Client-Name': clientName } });
     if (!r) return [];
