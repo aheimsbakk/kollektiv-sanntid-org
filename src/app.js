@@ -38,6 +38,11 @@ async function init(){
   }catch(e){/*ignore*/}
 
   const board = createBoardElements(DEFAULTS.STATION_NAME);
+  // track when the next automatic refresh will occur (epoch ms) so we can
+  // show a per-second countdown in the header status chip.
+  let nextRefreshAt = Date.now();
+  // set when a live fetch has actually contacted the API (used for diagnostics)
+  let liveFetchSucceeded = false;
   // ensure the browser page title matches the current station name for clarity
   try{ document.title = DEFAULTS.STATION_NAME || document.title; }catch(e){}
   // register service worker if available so the app becomes installable
@@ -76,6 +81,8 @@ async function init(){
     // If API returns no departures, show an explicit empty state instead of demo data
     if(!fresh || !fresh.length) fresh = [];
     renderDepartures(board.list, fresh);
+    // schedule next automatic refresh relative to this manual refresh
+    nextRefreshAt = Date.now() + (DEFAULTS.FETCH_INTERVAL * 1000);
       }catch(e){ console.warn('Manual refresh failed', e); }
     })();
     // apply text size immediately
@@ -119,7 +126,15 @@ async function init(){
     const stopId = await lookupStopId({ stationName: DEFAULTS.STATION_NAME, clientName: DEFAULTS.CLIENT_NAME });
     if(stopId && DEFAULTS.API_URL){
       data = await fetchDepartures({ stopId, numDepartures: DEFAULTS.NUM_DEPARTURES, modes: DEFAULTS.TRANSPORT_MODES, apiUrl: DEFAULTS.API_URL, clientName: DEFAULTS.CLIENT_NAME });
-      if(board.status){ board.status.style.display='inline-block'; board.status.textContent = 'Live'; }
+      // mark that we contacted the live API (even if it returned 0 items)
+      liveFetchSucceeded = true;
+      // ensure the status chip is visible; its textContent will be driven by the
+      // per-second ticker below to show "Next update in XX seconds."
+      if (board.status) {
+        board.status.style.display = 'inline-block';
+        // give an initial label while the ticker updates on the next tick
+        board.status.textContent = 'Live';
+      }
     }
   }catch(e){
     console.warn('Live fetch failed, falling back to demo', e && e.message ? e.message : e);
@@ -130,6 +145,9 @@ async function init(){
     data = [];
   }
   renderDepartures(board.list, data);
+  // initialise the next refresh timestamp to FETCH_INTERVAL from now so the
+  // header countdown starts immediately.
+  nextRefreshAt = Date.now() + (DEFAULTS.FETCH_INTERVAL * 1000);
   // Start per-second countdown updates (keeps DOM nodes, avoids full re-render)
   function tickCountdowns(){
     const now = Date.now();
@@ -142,19 +160,25 @@ async function init(){
       const txt = formatCountdown(epoch, now);
       t.textContent = (txt != null) ? txt : '—';
     });
+    // update header status chip with seconds until next automatic refresh
+    if (board.status) {
+      const msLeft = (typeof nextRefreshAt === 'number') ? (nextRefreshAt - now) : (DEFAULTS.FETCH_INTERVAL * 1000);
+      const secLeft = Math.max(0, Math.ceil(msLeft / 1000));
+      board.status.textContent = `Next update in ${secLeft} seconds.`;
+    }
   }
   tickCountdowns();
   setInterval(tickCountdowns, 1000);
   // departure-specific situation lines are shown per-item; global banner removed
   // show diagnostics when live fetch returned empty results
-  if(board.debug){
-    if(board.status && board.status.textContent === 'Live' && data.length===0){
-      board.debug.style.display='block';
-      board.debug.textContent = 'Live fetch succeeded but returned 0 departures. Possible reasons: remote has no upcoming departures or request params filter results.\nCheck network requests for details.';
-    } else {
-      board.debug.style.display='none';
+    if (board.debug) {
+      if (liveFetchSucceeded && data.length === 0) {
+        board.debug.style.display = 'block';
+        board.debug.textContent = 'Live fetch succeeded but returned 0 departures. Possible reasons: remote has no upcoming departures or request params filter results.\nCheck network requests for details.';
+      } else {
+        board.debug.style.display = 'none';
+      }
     }
-  }
 
   // refresh logic: clear cache and refetch every FETCH_INTERVAL seconds
   setInterval(async ()=>{
@@ -165,6 +189,7 @@ async function init(){
       let fresh = [];
       if(stopId){
         fresh = await fetchDepartures({ stopId, numDepartures: DEFAULTS.NUM_DEPARTURES, modes: DEFAULTS.TRANSPORT_MODES, apiUrl: DEFAULTS.API_URL, clientName: DEFAULTS.CLIENT_NAME });
+        liveFetchSucceeded = true;
       }
       if(!fresh || !fresh.length){
         fresh = await getDemoData();
@@ -172,6 +197,8 @@ async function init(){
       // re-render for now; later we can diff and patch
       renderDepartures(board.list, fresh);
       data = fresh;
+      // reset next refresh time to FETCH_INTERVAL from now
+      nextRefreshAt = Date.now() + (DEFAULTS.FETCH_INTERVAL * 1000);
     }catch(err){
       console.warn('Refresh failed', err);
     }
