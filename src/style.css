@@ -353,7 +353,7 @@ body.options-open .app-root {
   display: none;
   border-radius: 6px;
   overflow: auto;
-  background: rgba(0,0,0,0.45);
+  background: rgba(100,100,100,0.95);
   box-shadow: 0 6px 18px rgba(0,0,0,0.6);
   display: grid;
   grid-auto-rows: min-content;
