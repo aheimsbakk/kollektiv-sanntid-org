@@ -85,9 +85,57 @@ async function init(){
   }
   // ensure the browser page title matches the current station name for clarity
   try{ document.title = DEFAULTS.STATION_NAME || document.title; }catch(e){}
-  // register service worker if available so the app becomes installable
-  if('serviceWorker' in navigator){
-    try{ navigator.serviceWorker.register('./sw.js').catch(()=>{}); }catch(e){}
+  // register service worker and implement an "update available" flow that
+  // prompts the user to reload when a new service worker is installed.
+  if ('serviceWorker' in navigator) {
+    try {
+      navigator.serviceWorker.register('./sw.js').then(reg => {
+        // helper to show a non-blocking update prompt
+        const showUpdatePrompt = (worker) => {
+          // avoid creating multiple prompts
+          if (document.getElementById('sw-update-toast')) return;
+          const toast = document.createElement('div');
+          toast.id = 'sw-update-toast';
+          toast.className = 'options-toast';
+          toast.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center;gap:12px;"><span>New version available</span><div style="display:flex;gap:8px"><button id="sw-refresh-btn">Reload</button><button id="sw-dismiss-btn">Dismiss</button></div></div>`;
+          document.body.appendChild(toast);
+          const remove = ()=>{ try{ toast.remove(); }catch(e){} };
+          document.getElementById('sw-refresh-btn').addEventListener('click', ()=>{
+            // ask the waiting worker to skipWaiting, then reload on controllerchange
+            if (!worker) return;
+            worker.postMessage({type: 'SKIP_WAITING'});
+          });
+          document.getElementById('sw-dismiss-btn').addEventListener('click', remove);
+        };
+
+        // If there's already a waiting worker, prompt immediately
+        if (reg && reg.waiting) {
+          showUpdatePrompt(reg.waiting);
+        }
+
+        // Listen for updates found (new installing worker)
+        reg.addEventListener('updatefound', () => {
+          const installing = reg.installing;
+          if (!installing) return;
+          installing.addEventListener('statechange', () => {
+            if (installing.state === 'installed') {
+              // If there's an active controller, this is an update (not first install)
+              if (navigator.serviceWorker.controller) {
+                showUpdatePrompt(reg.waiting || installing);
+              }
+            }
+          });
+        });
+
+        // When the new SW takes control, reload so the user gets the new assets
+        let refreshing = false;
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+          if (refreshing) return;
+          refreshing = true;
+          window.location.reload();
+        });
+      }).catch(()=>{});
+    } catch (e) { /* ignore */ }
   }
   // header controls with gear
   const headerControls = createHeaderToggle(()=>{ opts.open(); });

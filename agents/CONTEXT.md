@@ -10,3 +10,4 @@ Next Steps:
 - Wire station autocomplete into options panel (done) and ensure it is
   debounced and accessible.
 - Prefer explicit parsing of `serviceJourney.journeyPattern.line.transportMode` when present.
+ - Implement service worker update flow and prompt-to-reload UX (done: app registration + updated sw.js)
