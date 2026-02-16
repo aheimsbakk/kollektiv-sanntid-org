@@ -2,7 +2,7 @@
 set -euo pipefail
 
 # fix_worklogs.sh
-# Auto-fix worklog files staged for commit so they conform to agent/WORKLOG_TEMPLATE.md
+# Auto-fix worklog files staged for commit so they conform to agents/WORKLOG_TEMPLATE.md
 # Usage: run during pre-commit. It reads staged files from git index and updates workspace
 # files (then re-stages them) to ensure strict front-matter keys/order, valid timestamp,
 # bracketed tags, and 1-3 sentence body.

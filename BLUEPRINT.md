@@ -11,7 +11,7 @@ High-level constraints
 - The app must function fully in the browser. If Entur's API blocks cross-origin requests, the app will fall back
   to a demo/offline mode and a manual JSON upload path so users can load their own fetched data.
 - Keep accessibility and responsive design in mind.
-- Follow agent protocol before committing: create `agent/worklogs/YYYY-MM-DD-HH-mm-{short-desc}.md` and update `agent/CONTEXT.md` (<=20 lines).
+- Follow agents protocol before committing: create `agents/worklogs/YYYY-MM-DD-HH-mm-{short-desc}.md` and update `agents/CONTEXT.md` (<=20 lines).
 
 User-facing features
 - Station header (toggleable).
@@ -149,10 +149,10 @@ Implementation milestones (priority order)
 5. Settings persistence and controls.
 6. Accessibility polish and responsive tweaks.
 7. Error handling, offline/demo mode, and manual testing pages.
-8. Prepare release: `agent/worklogs/...` entry and `agent/CONTEXT.md` update before commit.
+ 8. Prepare release: `agents/worklogs/...` entry and `agents/CONTEXT.md` update before commit.
 
 Commit & agent protocol notes (required)
-- Before committing any code, create a granular worklog file: `agent/worklogs/YYYY-MM-DD-HH-mm-create-blueprint.md` containing ONLY the front-matter keys below followed by 1–3 sentence body describing changes and files touched.
+ - Before committing any code, create a granular worklog file: `agents/worklogs/YYYY-MM-DD-HH-mm-create-blueprint.md` containing ONLY the front-matter keys below followed by 1–3 sentence body describing changes and files touched.
   - Example front matter:
     ```yaml
     ---
@@ -163,7 +163,7 @@ Commit & agent protocol notes (required)
     tags: [blueprint, planning, departure]
     ---
     ```
-- Immediately update `agent/CONTEXT.md` (under 20 lines) with Current Goal, Last 3 Changes, Next Steps.
+ - Immediately update `agents/CONTEXT.md` (under 20 lines) with Current Goal, Last 3 Changes, Next Steps.
 - If any file contains `VERSION="x.y.z"`, bump semver and mention it in worklog body.
 - Commit message style: Conventional — e.g., `feat(ui): add blueprint and scaffolding plan`.
 

@@ -29,9 +29,8 @@ This repository is a small, dependency-free departure board implemented with van
   - `git config core.hooksPath .githooks`.
 
 ## Contributing
-- Contributions are welcome! Please document your changes concisely in a worklog file under `agent/worklogs/YYYY-MM-DD-HH-mm-{desc}.md` using the provided `agent/WORKLOG_TEMPLATE.md`.
+- Contributions are welcome! Please document your changes concisely in a worklog file under `agents/worklogs/YYYY-MM-DD-HH-mm-{desc}.md` using the provided `agents/WORKLOG_TEMPLATE.md`.
 - Ensure all tests pass (`node tests/run.mjs`).
 
 ## License
 - MIT
-

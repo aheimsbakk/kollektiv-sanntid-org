@@ -230,7 +230,7 @@ if [ "$ERR" -ne 0 ]; then
     echo " - $e" >&2
   done
   echo
-  echo "Fix worklogs to match agent/WORKLOG_TEMPLATE.md (front-matter keys in order: $REQUIRED_SEQ)" >&2
+  echo "Fix worklogs to match agents/WORKLOG_TEMPLATE.md (front-matter keys in order: $REQUIRED_SEQ)" >&2
   exit 1
 else
   exit 0

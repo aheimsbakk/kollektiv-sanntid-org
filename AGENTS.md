@@ -4,7 +4,7 @@
 
 ### 1.1. Granular Worklog (Long-term Memory)
 - **Action:** Every change requires a worklog file.
-- **Path:** `agent/worklogs/YYYY-MM-DD-HH-mm-{short-desc}.md`
+ - **Path:** `agents/worklogs/YYYY-MM-DD-HH-mm-{short-desc}.md`
   - **Date and time:** Use `date` command to fetch date and time.
 - **Front Matter (Strict):** Must contain ONLY these keys:
   ```yaml
@@ -18,23 +18,23 @@
   ```
 - **Body:** 1–3 sentences summarizing changes and files touched, and don't add redundant information about creating worklog.
 - **Safety:** NO secrets, API keys, or prompt text.
-- **Template:** agent/WORKLOG_TEMPLATE.md
+- **Template:** agents/WORKLOG_TEMPLATE.md
 - **Validate:** ALWAYS validate the worklog with scripts/validate_worklogs.sh
 
 ### 1.2. State Compaction (Short-term Memory)
-- **Action:** Immediately after creating a granular log, create or update `agent/CONTEXT.md`.
+- **Action:** Immediately after creating a granular log, create or update `agents/CONTEXT.md`.
 - **Constraint:** This file MUST stay under 20 lines.
 - **Structure:**
     - **Current Goal:** The high-level "vibe" we are chasing right now.
     - **Last 3 Changes:** Bullet points referencing the last 3 worklog filenames.
     - **Next Steps:** The immediate next 2 tactical moves.
 
-### 1.3. Context Hygiene
-- **Rule:** If `agent/CONTEXT.md` exceeds 20 lines, the agent must "garbage collect" by moving older tactical notes into a new worklog and resetting the `agent/CONTEXT.md` to the current priority only.
+-### 1.3. Context Hygiene
+- **Rule:** If `agents/CONTEXT.md` exceeds 20 lines, the agent must "garbage collect" by moving older tactical notes into a new worklog and resetting the `agents/CONTEXT.md` to the current priority only.
 - **Safety:** Never include raw code snippets or secrets in these files; use descriptive summaries only.
 
 ## 2. Workflow
-1. **Context:** Read recent logs in `agent/CONTEXT.md`.
+1. **Context:** Read recent logs in `agents/CONTEXT.md`.
 2. **Code:** Reach the goal of instructions.
 3. **Test:** Create, and run unit tests.
     - **Test fail**: Problem solve, code and test until success.
