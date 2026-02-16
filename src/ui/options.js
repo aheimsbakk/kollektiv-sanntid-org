@@ -44,7 +44,7 @@ export function createOptionsPanel(defaults, onApply){
   const rowModes = document.createElement('div'); rowModes.className='options-row';
   const lblModes = document.createElement('label'); lblModes.textContent = 'Transport modes (filter)';
   const modesWrap = document.createElement('div'); modesWrap.className='modes-checkboxes';
-  const POSSIBLE = ['bus','tram','metro','rail','water'];
+  const POSSIBLE = ['bus','tram','metro','rail','water','air','coach','gondola','funicular'];
   // helper to map mode -> emoji used in the UI
   const emojiForMode = (mode) => {
     if(!mode) return '🚆';
@@ -54,7 +54,10 @@ export function createOptionsPanel(defaults, onApply){
     if(m.includes('metro') || m.includes('t-bane') || m.includes('tbane')) return '🚇';
     if(m.includes('rail') || m.includes('train') || m.includes('tog')) return '🚅';
     if(m.includes('water') || m.includes('ferry') || m.includes('ferje') || m.includes('boat')) return '🛳️';
+    if(m.includes('air') || m.includes('plane') || m.includes('fly')) return '✈️';
     if(m.includes('coach')) return '🚐';
+    if(m.includes('gondola') || m.includes('cable')) return '🚡';
+    if(m.includes('funicular')) return '🚟';
     return '🚆';
   };
 
