@@ -126,23 +126,33 @@ export function createOptionsPanel(defaults, onApply){
   let acTimer = null;
   let lastQuery = '';
   let highlighted = -1;
-  function clearAutocomplete(){ acList.innerHTML = ''; acList.classList.remove('open'); highlighted = -1; }
+  let lastCandidates = [];
+  function clearAutocomplete(){ acList.innerHTML = ''; acList.classList.remove('open'); highlighted = -1; lastCandidates = []; }
+  function selectCandidateIndex(idx){
+    if (!Array.isArray(lastCandidates) || idx == null || idx < 0 || idx >= lastCandidates.length) return;
+    const c = lastCandidates[idx];
+    if (!c) return;
+    inpStation.value = c.title || c.id || '';
+    inpStation.dataset.stopId = String(c.id || '');
+    clearAutocomplete();
+    applyChanges(false);
+  }
   function showCandidates(cands){
     acList.innerHTML = '';
-    if (!Array.isArray(cands) || cands.length === 0){ clearAutocomplete(); return; }
-    cands.forEach((c, idx) => {
+    lastCandidates = Array.isArray(cands) ? cands.slice(0) : [];
+    if (!Array.isArray(lastCandidates) || lastCandidates.length === 0){ clearAutocomplete(); return; }
+    lastCandidates.forEach((c, idx) => {
       const li = document.createElement('li'); li.textContent = c.title || c.id || '';
       li.setAttribute('role','option'); li.setAttribute('data-id', String(c.id || ''));
+      li.dataset.index = String(idx);
       li.addEventListener('mousedown', (e) => { // use mousedown to handle selection before blur
         e.preventDefault();
-        inpStation.value = li.textContent || '';
-        inpStation.dataset.stopId = li.getAttribute('data-id') || '';
-        clearAutocomplete();
-        applyChanges(false);
+        selectCandidateIndex(idx);
       });
       li.addEventListener('mouseover', () => { Array.from(acList.children).forEach(ch => ch.classList.remove('highlighted')); li.classList.add('highlighted'); highlighted = idx; });
       acList.appendChild(li);
     });
+    highlighted = -1;
     acList.classList.add('open');
   }
 
@@ -165,11 +175,15 @@ export function createOptionsPanel(defaults, onApply){
     if (!acList.classList.contains('open')) return;
     const items = Array.from(acList.children);
     if (e.key === 'ArrowDown'){
-      e.preventDefault(); highlighted = Math.min(items.length - 1, highlighted + 1); items.forEach(it => it.classList.remove('highlighted')); if (items[highlighted]) items[highlighted].classList.add('highlighted');
+      e.preventDefault(); highlighted = Math.min(items.length - 1, highlighted + 1);
+      items.forEach(it => it.classList.remove('highlighted'));
+      if (items[highlighted]){ items[highlighted].classList.add('highlighted'); items[highlighted].scrollIntoView({ block: 'nearest' }); }
     } else if (e.key === 'ArrowUp'){
-      e.preventDefault(); highlighted = Math.max(0, highlighted - 1); items.forEach(it => it.classList.remove('highlighted')); if (items[highlighted]) items[highlighted].classList.add('highlighted');
+      e.preventDefault(); highlighted = Math.max(0, highlighted - 1);
+      items.forEach(it => it.classList.remove('highlighted'));
+      if (items[highlighted]){ items[highlighted].classList.add('highlighted'); items[highlighted].scrollIntoView({ block: 'nearest' }); }
     } else if (e.key === 'Enter'){
-      if (highlighted >= 0 && items[highlighted]){ e.preventDefault(); items[highlighted].dispatchEvent(new Event('mousedown')); }
+      if (highlighted >= 0){ e.preventDefault(); selectCandidateIndex(highlighted); }
     } else if (e.key === 'Escape'){
       clearAutocomplete();
     }
