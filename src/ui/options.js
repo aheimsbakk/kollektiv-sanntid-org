@@ -97,6 +97,7 @@ export function createOptionsPanel(defaults, onApply){
     const chosen = Array.from(modesWrap.querySelectorAll('input[type=checkbox]:checked')).map(i=>i.value);
     const newOpts = {
       STATION_NAME: inpStation.value || defaults.STATION_NAME,
+      STOP_ID: inpStation.dataset.stopId || null, // Use stored stopId from autocomplete if available
       NUM_DEPARTURES: Number(inpNum.value) || defaults.NUM_DEPARTURES,
       FETCH_INTERVAL: Number(inpInt.value) || defaults.FETCH_INTERVAL,
       TRANSPORT_MODES: chosen.length ? chosen : defaults.TRANSPORT_MODES,
@@ -176,6 +177,8 @@ export function createOptionsPanel(defaults, onApply){
     const v = String(inpStation.value || '');
     if (v === lastQuery) return;
     lastQuery = v;
+    // Clear stored stopId when user manually types (not selecting from autocomplete)
+    inpStation.dataset.stopId = '';
     clearTimeout(acTimer);
     if (v.trim().length < 3){ clearAutocomplete(); return; }
     // debounce queries to avoid overloading backend; reset on every keypress

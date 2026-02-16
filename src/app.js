@@ -51,7 +51,11 @@ async function init(){
   async function doRefresh({ fallbackToDemo = true } = {}){
     try{
       if(globalThis._enturCache) globalThis._enturCache.clear();
-      const stopId = await lookupStopId({ stationName: DEFAULTS.STATION_NAME, clientName: DEFAULTS.CLIENT_NAME });
+      // Use stored STOP_ID if available, otherwise lookup by station name
+      let stopId = DEFAULTS.STOP_ID;
+      if (!stopId) {
+        stopId = await lookupStopId({ stationName: DEFAULTS.STATION_NAME, clientName: DEFAULTS.CLIENT_NAME });
+      }
       let fresh = [];
       if(stopId){
         fresh = await fetchDepartures({ stopId, numDepartures: DEFAULTS.NUM_DEPARTURES, modes: DEFAULTS.TRANSPORT_MODES, apiUrl: DEFAULTS.API_URL, clientName: DEFAULTS.CLIENT_NAME });
@@ -150,6 +154,7 @@ async function init(){
     // apply new defaults and re-init fetch loop by reloading the page state
     // for now just update the UI and re-run first fetch cycle
     DEFAULTS.STATION_NAME = newOpts.STATION_NAME;
+    DEFAULTS.STOP_ID = newOpts.STOP_ID || null;
     DEFAULTS.NUM_DEPARTURES = newOpts.NUM_DEPARTURES;
     DEFAULTS.FETCH_INTERVAL = newOpts.FETCH_INTERVAL;
     DEFAULTS.TRANSPORT_MODES = newOpts.TRANSPORT_MODES;
@@ -203,7 +208,11 @@ async function init(){
   // Try live data first, fall back to demo
   let data = [];
   try{
-    const stopId = await lookupStopId({ stationName: DEFAULTS.STATION_NAME, clientName: DEFAULTS.CLIENT_NAME });
+    // Use stored STOP_ID if available, otherwise lookup by station name
+    let stopId = DEFAULTS.STOP_ID;
+    if (!stopId) {
+      stopId = await lookupStopId({ stationName: DEFAULTS.STATION_NAME, clientName: DEFAULTS.CLIENT_NAME });
+    }
     if(stopId && DEFAULTS.API_URL){
       // use the new helper to perform the first refresh but do not fallback to demo
       await doRefresh({ fallbackToDemo: false });
@@ -264,7 +273,11 @@ async function init(){
     try{
       // clear entur cache to force network refetch
       if(globalThis._enturCache) globalThis._enturCache.clear();
-      const stopId = await lookupStopId({ stationName: DEFAULTS.STATION_NAME, clientName: DEFAULTS.CLIENT_NAME });
+      // Use stored STOP_ID if available, otherwise lookup by station name
+      let stopId = DEFAULTS.STOP_ID;
+      if (!stopId) {
+        stopId = await lookupStopId({ stationName: DEFAULTS.STATION_NAME, clientName: DEFAULTS.CLIENT_NAME });
+      }
       let fresh = [];
       if(stopId){
         fresh = await fetchDepartures({ stopId, numDepartures: DEFAULTS.NUM_DEPARTURES, modes: DEFAULTS.TRANSPORT_MODES, apiUrl: DEFAULTS.API_URL, clientName: DEFAULTS.CLIENT_NAME });
