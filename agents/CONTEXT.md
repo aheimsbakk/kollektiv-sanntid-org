@@ -1,11 +1,11 @@
-Overall Context: Dependency-free departure board using Entur APIs with realtime data, reliable autocomplete filtering transport stops only, Norwegian character support (æøå), complete transport mode coverage.
+Overall Context: Dependency-free departure board using Entur APIs with realtime data, intelligent autocomplete with client-side re-ranking, Norwegian character support (æøå), complete transport mode coverage.
 
-Current Goal: All core features complete. Support for 6 actively-used transport modes with icons (bus, tram, metro, rail, water, coach).
+Current Goal: All core autocomplete and departure features complete. Autocomplete now correctly ranks exact/prefix matches higher.
 
 Last 3 Changes:
+- agents/worklogs/2026-02-16-22-17-fix-storen-autocomplete.md
 - agents/worklogs/2026-02-16-22-12-remove-unused-modes.md
 - agents/worklogs/2026-02-16-22-07-add-transport-modes.md
-- agents/worklogs/2026-02-16-21-58-filter-venue-stops.md
 
 Next Steps:
 - Display realtime status indicators (cancellation, predictionInaccurate) in UI

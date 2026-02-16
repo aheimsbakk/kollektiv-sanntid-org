@@ -438,10 +438,13 @@ function mapModesToGeocoderCategories(modes){
 // 2. The Entur geocoder has fuzzy matching issues with categories + Norwegian chars
 // 3. Without filters, users see all relevant results (address + venue layers)
 // 4. Mode filtering happens server-side when fetching departures anyway
-export async function searchStations({text, limit = 5, modes = null, fetchFn = fetch, clientName = 'personal-js-app', geocodeUrl='https://api.entur.io/geocoder/v1/autocomplete'}){
+ export async function searchStations({text, limit = 5, modes = null, fetchFn = fetch, clientName = 'personal-js-app', geocodeUrl='https://api.entur.io/geocoder/v1/autocomplete'}){
   if(!text || String(text).trim().length < 1) return [];
-  // Build URL without layers or categories to avoid geocoder bugs with Norwegian characters
-  const url = `${geocodeUrl}?text=${encodeURIComponent(text)}&lang=no&size=${limit}`;
+  // Request more results from geocoder (size=50) to work around fuzzy matching issues
+  // where stations like "Støren stasjon" rank lower than "Storeng" for query "Støren"
+  // We'll filter client-side to show only transport stops and return the requested limit
+  const fetchSize = Math.max(50, limit * 10);
+  const url = `${geocodeUrl}?text=${encodeURIComponent(text)}&lang=no&size=${fetchSize}`;
   try{
     const r = await fetchFn(url, { headers: { 'ET-Client-Name': clientName } });
     if (!r) return [];
@@ -450,19 +453,46 @@ export async function searchStations({text, limit = 5, modes = null, fetchFn = f
     if (contentType && !/application\/json/i.test(contentType)) return [];
     const j = await r.json();
     if (!j || !Array.isArray(j.features)) return [];
-    // Filter to only transport stops (venue layer OR IDs starting with NSR:)
-    // This prevents address/place results (like "Støren, Midtre Gauldal" ID:801983)
-    // from appearing when the user wants the station
+    // Filter to only transport stops (venue layer only)
+    // This prevents address/place results from appearing, even if they have NSR: IDs
+    // (e.g., "Stryn" has NSR:GroupOfStopPlaces:106 but layer="address")
     const transportStops = j.features.filter(f => {
       const props = f && f.properties;
       if (!props) return false;
-      const id = props.id;
       const layer = props.layer;
-      // Include if it's a venue layer OR has a proper NSR: ID
-      return layer === 'venue' || (id && String(id).startsWith('NSR:'));
+      // Only include venue layer results (actual transport stops/stations)
+      return layer === 'venue';
     });
+    
+    // Re-rank results to prioritize closer matches to the search query
+    // This helps "Støren stasjon" rank higher than "Storeng" when searching "Støren"
+    const queryLower = text.toLowerCase();
+    const scoredStops = transportStops.map(f => {
+      const name = (f.properties.name || '').toLowerCase();
+      const label = (f.properties.label || '').toLowerCase();
+      
+      // Calculate relevance score (higher is better)
+      let score = 0;
+      
+      // Exact match on name gets highest score
+      if (name === queryLower) score += 1000;
+      // Starts with query gets high score
+      else if (name.startsWith(queryLower)) score += 500;
+      // Contains query gets medium score
+      else if (name.includes(queryLower)) score += 100;
+      
+      // Also check label
+      if (label.startsWith(queryLower)) score += 50;
+      else if (label.includes(queryLower)) score += 10;
+      
+      return { feature: f, score };
+    });
+    
+    // Sort by score descending, then keep original order for ties
+    scoredStops.sort((a, b) => b.score - a.score);
+    
     // Map features into a lightweight candidate shape consumed by the UI
-    return transportStops.slice(0, limit).map(f => ({ id: f && f.properties && f.properties.id ? f.properties.id : null, title: f && f.properties && (f.properties.label || f.properties.name || f.properties.title) ? (f.properties.label || f.properties.name || f.properties.title) : (f && f.text ? f.text : ''), raw: f }));
+    return scoredStops.slice(0, limit).map(({ feature: f }) => ({ id: f && f.properties && f.properties.id ? f.properties.id : null, title: f && f.properties && (f.properties.label || f.properties.name || f.properties.title) ? (f.properties.label || f.properties.name || f.properties.title) : (f && f.text ? f.text : ''), raw: f }));
   }catch(e){
     return [];
   }
