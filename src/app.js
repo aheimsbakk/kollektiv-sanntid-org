@@ -191,11 +191,11 @@ async function init(){
       const txt = formatCountdown(epoch, now);
       t.textContent = (txt != null) ? txt : '—';
     });
-    // update header status chip with seconds until next automatic refresh
+    // update header status chip with seconds until next automatic refresh (compact)
     if (board.status) {
       const msLeft = (typeof nextRefreshAt === 'number') ? (nextRefreshAt - now) : (DEFAULTS.FETCH_INTERVAL * 1000);
       const secLeft = Math.max(0, Math.ceil(msLeft / 1000));
-      board.status.textContent = `Next update in ${secLeft} seconds.`;
+      board.status.textContent = `Updating in ${secLeft}s`;
     }
   }
   tickCountdowns();
