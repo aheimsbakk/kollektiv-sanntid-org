@@ -39,7 +39,7 @@ export function createDepartureNode(item){
     // search recursively in raw object for any string value that matches known tokens
     const raw = item.raw;
     if (!raw) return null;
-    const tokens = ['bus','tram','metro','rail','train','water','ferry','air','plane','coach','gondola','cable','funicular'];
+    const tokens = ['bus','tram','metro','rail','train','water','ferry','coach'];
 
     const matchesToken = (str) => {
       if (!str || typeof str !== 'string') return null;
@@ -96,10 +96,7 @@ export function createDepartureNode(item){
     if(m.includes('metro')) return '🚇';
     if(m.includes('rail') || m.includes('train')) return '🚅';
     if(m.includes('water') || m.includes('ferry')) return '🛳️';
-    if(m.includes('air') || m.includes('plane')) return '✈️';
     if(m.includes('coach')) return '🚐';
-    if(m.includes('gondola') || m.includes('cable')) return '🚡';
-    if(m.includes('funicular')) return '🚟';
     return '🚆';
   }
 
@@ -135,10 +132,7 @@ export function createDepartureNode(item){
     if(mm.includes('metro') || mm.includes('t-bane') || mm.includes('tbane')) return 'Metro';
     if(mm.includes('rail') || mm.includes('train') || mm.includes('tog')) return 'Train';
     if(mm.includes('water') || mm.includes('ferry') || mm.includes('ferje') || mm.includes('boat')) return 'Ferry';
-    if(mm.includes('air') || mm.includes('plane') || mm.includes('fly')) return 'Plane';
     if(mm.includes('coach')) return 'Coach';
-    if(mm.includes('gondola') || mm.includes('cable')) return 'Gondola';
-    if(mm.includes('funicular')) return 'Funicular';
     return '';
   };
   try{ dest.setAttribute('aria-label', destinationText + (readableMode(mode) ? (' ' + readableMode(mode)) : '')); }catch(e){}
