@@ -450,8 +450,19 @@ export async function searchStations({text, limit = 5, modes = null, fetchFn = f
     if (contentType && !/application\/json/i.test(contentType)) return [];
     const j = await r.json();
     if (!j || !Array.isArray(j.features)) return [];
+    // Filter to only transport stops (venue layer OR IDs starting with NSR:)
+    // This prevents address/place results (like "Støren, Midtre Gauldal" ID:801983)
+    // from appearing when the user wants the station
+    const transportStops = j.features.filter(f => {
+      const props = f && f.properties;
+      if (!props) return false;
+      const id = props.id;
+      const layer = props.layer;
+      // Include if it's a venue layer OR has a proper NSR: ID
+      return layer === 'venue' || (id && String(id).startsWith('NSR:'));
+    });
     // Map features into a lightweight candidate shape consumed by the UI
-    return j.features.slice(0, limit).map(f => ({ id: f && f.properties && f.properties.id ? f.properties.id : null, title: f && f.properties && (f.properties.label || f.properties.name || f.properties.title) ? (f.properties.label || f.properties.name || f.properties.title) : (f && f.text ? f.text : ''), raw: f }));
+    return transportStops.slice(0, limit).map(f => ({ id: f && f.properties && f.properties.id ? f.properties.id : null, title: f && f.properties && (f.properties.label || f.properties.name || f.properties.title) ? (f.properties.label || f.properties.name || f.properties.title) : (f && f.text ? f.text : ''), raw: f }));
   }catch(e){
     return [];
   }
