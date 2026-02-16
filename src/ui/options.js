@@ -178,12 +178,13 @@ export function createOptionsPanel(defaults, onApply){
     lastQuery = v;
     clearTimeout(acTimer);
     if (v.trim().length < 3){ clearAutocomplete(); return; }
+    // debounce queries to avoid overloading backend; reset on every keypress
     acTimer = setTimeout(async () => {
       try{
         const cands = await searchStations({ text: v, limit: 5, fetchFn: window.fetch });
         showCandidates(cands);
       }catch(err){ clearAutocomplete(); }
-    }, 250);
+    }, 500);
   });
 
   // keyboard navigation for autocomplete
