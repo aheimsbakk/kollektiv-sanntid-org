@@ -25,6 +25,7 @@
 - **Action:** Immediately after creating a granular log, create or update `agents/CONTEXT.md`.
 - **Constraint:** This file MUST stay under 20 lines.
 - **Structure:**
+    - **Overall Context:** A concise summary of the current state of the system, including any relevant notes or observations. Don't add redundant information.
     - **Current Goal:** The high-level "vibe" we are chasing right now.
     - **Last 3 Changes:** Bullet points referencing the last 3 worklog filenames.
     - **Next Steps:** The immediate next 2 tactical moves.
@@ -40,8 +41,9 @@
     - **Test fail**: Problem solve, code and test until success.
     - **Improve unit tests:** (Optional) Improve edge case testing.
 4. **Create:** Generate the worklog file BEFORE committing. Validate worklog file.
-5. **Commit:** Commit changes + worklog.
-   - **Commit message:** Conventional commit message format. 
+5. **Update:** Update short term memory, `agents/CONTEXT.md`. 
+6. **Commit:** Commit changes + worklog.
+   - **Commit message:** Conventional commit message format.
 
 ## 3. Versioning
 - **Rule:** If a file contains `VERSION="x.y.z"`, you MUST update it (SemVer).
