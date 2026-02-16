@@ -43,6 +43,46 @@ async function init(){
   let nextRefreshAt = Date.now();
   // set when a live fetch has actually contacted the API (used for diagnostics)
   let liveFetchSucceeded = false;
+  // id for the refresh interval so we can restart it when FETCH_INTERVAL changes
+  let refreshTimerId = null;
+
+  // perform a refresh: fetch live data when possible, optionally fallback to demo
+  // fallbackToDemo: when false, leave an explicit empty state if live API returns no items
+  async function doRefresh({ fallbackToDemo = true } = {}){
+    try{
+      if(globalThis._enturCache) globalThis._enturCache.clear();
+      const stopId = await lookupStopId({ stationName: DEFAULTS.STATION_NAME, clientName: DEFAULTS.CLIENT_NAME });
+      let fresh = [];
+      if(stopId){
+        fresh = await fetchDepartures({ stopId, numDepartures: DEFAULTS.NUM_DEPARTURES, modes: DEFAULTS.TRANSPORT_MODES, apiUrl: DEFAULTS.API_URL, clientName: DEFAULTS.CLIENT_NAME });
+        liveFetchSucceeded = true;
+      }
+      if(!fresh || !fresh.length){
+        if (fallbackToDemo) {
+          fresh = await getDemoData();
+        } else {
+          fresh = [];
+        }
+      }
+      renderDepartures(board.list, fresh);
+      data = fresh;
+    }catch(err){
+      console.warn('Refresh failed', err);
+    }finally{
+      // schedule the next refresh relative to now using the (possibly updated) FETCH_INTERVAL
+      nextRefreshAt = Date.now() + (DEFAULTS.FETCH_INTERVAL * 1000);
+    }
+  }
+
+  // (re)start the automatic refresh loop using the current DEFAULTS.FETCH_INTERVAL
+  function startRefreshLoop(){
+    try{ if (refreshTimerId) clearInterval(refreshTimerId); }catch(e){}
+    nextRefreshAt = Date.now() + (DEFAULTS.FETCH_INTERVAL * 1000);
+    refreshTimerId = setInterval(()=>{
+      // fire off refresh but don't await here; doRefresh handles its own errors
+      doRefresh().catch(err => console.warn('Refresh failed', err));
+    }, DEFAULTS.FETCH_INTERVAL * 1000);
+  }
   // ensure the browser page title matches the current station name for clarity
   try{ document.title = DEFAULTS.STATION_NAME || document.title; }catch(e){}
   // register service worker if available so the app becomes installable
@@ -69,21 +109,13 @@ async function init(){
     const headerTitle = board.el.querySelector('.station-title');
     if (headerTitle) headerTitle.textContent = DEFAULTS.STATION_NAME;
     try{ document.title = DEFAULTS.STATION_NAME || document.title; }catch(e){}
-    // trigger a manual refresh
+    // trigger a manual refresh (do not fallback to demo for manual refresh)
     (async ()=>{
       try{
-        if(globalThis._enturCache) globalThis._enturCache.clear();
-        const stopId = await lookupStopId({ stationName: DEFAULTS.STATION_NAME, clientName: DEFAULTS.CLIENT_NAME });
-        let fresh = [];
-        if(stopId){
-          fresh = await fetchDepartures({ stopId, numDepartures: DEFAULTS.NUM_DEPARTURES, modes: DEFAULTS.TRANSPORT_MODES, apiUrl: DEFAULTS.API_URL, clientName: DEFAULTS.CLIENT_NAME });
-        }
-    // If API returns no departures, show an explicit empty state instead of demo data
-    if(!fresh || !fresh.length) fresh = [];
-    renderDepartures(board.list, fresh);
-    // schedule next automatic refresh relative to this manual refresh
-    nextRefreshAt = Date.now() + (DEFAULTS.FETCH_INTERVAL * 1000);
+        await doRefresh({ fallbackToDemo: false });
       }catch(e){ console.warn('Manual refresh failed', e); }
+      // restart periodic refresh loop so it uses the updated FETCH_INTERVAL
+      startRefreshLoop();
     })();
     // apply text size immediately
     try{ document.documentElement.classList.remove('text-size-tiny','text-size-small','text-size-medium','text-size-large','text-size-xlarge');
@@ -125,9 +157,8 @@ async function init(){
   try{
     const stopId = await lookupStopId({ stationName: DEFAULTS.STATION_NAME, clientName: DEFAULTS.CLIENT_NAME });
     if(stopId && DEFAULTS.API_URL){
-      data = await fetchDepartures({ stopId, numDepartures: DEFAULTS.NUM_DEPARTURES, modes: DEFAULTS.TRANSPORT_MODES, apiUrl: DEFAULTS.API_URL, clientName: DEFAULTS.CLIENT_NAME });
-      // mark that we contacted the live API (even if it returned 0 items)
-      liveFetchSucceeded = true;
+      // use the new helper to perform the first refresh but do not fallback to demo
+      await doRefresh({ fallbackToDemo: false });
       // ensure the status chip is visible; its textContent will be driven by the
       // per-second ticker below to show "Next update in XX seconds."
       if (board.status) {
@@ -144,10 +175,10 @@ async function init(){
     // Don't auto-fallback to demo here; show an explicit empty state handled by renderDepartures
     data = [];
   }
-  renderDepartures(board.list, data);
-  // initialise the next refresh timestamp to FETCH_INTERVAL from now so the
-  // header countdown starts immediately.
-  nextRefreshAt = Date.now() + (DEFAULTS.FETCH_INTERVAL * 1000);
+  // run initial render (doRefresh already rendered when live fetch succeeded)
+  if (!data || data.length === 0) renderDepartures(board.list, data);
+  // initialise and start the periodic refresh loop
+  startRefreshLoop();
   // Start per-second countdown updates (keeps DOM nodes, avoids full re-render)
   function tickCountdowns(){
     const now = Date.now();
