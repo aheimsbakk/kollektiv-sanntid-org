@@ -150,8 +150,9 @@ export function parseEnturResponse(json){
 }
 
 // Lightweight fetch wrapper (optional). Not used by unit tests.
-export async function fetchDepartures({stopId, numDepartures=2, modes=['bus'], apiUrl, clientName='personal-js-app', fetchFn=fetch}){
+export async function fetchDepartures({stopId, numDepartures=2, modes=['bus'], apiUrl='https://api.entur.io/journey-planner/v3/graphql', clientName='personal-js-app', fetchFn=fetch}){
   if (!stopId) throw new Error('stopId required');
+  if (!apiUrl) throw new Error('apiUrl required');
   // Simple in-memory cache keyed by stopId+num+modes+apiUrl
   const cacheKey = `${stopId}::${numDepartures}::${modes.join(',')}::${apiUrl}`;
   if(!globalThis._enturCache) globalThis._enturCache = new Map();
@@ -432,16 +433,15 @@ function mapModesToGeocoderCategories(modes){
 }
 
 // New helper: search geocoder and return up to `limit` candidate feature objects
-// Optionally filter by transport modes using the categories parameter
+// Note: We intentionally don't filter by layers or categories because:
+// 1. The Entur geocoder has bugs with layers=venue + Norwegian chars (e.g., "Støren")
+// 2. The Entur geocoder has fuzzy matching issues with categories + Norwegian chars
+// 3. Without filters, users see all relevant results (address + venue layers)
+// 4. Mode filtering happens server-side when fetching departures anyway
 export async function searchStations({text, limit = 5, modes = null, fetchFn = fetch, clientName = 'personal-js-app', geocodeUrl='https://api.entur.io/geocoder/v1/autocomplete'}){
   if(!text || String(text).trim().length < 1) return [];
-  // Build URL with layers=venue to restrict to transport stops/stations
-  let url = `${geocodeUrl}?text=${encodeURIComponent(text)}&lang=no&size=${limit}&layers=venue`;
-  // Add categories filter if modes are provided
-  const categories = mapModesToGeocoderCategories(modes);
-  if (categories) {
-    url += `&categories=${encodeURIComponent(categories)}`;
-  }
+  // Build URL without layers or categories to avoid geocoder bugs with Norwegian characters
+  const url = `${geocodeUrl}?text=${encodeURIComponent(text)}&lang=no&size=${limit}`;
   try{
     const r = await fetchFn(url, { headers: { 'ET-Client-Name': clientName } });
     if (!r) return [];
