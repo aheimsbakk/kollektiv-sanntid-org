@@ -96,7 +96,7 @@ export function createDepartureNode(item){
     if(m.includes('metro')) return '🚇';
     if(m.includes('rail') || m.includes('train')) return '🚅';
     if(m.includes('water') || m.includes('ferry')) return '🛳️';
-    if(m.includes('coach')) return '🚐';
+    if(m.includes('coach')) return '🚍';
     return '🚆';
   }
 

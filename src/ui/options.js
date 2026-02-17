@@ -72,7 +72,7 @@ export function createOptionsPanel(defaults, onApply){
     if(m.includes('metro') || m.includes('t-bane') || m.includes('tbane')) return '🚇';
     if(m.includes('rail') || m.includes('train') || m.includes('tog')) return '🚅';
     if(m.includes('water') || m.includes('ferry') || m.includes('ferje') || m.includes('boat')) return '🛳️';
-    if(m.includes('coach')) return '🚐';
+    if(m.includes('coach')) return '🚍';
     return '🚆';
   };
 
