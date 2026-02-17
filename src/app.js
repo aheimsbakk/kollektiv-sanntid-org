@@ -6,6 +6,10 @@ import { createHeaderToggle } from './ui/header.js';
 import { createOptionsPanel } from './ui/options.js';
 import { createDepartureNode, updateDepartureCountdown } from './ui/departure.js';
 import { fetchDepartures, lookupStopId } from './entur.js';
+import { initLanguage, t } from './i18n.js';
+
+// Initialize language on startup
+initLanguage();
 
 const ROOT = document.getElementById('app');
 
@@ -101,7 +105,7 @@ async function init(){
           const toast = document.createElement('div');
           toast.id = 'sw-update-toast';
           toast.className = 'options-toast';
-          toast.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center;gap:12px;"><span>New version available</span><div style="display:flex;gap:8px"><button id="sw-refresh-btn">Reload</button><button id="sw-dismiss-btn">Dismiss</button></div></div>`;
+          toast.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center;gap:12px;"><span>${t('newVersionAvailable')}</span><div style="display:flex;gap:8px"><button id="sw-refresh-btn">${t('reload')}</button><button id="sw-dismiss-btn">${t('dismiss')}</button></div></div>`;
           document.body.appendChild(toast);
           const remove = ()=>{ try{ toast.remove(); }catch(e){} };
           document.getElementById('sw-refresh-btn').addEventListener('click', ()=>{
@@ -151,6 +155,24 @@ async function init(){
 
   // options panel
   const opts = createOptionsPanel(DEFAULTS, (newOpts)=>{
+    // If language changed, reload the entire options panel
+    if (newOpts._languageChanged) {
+      // Close current panel
+      opts.close();
+      // Remove old panel
+      opts.panel.remove();
+      // Create new panel with updated translations
+      const newOpts = createOptionsPanel(DEFAULTS, opts._onApply);
+      document.body.appendChild(newOpts.panel);
+      // Update reference
+      Object.assign(opts, newOpts);
+      // Store the onApply handler for future language changes
+      opts._onApply = arguments[0];
+      // Reopen the panel
+      setTimeout(() => opts.open(), 50);
+      return;
+    }
+    
     // apply new defaults and re-init fetch loop by reloading the page state
     // for now just update the UI and re-run first fetch cycle
     DEFAULTS.STATION_NAME = newOpts.STATION_NAME;
@@ -175,6 +197,32 @@ async function init(){
       document.documentElement.classList.add('text-size-'+(newOpts.TEXT_SIZE || 'large'));
     }catch(e){}
   });
+  // Store the onApply handler reference for language change reloads
+  opts._onApply = (newOpts)=>{
+    // apply new defaults and re-init fetch loop by reloading the page state
+    // for now just update the UI and re-run first fetch cycle
+    DEFAULTS.STATION_NAME = newOpts.STATION_NAME;
+    DEFAULTS.STOP_ID = newOpts.STOP_ID || null;
+    DEFAULTS.NUM_DEPARTURES = newOpts.NUM_DEPARTURES;
+    DEFAULTS.FETCH_INTERVAL = newOpts.FETCH_INTERVAL;
+    DEFAULTS.TRANSPORT_MODES = newOpts.TRANSPORT_MODES;
+    // update header title (station displayed in header element)
+    const headerTitle = board.el.querySelector('.station-title');
+    if (headerTitle) headerTitle.textContent = DEFAULTS.STATION_NAME;
+    try{ document.title = DEFAULTS.STATION_NAME || document.title; }catch(e){}
+    // trigger a manual refresh (do not fallback to demo for manual refresh)
+    (async ()=>{
+      try{
+        await doRefresh({ fallbackToDemo: false });
+      }catch(e){ console.warn('Manual refresh failed', e); }
+      // restart periodic refresh loop so it uses the updated FETCH_INTERVAL
+      startRefreshLoop();
+    })();
+    // apply text size immediately
+    try{ document.documentElement.classList.remove('text-size-tiny','text-size-small','text-size-medium','text-size-large','text-size-xlarge');
+      document.documentElement.classList.add('text-size-'+(newOpts.TEXT_SIZE || 'large'));
+    }catch(e){}
+  };
   document.body.appendChild(opts.panel);
   // expose control so header toggle can call opts.open()
   window.__APP_OPTIONS__ = opts;
@@ -252,7 +300,7 @@ async function init(){
     if (board.status) {
       const msLeft = (typeof nextRefreshAt === 'number') ? (nextRefreshAt - now) : (DEFAULTS.FETCH_INTERVAL * 1000);
       const secLeft = Math.max(0, Math.ceil(msLeft / 1000));
-      board.status.textContent = `Updating in ${secLeft}s`;
+      board.status.textContent = `${t('updatingIn')} ${secLeft}${t('seconds')}`;
     }
   }
   tickCountdowns();

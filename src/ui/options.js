@@ -1,14 +1,15 @@
 // Options panel UI: slide-in from right with controls to update DEFAULTS
 import { searchStations } from '../entur.js';
+import { t, setLanguage, getLanguage, getLanguages } from '../i18n.js';
 
 export function createOptionsPanel(defaults, onApply){
   const panel = document.createElement('aside'); panel.className = 'options-panel';
-  const title = document.createElement('h3'); title.textContent = 'Settings';
+  const title = document.createElement('h3'); title.textContent = t('settings');
   panel.appendChild(title);
 
   // station name
   const rowStation = document.createElement('div'); rowStation.className='options-row';
-  const lblStation = document.createElement('label'); lblStation.textContent = 'Station name';
+  const lblStation = document.createElement('label'); lblStation.textContent = t('stationName');
   const inpStation = document.createElement('input'); inpStation.type='text'; inpStation.autocomplete='off'; inpStation.setAttribute('aria-autocomplete','list'); inpStation.value = defaults.STATION_NAME || '';
   rowStation.append(lblStation, inpStation);
 
@@ -22,26 +23,26 @@ export function createOptionsPanel(defaults, onApply){
 
   // number of departures
   const rowNum = document.createElement('div'); rowNum.className='options-row';
-  const lblNum = document.createElement('label'); lblNum.textContent = 'Number of departures';
+  const lblNum = document.createElement('label'); lblNum.textContent = t('numberOfDepartures');
   const inpNum = document.createElement('input'); inpNum.type='number'; inpNum.min=1; inpNum.value = defaults.NUM_DEPARTURES || 2;
   rowNum.append(lblNum, inpNum);
 
   // fetch interval
   const rowInt = document.createElement('div'); rowInt.className='options-row';
-  const lblInt = document.createElement('label'); lblInt.textContent = 'Fetch interval (seconds)';
+  const lblInt = document.createElement('label'); lblInt.textContent = t('fetchInterval');
   const inpInt = document.createElement('input'); inpInt.type='number'; inpInt.min=20; inpInt.value = defaults.FETCH_INTERVAL || 60;
   rowInt.append(lblInt, inpInt);
 
   // text size option
   const rowSize = document.createElement('div'); rowSize.className='options-row';
-  const lblSize = document.createElement('label'); lblSize.textContent = 'Text size';
+  const lblSize = document.createElement('label'); lblSize.textContent = t('textSize');
   const selSize = document.createElement('select');
   const sizeOptions = [
-    { value: 'tiny', label: 'Tiny' },
-    { value: 'small', label: 'Small' },
-    { value: 'medium', label: 'Medium' },
-    { value: 'large', label: 'Large' },
-    { value: 'xlarge', label: 'Extra large' }
+    { value: 'tiny', label: t('tiny') },
+    { value: 'small', label: t('small') },
+    { value: 'medium', label: t('medium') },
+    { value: 'large', label: t('large') },
+    { value: 'xlarge', label: t('extraLarge') }
   ];
   sizeOptions.forEach(s=>{ const o=document.createElement('option'); o.value=s.value; o.textContent=s.label; selSize.appendChild(o); });
   selSize.value = defaults.TEXT_SIZE || 'medium';
@@ -49,7 +50,7 @@ export function createOptionsPanel(defaults, onApply){
 
   // transport modes (multiple checkboxes in table layout)
   const rowModes = document.createElement('div'); rowModes.className='options-row';
-  const lblModes = document.createElement('label'); lblModes.textContent = 'Transport modes (filter)';
+  const lblModes = document.createElement('label'); lblModes.textContent = t('transportModes');
   const modesWrap = document.createElement('div'); modesWrap.className='modes-checkboxes';
   
   // Create table structure for 2x3 layout
@@ -83,7 +84,7 @@ export function createOptionsPanel(defaults, onApply){
       const lab = document.createElement('label'); lab.className = 'mode-checkbox-label';
       const icon = document.createElement('span'); icon.className = 'mode-icon'; icon.setAttribute('aria-hidden','true'); icon.textContent = emojiForMode(m);
       const cb = document.createElement('input'); cb.type='checkbox'; cb.value = m; cb.checked = (defaults.TRANSPORT_MODES || []).includes(m);
-      const span = document.createElement('span'); span.textContent = m.charAt(0).toUpperCase() + m.slice(1); span.style.marginLeft = '6px';
+      const span = document.createElement('span'); span.textContent = t(m); span.style.marginLeft = '6px';
       lab.append(icon, cb, span);
       td.appendChild(lab);
       tr.appendChild(td);
@@ -109,12 +110,52 @@ export function createOptionsPanel(defaults, onApply){
   }catch(e){}
   rowModes.append(lblModes, modesWrap);
 
+  // Language switcher
+  const rowLang = document.createElement('div'); rowLang.className='options-row';
+  const lblLang = document.createElement('label'); lblLang.textContent = t('switchLanguage');
+  const langWrap = document.createElement('div'); langWrap.className='language-switcher';
+  
+  const languages = getLanguages();
+  languages.forEach(lang => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'language-flag';
+    btn.textContent = lang.flag;
+    btn.title = lang.name;
+    btn.setAttribute('aria-label', lang.name);
+    if (getLanguage() === lang.code) {
+      btn.classList.add('active');
+    }
+    btn.addEventListener('click', () => {
+      setLanguage(lang.code);
+      // Update all active states
+      langWrap.querySelectorAll('.language-flag').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      // Reload the panel to show updated translations
+      if (onApply) {
+        const currentSettings = {
+          STATION_NAME: inpStation.value || defaults.STATION_NAME,
+          STOP_ID: inpStation.dataset.stopId || null,
+          NUM_DEPARTURES: Number(inpNum.value) || defaults.NUM_DEPARTURES,
+          FETCH_INTERVAL: Number(inpInt.value) || defaults.FETCH_INTERVAL,
+          TRANSPORT_MODES: Array.from(modesWrap.querySelectorAll('input[type=checkbox]:checked')).map(i=>i.value),
+          TEXT_SIZE: selSize.value || defaults.TEXT_SIZE
+        };
+        onApply({ ...currentSettings, _languageChanged: true });
+      }
+      showToast(t('languageChanged'));
+    });
+    langWrap.appendChild(btn);
+  });
+  
+  rowLang.append(lblLang, langWrap);
+
   const actions = document.createElement('div'); actions.className='options-actions';
-  const btnSave = document.createElement('button'); btnSave.type='button'; btnSave.textContent = 'Apply';
-  const btnClose = document.createElement('button'); btnClose.type='button'; btnClose.textContent = 'Close';
+  const btnSave = document.createElement('button'); btnSave.type='button'; btnSave.textContent = t('apply');
+  const btnClose = document.createElement('button'); btnClose.type='button'; btnClose.textContent = t('close');
   actions.append(btnClose, btnSave);
 
-  panel.append(rowStation, rowNum, rowInt, rowSize, rowModes, actions);
+  panel.append(rowStation, rowNum, rowInt, rowSize, rowModes, rowLang, actions);
 
   function open(){ panel.classList.add('open'); }
   function close(){ panel.classList.remove('open'); }
@@ -282,7 +323,7 @@ export function createOptionsPanel(defaults, onApply){
   const toast = document.createElement('div'); toast.className = 'options-toast'; toast.style.display='none'; panel.appendChild(toast);
   function showToast(msg){
     try{
-      toast.textContent = msg || 'Settings applied';
+      toast.textContent = msg || t('settingsApplied');
       toast.style.display = 'block';
       toast.style.opacity = '1';
       clearTimeout(showToast._t);
@@ -299,12 +340,12 @@ export function createOptionsPanel(defaults, onApply){
   modesWrap.addEventListener('change', (e)=>{
     if (e.target && e.target.type === 'checkbox'){
       clearTimeout(modesDebounceTimer);
-      modesDebounceTimer = setTimeout(()=>{ applyChanges(false); showToast('Filters updated'); }, 500);
+      modesDebounceTimer = setTimeout(()=>{ applyChanges(false); showToast(t('filtersUpdated')); }, 500);
     }
   });
 
   // apply immediately when text size selection changes
-  selSize.addEventListener('change', ()=>{ applyChanges(false); showToast('Text size updated'); });
+  selSize.addEventListener('change', ()=>{ applyChanges(false); showToast(t('textSizeUpdated')); });
 
   // when opening/closing, toggle a body class so we can shift the app content
   const origOpen = open;
