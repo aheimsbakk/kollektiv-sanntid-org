@@ -183,11 +183,19 @@ export function createOptionsPanel(defaults, onApply){
   // apply changes without closing the panel unless shouldClose === true
   function applyChanges(shouldClose){
     const chosen = Array.from(modesWrap.querySelectorAll('input[type=checkbox]:checked')).map(i=>i.value);
+    
+    // Validate fetch interval
+    let fetchInterval = Number(inpInt.value) || defaults.FETCH_INTERVAL;
+    if (fetchInterval < 20) {
+      fetchInterval = 20;
+      inpInt.value = 20; // Update the input to show corrected value
+    }
+    
     const newOpts = {
       STATION_NAME: inpStation.value || defaults.STATION_NAME,
       STOP_ID: inpStation.dataset.stopId || null, // Use stored stopId from autocomplete if available
       NUM_DEPARTURES: Number(inpNum.value) || defaults.NUM_DEPARTURES,
-      FETCH_INTERVAL: Number(inpInt.value) || defaults.FETCH_INTERVAL,
+      FETCH_INTERVAL: fetchInterval,
       TRANSPORT_MODES: chosen.length ? chosen : defaults.TRANSPORT_MODES,
       TEXT_SIZE: selSize.value || (defaults.TEXT_SIZE || 'large')
     };
@@ -212,6 +220,17 @@ export function createOptionsPanel(defaults, onApply){
   inpInt.addEventListener('keydown', (e) => {
     if (e.key === 'Enter'){
       e.preventDefault();
+      // Validate and enforce minimum value
+      const val = inpInt.value.trim();
+      if (val === '') {
+        // Empty input: restore current value
+        inpInt.value = defaults.FETCH_INTERVAL || 60;
+      } else {
+        const num = Number(val);
+        if (num < 20) {
+          inpInt.value = 20;
+        }
+      }
       applyChanges(false);
       selSize.focus();
     }
@@ -221,6 +240,20 @@ export function createOptionsPanel(defaults, onApply){
     if (e.key === 'Enter'){
       e.preventDefault();
       btnSave.focus();
+    }
+  });
+
+  // Validate fetch interval on blur
+  inpInt.addEventListener('blur', () => {
+    const val = inpInt.value.trim();
+    if (val === '') {
+      // Empty input: restore current value
+      inpInt.value = defaults.FETCH_INTERVAL || 60;
+    } else {
+      const num = Number(val);
+      if (num < 20) {
+        inpInt.value = 20;
+      }
     }
   });
 
