@@ -57,11 +57,13 @@ export function createOptionsPanel(defaults, onApply){
   const modesTable = document.createElement('table'); modesTable.className = 'modes-table';
   const tbody = document.createElement('tbody');
   
-  // Row 1: Bus, Rail, Metro
-  // Row 2: Water, Tram, Coach
+  // Row 1: Bus, Metro
+  // Row 2: Rail, Tram
+  // Row 3: Water, Coach
   const POSSIBLE = [
-    ['bus', 'rail', 'metro'],
-    ['water', 'tram', 'coach']
+    ['bus', 'metro'],
+    ['rail', 'tram'],
+    ['water', 'coach']
   ];
   
   // helper to map mode -> emoji used in the UI
@@ -137,7 +139,7 @@ export function createOptionsPanel(defaults, onApply){
     
     // Update transport mode labels
     const modeLabels = modesWrap.querySelectorAll('.mode-checkbox-label span:last-child');
-    const modeValues = ['bus', 'rail', 'metro', 'water', 'tram', 'coach'];
+    const modeValues = ['bus', 'metro', 'rail', 'tram', 'water', 'coach'];
     modeLabels.forEach((label, idx) => {
       label.textContent = t(modeValues[idx]);
     });
