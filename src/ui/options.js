@@ -139,14 +139,28 @@ export function createOptionsPanel(defaults, onApply){
   btnClose.addEventListener('click', ()=> close());
   btnSave.addEventListener('click', ()=> applyChanges(true));
 
-  // apply on Enter in non-station text inputs without closing the panel
-  [inpNum, inpInt].forEach(inp => {
-    inp.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter'){
-        e.preventDefault();
-        applyChanges(false);
-      }
-    });
+  // Enter key navigation: station -> departures -> interval -> text size -> Apply
+  inpNum.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter'){
+      e.preventDefault();
+      applyChanges(false);
+      inpInt.focus();
+    }
+  });
+
+  inpInt.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter'){
+      e.preventDefault();
+      applyChanges(false);
+      selSize.focus();
+    }
+  });
+
+  selSize.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter'){
+      e.preventDefault();
+      btnSave.focus();
+    }
   });
 
   // Station autocomplete behaviour: query after 3 characters and show up to 5 matches
@@ -221,25 +235,48 @@ export function createOptionsPanel(defaults, onApply){
 
   // keyboard navigation for autocomplete
   inpStation.addEventListener('keydown', (e) => {
-    if (!acList || !acList.classList.contains('open')) return;
-    const items = Array.from(acList.children || []);
-    if (e.key === 'ArrowDown'){
-      e.preventDefault(); highlighted = Math.min(items.length - 1, highlighted + 1);
-      items.forEach(it => it.classList.remove('highlighted'));
-      if (items[highlighted]){ items[highlighted].classList.add('highlighted'); items[highlighted].scrollIntoView({ block: 'nearest' }); }
-    } else if (e.key === 'ArrowUp'){
-      e.preventDefault(); highlighted = Math.max(0, highlighted - 1);
-      items.forEach(it => it.classList.remove('highlighted'));
-      if (items[highlighted]){ items[highlighted].classList.add('highlighted'); items[highlighted].scrollIntoView({ block: 'nearest' }); }
-    } else if (e.key === 'Enter'){
-      if (highlighted >= 0){ e.preventDefault(); selectCandidateIndex(highlighted); }
-    } else if (e.key === 'Escape'){
-      clearAutocomplete();
+    const hasAutocomplete = acList && acList.classList.contains('open');
+    const items = hasAutocomplete ? Array.from(acList.children || []) : [];
+    
+    if (hasAutocomplete) {
+      if (e.key === 'ArrowDown'){
+        e.preventDefault(); highlighted = Math.min(items.length - 1, highlighted + 1);
+        items.forEach(it => it.classList.remove('highlighted'));
+        if (items[highlighted]){ items[highlighted].classList.add('highlighted'); items[highlighted].scrollIntoView({ block: 'nearest' }); }
+      } else if (e.key === 'ArrowUp'){
+        e.preventDefault(); highlighted = Math.max(0, highlighted - 1);
+        items.forEach(it => it.classList.remove('highlighted'));
+        if (items[highlighted]){ items[highlighted].classList.add('highlighted'); items[highlighted].scrollIntoView({ block: 'nearest' }); }
+      } else if (e.key === 'Enter'){
+        e.preventDefault();
+        // If something is highlighted, select it; otherwise select first item
+        const indexToSelect = highlighted >= 0 ? highlighted : 0;
+        if (items.length > 0) {
+          selectCandidateIndex(indexToSelect);
+        }
+        // Move focus to next field
+        inpNum.focus();
+      } else if (e.key === 'Escape'){
+        clearAutocomplete();
+      }
+    } else if (e.key === 'Enter') {
+      // No autocomplete open, just move to next field
+      e.preventDefault();
+      inpNum.focus();
     }
   });
 
   // hide autocomplete shortly after blur so clicks on list are handled
-  inpStation.addEventListener('blur', () => { setTimeout(() => { clearAutocomplete(); }, 150); });
+  // If blur happens with autocomplete open and no selection made, auto-select first item
+  inpStation.addEventListener('blur', () => { 
+    setTimeout(() => { 
+      // If autocomplete is still open, auto-select first item before clearing
+      if (acList && acList.classList.contains('open') && lastCandidates.length > 0) {
+        selectCandidateIndex(0);
+      }
+      clearAutocomplete(); 
+    }, 150); 
+  });
 
   // small visual confirmation (toast) when applying settings
   const toast = document.createElement('div'); toast.className = 'options-toast'; toast.style.display='none'; panel.appendChild(toast);
