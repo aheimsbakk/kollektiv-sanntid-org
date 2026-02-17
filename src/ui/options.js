@@ -184,6 +184,13 @@ export function createOptionsPanel(defaults, onApply){
   function applyChanges(shouldClose){
     const chosen = Array.from(modesWrap.querySelectorAll('input[type=checkbox]:checked')).map(i=>i.value);
     
+    // Validate number of departures
+    let numDepartures = Number(inpNum.value) || defaults.NUM_DEPARTURES;
+    if (numDepartures < 1) {
+      numDepartures = 1;
+      inpNum.value = 1; // Update the input to show corrected value
+    }
+    
     // Validate fetch interval
     let fetchInterval = Number(inpInt.value) || defaults.FETCH_INTERVAL;
     if (fetchInterval < 20) {
@@ -194,7 +201,7 @@ export function createOptionsPanel(defaults, onApply){
     const newOpts = {
       STATION_NAME: inpStation.value || defaults.STATION_NAME,
       STOP_ID: inpStation.dataset.stopId || null, // Use stored stopId from autocomplete if available
-      NUM_DEPARTURES: Number(inpNum.value) || defaults.NUM_DEPARTURES,
+      NUM_DEPARTURES: numDepartures,
       FETCH_INTERVAL: fetchInterval,
       TRANSPORT_MODES: chosen.length ? chosen : defaults.TRANSPORT_MODES,
       TEXT_SIZE: selSize.value || (defaults.TEXT_SIZE || 'large')
@@ -212,6 +219,17 @@ export function createOptionsPanel(defaults, onApply){
   inpNum.addEventListener('keydown', (e) => {
     if (e.key === 'Enter'){
       e.preventDefault();
+      // Validate and enforce minimum value
+      const val = inpNum.value.trim();
+      if (val === '') {
+        // Empty input: restore current value
+        inpNum.value = defaults.NUM_DEPARTURES || 2;
+      } else {
+        const num = Number(val);
+        if (num < 1) {
+          inpNum.value = 1;
+        }
+      }
       applyChanges(false);
       inpInt.focus();
     }
@@ -240,6 +258,20 @@ export function createOptionsPanel(defaults, onApply){
     if (e.key === 'Enter'){
       e.preventDefault();
       btnSave.focus();
+    }
+  });
+
+  // Validate number of departures on blur
+  inpNum.addEventListener('blur', () => {
+    const val = inpNum.value.trim();
+    if (val === '') {
+      // Empty input: restore current value
+      inpNum.value = defaults.NUM_DEPARTURES || 2;
+    } else {
+      const num = Number(val);
+      if (num < 1) {
+        inpNum.value = 1;
+      }
     }
   });
 
