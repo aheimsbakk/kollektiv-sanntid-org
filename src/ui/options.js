@@ -58,11 +58,11 @@ export function createOptionsPanel(defaults, onApply){
   const tbody = document.createElement('tbody');
   
   // Row 1: Bus, Metro
-  // Row 2: Rail, Tram
+  // Row 2: Tram, Rail
   // Row 3: Water, Coach
   const POSSIBLE = [
     ['bus', 'metro'],
-    ['rail', 'tram'],
+    ['tram', 'rail'],
     ['water', 'coach']
   ];
   
@@ -139,7 +139,7 @@ export function createOptionsPanel(defaults, onApply){
     
     // Update transport mode labels
     const modeLabels = modesWrap.querySelectorAll('.mode-checkbox-label span:last-child');
-    const modeValues = ['bus', 'metro', 'rail', 'tram', 'water', 'coach'];
+    const modeValues = ['bus', 'metro', 'tram', 'rail', 'water', 'coach'];
     modeLabels.forEach((label, idx) => {
       label.textContent = t(modeValues[idx]);
     });
