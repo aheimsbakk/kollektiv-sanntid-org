@@ -366,6 +366,11 @@ function detectBrowserLanguage() {
   const browserLang = navigator.language || navigator.userLanguage;
   const langCode = browserLang.split('-')[0].toLowerCase();
   
+  // Map Norwegian variants (nb/nn) to 'no'
+  if (langCode === 'nb' || langCode === 'nn') {
+    return 'no';
+  }
+  
   // Check if we support this language
   if (translations[langCode]) {
     return langCode;
