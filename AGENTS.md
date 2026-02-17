@@ -40,17 +40,23 @@
 3. **Test:** Create, and run unit tests.
     - **Test fail**: Problem solve, code and test until success.
     - **Improve unit tests:** (Optional) Improve edge case testing.
-4. **Create:** Generate the worklog file BEFORE committing. Validate worklog file.
-5. **Update:** Update short term memory, `agents/CONTEXT.md`. 
-6. **Commit:** Commit changes + worklog.
+4. **Version:** Bump version using `scripts/bump-version.sh` (SemVer).
+    - **Patch:** Bug fixes (0.0.x)
+    - **Minor:** New features (0.x.0)
+    - **Major:** Breaking changes (x.0.0)
+5. **Create:** Generate the worklog file BEFORE committing. Validate worklog file.
+6. **Update:** Update short term memory, `agents/CONTEXT.md`. 
+7. **Commit:** Commit changes + worklog.
    - **Commit message:** Conventional commit message format.
 
 ## 3. Versioning
-- **Rule:** If a file contains `VERSION="x.y.z"`, you MUST update it (SemVer).
-  - Patch: Bug fix.
-  - Minor: Feature.
-  - Major: Breaking change.
+- **Rule:** EVERY commit MUST bump the version in `src/sw.js`.
+  - **Patch (0.0.x):** Bug fixes, refactors, documentation updates
+  - **Minor (0.x.0):** New features, enhancements
+  - **Major (x.0.0):** Breaking changes, API changes
+- **Tool:** Always use `scripts/bump-version.sh [patch|minor|major]`
 - **Action:** Mention the new version in the worklog body.
+- **Why:** Service worker cache invalidation requires version bumps for users to receive updates.
 
 ## 4. Enforcement
 - Worklogs must validate against the schema above.

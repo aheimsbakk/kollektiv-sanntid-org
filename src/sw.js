@@ -1,4 +1,4 @@
-const VERSION = '1.0.2';
+const VERSION = '1.0.3';
 const CACHE_NAME = `departures-v${VERSION}`;
 const ASSETS = [
   './', './index.html', './style.css', './app.js', './manifest.webmanifest'
