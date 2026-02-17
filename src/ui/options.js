@@ -29,14 +29,21 @@ export function createOptionsPanel(defaults, onApply){
   // fetch interval
   const rowInt = document.createElement('div'); rowInt.className='options-row';
   const lblInt = document.createElement('label'); lblInt.textContent = 'Fetch interval (seconds)';
-  const inpInt = document.createElement('input'); inpInt.type='number'; inpInt.min=5; inpInt.value = defaults.FETCH_INTERVAL || 60;
+  const inpInt = document.createElement('input'); inpInt.type='number'; inpInt.min=20; inpInt.value = defaults.FETCH_INTERVAL || 60;
   rowInt.append(lblInt, inpInt);
 
   // text size option
   const rowSize = document.createElement('div'); rowSize.className='options-row';
   const lblSize = document.createElement('label'); lblSize.textContent = 'Text size';
   const selSize = document.createElement('select');
-  ['tiny','small','medium','large','xlarge'].forEach(s=>{ const o=document.createElement('option'); o.value=s; o.textContent=s; selSize.appendChild(o); });
+  const sizeOptions = [
+    { value: 'tiny', label: 'Tiny' },
+    { value: 'small', label: 'Small' },
+    { value: 'medium', label: 'Medium' },
+    { value: 'large', label: 'Large' },
+    { value: 'xlarge', label: 'Extra large' }
+  ];
+  sizeOptions.forEach(s=>{ const o=document.createElement('option'); o.value=s.value; o.textContent=s.label; selSize.appendChild(o); });
   selSize.value = defaults.TEXT_SIZE || 'medium';
   rowSize.append(lblSize, selSize);
 
@@ -189,7 +196,7 @@ export function createOptionsPanel(defaults, onApply){
         const cands = await searchStations({ text: v, limit: 5, fetchFn: window.fetch });
         showCandidates(cands);
       }catch(err){ clearAutocomplete(); }
-    }, 500);
+    }, 250);
   });
 
   // keyboard navigation for autocomplete
