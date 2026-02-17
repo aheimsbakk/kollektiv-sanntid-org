@@ -115,6 +115,34 @@ export function createOptionsPanel(defaults, onApply){
   const lblLang = document.createElement('label'); lblLang.textContent = t('switchLanguage');
   const langWrap = document.createElement('div'); langWrap.className='language-switcher';
   
+  // Function to update all translatable UI elements
+  function updateTranslations() {
+    title.textContent = t('settings');
+    lblStation.textContent = t('stationName');
+    lblNum.textContent = t('numberOfDepartures');
+    lblInt.textContent = t('fetchInterval');
+    lblSize.textContent = t('textSize');
+    lblModes.textContent = t('transportModes');
+    lblLang.textContent = t('switchLanguage');
+    btnSave.textContent = t('apply');
+    btnClose.textContent = t('close');
+    
+    // Update text size options
+    const sizeOpts = selSize.querySelectorAll('option');
+    sizeOpts[0].textContent = t('tiny');
+    sizeOpts[1].textContent = t('small');
+    sizeOpts[2].textContent = t('medium');
+    sizeOpts[3].textContent = t('large');
+    sizeOpts[4].textContent = t('extraLarge');
+    
+    // Update transport mode labels
+    const modeLabels = modesWrap.querySelectorAll('.mode-checkbox-label span:last-child');
+    const modeValues = ['bus', 'rail', 'metro', 'water', 'tram', 'coach'];
+    modeLabels.forEach((label, idx) => {
+      label.textContent = t(modeValues[idx]);
+    });
+  }
+  
   const languages = getLanguages();
   languages.forEach(lang => {
     const btn = document.createElement('button');
@@ -131,18 +159,8 @@ export function createOptionsPanel(defaults, onApply){
       // Update all active states
       langWrap.querySelectorAll('.language-flag').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
-      // Reload the panel to show updated translations
-      if (onApply) {
-        const currentSettings = {
-          STATION_NAME: inpStation.value || defaults.STATION_NAME,
-          STOP_ID: inpStation.dataset.stopId || null,
-          NUM_DEPARTURES: Number(inpNum.value) || defaults.NUM_DEPARTURES,
-          FETCH_INTERVAL: Number(inpInt.value) || defaults.FETCH_INTERVAL,
-          TRANSPORT_MODES: Array.from(modesWrap.querySelectorAll('input[type=checkbox]:checked')).map(i=>i.value),
-          TEXT_SIZE: selSize.value || defaults.TEXT_SIZE
-        };
-        onApply({ ...currentSettings, _languageChanged: true });
-      }
+      // Update all translations in the panel
+      updateTranslations();
       showToast(t('languageChanged'));
     });
     langWrap.appendChild(btn);
