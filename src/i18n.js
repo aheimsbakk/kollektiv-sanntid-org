@@ -37,8 +37,6 @@ const translations = {
     
     // Update toast
     newVersionAvailable: 'New version available, reloading...',
-    reload: 'Reload',
-    dismiss: 'Dismiss',
     
     // Status
     updatingIn: 'Updating in',
@@ -88,8 +86,6 @@ const translations = {
     
     // Update toast
     newVersionAvailable: 'Ny versjon tilgjengelig, laster inn på nytt...',
-    reload: 'Last inn på nytt',
-    dismiss: 'Avvis',
     
     // Status
     updatingIn: 'Oppdaterer om',
@@ -139,8 +135,6 @@ const translations = {
     
     // Update toast
     newVersionAvailable: 'Neue Version verfügbar, wird neu geladen...',
-    reload: 'Neu laden',
-    dismiss: 'Verwerfen',
     
     // Status
     updatingIn: 'Aktualisierung in',
@@ -190,8 +184,6 @@ const translations = {
     
     // Update toast
     newVersionAvailable: 'Nueva versión disponible, recargando...',
-    reload: 'Recargar',
-    dismiss: 'Descartar',
     
     // Status
     updatingIn: 'Actualizando en',
@@ -241,8 +233,6 @@ const translations = {
     
     // Update toast
     newVersionAvailable: 'Nuova versione disponibile, ricaricamento...',
-    reload: 'Ricarica',
-    dismiss: 'Ignora',
     
     // Status
     updatingIn: 'Aggiornamento tra',
@@ -292,8 +282,6 @@ const translations = {
     
     // Update toast
     newVersionAvailable: 'Διαθέσιμη νέα έκδοση, επαναφόρτωση...',
-    reload: 'Επαναφόρτωση',
-    dismiss: 'Απόρριψη',
     
     // Status
     updatingIn: 'Ενημέρωση σε',
@@ -343,8 +331,6 @@ const translations = {
     
     // Update toast
     newVersionAvailable: 'نسخه جدید موجود است، در حال بارگذاری مجدد...',
-    reload: 'بارگذاری مجدد',
-    dismiss: 'نادیده گرفتن',
     
     // Status
     updatingIn: 'به‌روزرسانی در',
@@ -394,8 +380,6 @@ const translations = {
     
     // Update toast
     newVersionAvailable: 'नया संस्करण उपलब्ध है, फिर से लोड किया जा रहा है...',
-    reload: 'फिर से लोड करें',
-    dismiss: 'खारिज करें',
     
     // Status
     updatingIn: 'अपडेट में',
@@ -445,8 +429,6 @@ const translations = {
     
     // Update toast
     newVersionAvailable: 'Ný útgáfa tiltæk, endurnýja...',
-    reload: 'Endurhlaða',
-    dismiss: 'Hafna',
     
     // Status
     updatingIn: 'Uppfærir eftir',
@@ -496,8 +478,6 @@ const translations = {
     
     // Update toast
     newVersionAvailable: 'Доступна нова версія, перезавантаження...',
-    reload: 'Перезавантажити',
-    dismiss: 'Відхилити',
     
     // Status
     updatingIn: 'Оновлення через',
@@ -547,8 +527,6 @@ const translations = {
     
     // Update toast
     newVersionAvailable: 'Nouvelle version disponible, rechargement...',
-    reload: 'Recharger',
-    dismiss: 'Ignorer',
     
     // Status
     updatingIn: 'Mise à jour dans',
@@ -561,6 +539,55 @@ const translations = {
     // Station dropdown
     noStationSelected: 'Aucune station sélectionnée',
     noRecentStations: 'Aucune station récente'
+  },
+  
+  pl: {
+    // Options panel
+    settings: 'Ustawienia',
+    stationName: 'Nazwa stacji',
+    numberOfDepartures: 'Liczba odjazdów',
+    fetchInterval: 'Interwał odświeżania (sekundy)',
+    textSize: 'Rozmiar tekstu',
+    transportModes: 'Środki transportu (filtr)',
+    switchLanguage: 'Zmień język',
+    apply: 'Zastosuj',
+    close: 'Zamknij',
+    
+    // Text sizes
+    tiny: 'Bardzo mały',
+    small: 'Mały',
+    medium: 'Średni',
+    large: 'Duży',
+    extraLarge: 'Bardzo duży',
+    
+    // Transport modes
+    bus: 'Autobus',
+    tram: 'Tramwaj',
+    metro: 'Metro',
+    rail: 'Pociąg',
+    water: 'Statek',
+    coach: 'Autokar',
+    
+    // Toast messages
+    settingsApplied: 'Ustawienia zastosowane',
+    filtersUpdated: 'Filtry zaktualizowane',
+    textSizeUpdated: 'Rozmiar tekstu zaktualizowany',
+    languageChanged: 'Język zmieniony',
+    
+    // Update toast
+    newVersionAvailable: 'Nowa wersja dostępna, przeładowanie...',
+    
+    // Status
+    updatingIn: 'Aktualizacja za',
+    seconds: 's',
+    
+    // Footer
+    version: 'Wersja',
+    starOnGitHub: 'GitHub',
+    
+    // Station dropdown
+    noStationSelected: 'Nie wybrano stacji',
+    noRecentStations: 'Brak ostatnich stacji'
   }
 };
 
@@ -576,6 +603,7 @@ const languages = [
   { code: 'is', flag: '🇮🇸', name: 'Íslenska' },
   { code: 'it', flag: '🇮🇹', name: 'Italiano' },
   { code: 'fa', flag: '🇮🇷', name: 'فارسی' },
+  { code: 'pl', flag: '🇵🇱', name: 'Polski' },
   { code: 'uk', flag: '🇺🇦', name: 'Українська' }
 ];
 

@@ -137,13 +137,32 @@ async function init(){
           const toast = document.createElement('div');
           toast.id = 'sw-update-toast';
           toast.className = 'options-toast';
-          toast.innerHTML = `<span>${t('newVersionAvailable')}</span>`;
+          
+          // Show countdown timer
+          let countdown = 5;
+          const updateCountdown = () => {
+            toast.innerHTML = `<span>${t('newVersionAvailable')} ${t('updatingIn')} ${countdown}${t('seconds')}</span>`;
+          };
+          updateCountdown();
+          
           document.body.appendChild(toast);
           
-          // Immediately trigger skipWaiting to activate the new service worker
-          if (worker) {
-            worker.postMessage({type: 'SKIP_WAITING'});
-          }
+          // Update countdown every second
+          const countdownInterval = setInterval(() => {
+            countdown--;
+            if (countdown > 0) {
+              updateCountdown();
+            } else {
+              clearInterval(countdownInterval);
+            }
+          }, 1000);
+          
+          // Trigger skipWaiting after 5 seconds
+          setTimeout(() => {
+            if (worker) {
+              worker.postMessage({type: 'SKIP_WAITING'});
+            }
+          }, 5000);
         };
 
         // If there's already a waiting worker, notify and reload immediately
