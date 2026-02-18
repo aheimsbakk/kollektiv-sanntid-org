@@ -470,3 +470,29 @@ body.options-open .app-root {
   clip: rect(1px, 1px, 1px, 1px);
   white-space: nowrap;
 }
+
+/* ----------------------------------------------------------------------
+   APP FOOTER (Version & GitHub link)
+   ---------------------------------------------------------------------- */
+
+.app-footer {
+  position: fixed;
+  bottom: 18px;
+  left: 18px;
+  z-index: 1000;
+  font-size: 12px;
+  color: var(--fg-dim);
+  background: var(--overlay-weak);
+  padding: 6px 10px;
+  border-radius: 6px;
+  backdrop-filter: blur(8px);
+}
+
+.app-footer a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.app-footer a:hover {
+  text-decoration: underline;
+}
