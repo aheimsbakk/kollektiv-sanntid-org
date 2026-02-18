@@ -86,7 +86,7 @@ export function createOptionsPanel(defaults, onApply, onLanguageChange){
       const lab = document.createElement('label'); lab.className = 'mode-checkbox-label';
       const icon = document.createElement('span'); icon.className = 'mode-icon'; icon.setAttribute('aria-hidden','true'); icon.textContent = emojiForMode(m);
       const cb = document.createElement('input'); cb.type='checkbox'; cb.value = m; cb.checked = (defaults.TRANSPORT_MODES || []).includes(m);
-      const span = document.createElement('span'); span.textContent = t(m); span.style.marginLeft = '6px';
+      const span = document.createElement('span'); span.textContent = t(m);
       lab.append(icon, cb, span);
       td.appendChild(lab);
       tr.appendChild(td);
@@ -409,17 +409,17 @@ export function createOptionsPanel(defaults, onApply, onLanguageChange){
   });
 
   // small visual confirmation (toast) when applying settings
-  const toast = document.createElement('div'); toast.className = 'options-toast'; toast.style.display='none'; panel.appendChild(toast);
+  const toast = document.createElement('div'); toast.className = 'options-toast'; panel.appendChild(toast);
   function showToast(msg){
     try{
       toast.textContent = msg || t('settingsApplied');
-      toast.style.display = 'block';
+      toast.classList.add('visible');
       toast.style.opacity = '1';
       clearTimeout(showToast._t);
       showToast._t = setTimeout(()=>{
         toast.style.opacity = '0';
         // hide after transition
-        setTimeout(()=>{ toast.style.display='none'; }, 300);
+        setTimeout(()=>{ toast.classList.remove('visible'); }, 300);
       }, 1400);
     }catch(e){/*ignore*/}
   }

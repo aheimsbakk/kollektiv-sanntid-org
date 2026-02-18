@@ -1,12 +1,13 @@
-Overall Context: Dependency-free departure board using Entur APIs with realtime data, intelligent autocomplete with client-side re-ranking, Norwegian character support (æøå), complete transport mode coverage. Service worker uses versioned caching. Options panel with 3x2 transport modes table, keyboard navigation, and validated inputs. Full multilingual support (8 languages). Interactive station dropdown with localStorage-based recent stations (max 5, FIFO reordering). Footer shows version with link emoji.
+Overall Context: Dependency-free departure board with Entur APIs, intelligent autocomplete, Norwegian support. Versioned service worker caching. Options panel with transport modes, multilingual (8 languages), station dropdown (max 5 recent). CSS refactored for dark/light mode support: max 10% transparency, white text, light gray shadows on destinations/icons/countdowns only.
 
-Current Goal: Enhance UX with realtime status indicators and platform information.
+Current Goal: Implement dark/light mode switching, then add realtime status indicators and platform info.
 
 Last 3 Changes:
+- agents/worklogs/2026-02-18-18-12-css-cleanup-darkmode-prep.md
 - agents/worklogs/2026-02-18-17-54-footer-link-emoji.md
 - agents/worklogs/2026-02-18-17-20-recent-stations-dropdown.md
-- agents/worklogs/2026-02-18-17-07-simplify-footer-text.md
 
 Next Steps:
-- Display realtime status indicators (cancellation, predictionInaccurate) in UI
+- Implement dark/light mode theme switching
+- Display realtime status indicators (cancellation, predictionInaccurate)
 - Show platform/quay info from quay.publicCode field

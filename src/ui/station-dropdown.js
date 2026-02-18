@@ -72,7 +72,6 @@ export function createStationDropdown(currentStationName, onStationSelect) {
   const menu = document.createElement('div');
   menu.className = 'station-dropdown-menu';
   menu.setAttribute('role', 'listbox');
-  menu.style.display = 'none';
   
   let isOpen = false;
   let selectedIndex = -1;
@@ -111,7 +110,11 @@ export function createStationDropdown(currentStationName, onStationSelect) {
   // Toggle dropdown
   function toggleDropdown() {
     isOpen = !isOpen;
-    menu.style.display = isOpen ? 'block' : 'none';
+    if (isOpen) {
+      menu.classList.add('open');
+    } else {
+      menu.classList.remove('open');
+    }
     titleBtn.setAttribute('aria-expanded', isOpen.toString());
     arrow.textContent = isOpen ? ' ▲' : ' ▼';
     
@@ -125,7 +128,7 @@ export function createStationDropdown(currentStationName, onStationSelect) {
   function closeDropdown() {
     if (!isOpen) return;
     isOpen = false;
-    menu.style.display = 'none';
+    menu.classList.remove('open');
     titleBtn.setAttribute('aria-expanded', 'false');
     arrow.textContent = ' ▼';
     selectedIndex = -1;

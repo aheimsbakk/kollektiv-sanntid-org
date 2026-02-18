@@ -8,7 +8,7 @@ export function createBoardElements(stationName, onStationSelect){
   // station dropdown (replaces simple title)
   const stationDropdown = createStationDropdown(stationName, onStationSelect);
   // status chip (Live / Demo) should appear under the station title
-  const status = document.createElement('div'); status.className='status-chip'; status.style.display='none';
+  const status = document.createElement('div'); status.className='status-chip';
   const list = document.createElement('div'); list.className='departures';
   const headerWrap = document.createElement('div'); headerWrap.className='header-wrap';
   // header-left stacks title and status vertically; header-controls (gear) live to the right

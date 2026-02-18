@@ -315,14 +315,14 @@ async function init(){
       // ensure the status chip is visible; its textContent will be driven by the
       // per-second ticker below to show "Next update in XX seconds."
       if (board.status) {
-        board.status.style.display = 'inline-block';
+        board.status.classList.add('visible');
         // give an initial label while the ticker updates on the next tick
         board.status.textContent = 'Live';
       }
     }
   }catch(e){
     console.warn('Live fetch failed, falling back to demo', e && e.message ? e.message : e);
-    if(board.status){ board.status.style.display='inline-block'; board.status.textContent = 'Demo'; }
+    if(board.status){ board.status.classList.add('visible'); board.status.textContent = 'Demo'; }
   }
   if(!data || !data.length){
     // Don't auto-fallback to demo here; show an explicit empty state handled by renderDepartures
