@@ -27,7 +27,7 @@
   --border-muted: rgba(255, 255, 255, 0.1);
   
   /* Text shadows (subtle light glow effect visible on dark background) */
-  --text-shadow-light: 0px 0px 2px rgba(0, 0, 0, 1), 1px 1px 4px rgba(255, 255, 255, 1);
+  --text-shadow-light: 0px 0px 2px rgba(0, 0, 0, 1), 0px 0px 4px rgba(255, 255, 255, 1);
   
   /* Layout spacing - adjust these to control vertical rhythm */
   --vertical-gap: 0em;         /* Gap between departure rows */
@@ -231,9 +231,9 @@ body.options-open .app-root {
 
 /* Base button style (used by options actions and language flags) */
 button {
-  padding: 8px 8px;
+  padding: 4px 4px;
   border-radius: 6px;
-  background: var(--overlay-medium);
+  background: var(--overlay-light);
   color: var(--text-primary);
   border: 1px solid var(--border-muted);
   cursor: pointer;
@@ -253,7 +253,7 @@ button:active {
 /* Language flag buttons */
 .language-flag {
   padding: 2px 2px;
-  font-size: 1.1em;
+  font-size: 1em;
 }
 
 .language-flag.active {
@@ -269,14 +269,9 @@ button:active {
   margin-top: 8px;
 }
 
-/* Gear button - special case with transparent background */
+/* Gear button - uses base button styles but keeps custom size */
 .gear-btn {
-  background: transparent;
-  border: 0;
-  color: var(--text-primary);
   font-size: 20px;
-  cursor: pointer;
-  padding: 0;
 }
 
 /* Fixed gear button in top-right corner of viewport */
@@ -285,19 +280,10 @@ button:active {
   right: 18px;
   top: 18px;
   z-index: 1300;
-  background: var(--overlay-medium);
-  border-radius: 999px;
-  padding: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid var(--border-muted);
 }
 
 .global-gear .gear-btn {
   font-size: 26px;
-  padding: 6px;
-  color: var(--text-primary);
 }
 
 
