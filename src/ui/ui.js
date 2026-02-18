@@ -42,7 +42,7 @@ export function createBoardElements(stationName, onStationSelect){
     }catch(e){ debug.textContent = String(obj); }
   };
   el.append(debug);
-  return {el, header, list, status, debug, footer};
+  return {el, list, status, debug, footer, stationDropdown};
 }
 
 // Update footer translations when language changes
