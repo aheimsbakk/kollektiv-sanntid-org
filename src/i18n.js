@@ -46,7 +46,11 @@ const translations = {
     
     // Footer
     version: 'Version',
-    starOnGitHub: 'GitHub'
+    starOnGitHub: 'GitHub',
+    
+    // Station dropdown
+    noStationSelected: 'No station selected',
+    noRecentStations: 'No recent stations'
   },
   
   no: {
@@ -93,7 +97,11 @@ const translations = {
     
     // Footer
     version: 'Versjon',
-    starOnGitHub: 'GitHub'
+    starOnGitHub: 'GitHub',
+    
+    // Station dropdown
+    noStationSelected: 'Ingen stasjon valgt',
+    noRecentStations: 'Ingen nylige stasjoner'
   },
   
   de: {
@@ -140,7 +148,11 @@ const translations = {
     
     // Footer
     version: 'Version',
-    starOnGitHub: 'GitHub'
+    starOnGitHub: 'GitHub',
+    
+    // Station dropdown
+    noStationSelected: 'Keine Station ausgewählt',
+    noRecentStations: 'Keine letzten Stationen'
   },
   
   es: {
@@ -187,7 +199,11 @@ const translations = {
     
     // Footer
     version: 'Versión',
-    starOnGitHub: 'GitHub'
+    starOnGitHub: 'GitHub',
+    
+    // Station dropdown
+    noStationSelected: 'Ninguna estación seleccionada',
+    noRecentStations: 'No hay estaciones recientes'
   },
   
   it: {
@@ -234,7 +250,11 @@ const translations = {
     
     // Footer
     version: 'Versione',
-    starOnGitHub: 'GitHub'
+    starOnGitHub: 'GitHub',
+    
+    // Station dropdown
+    noStationSelected: 'Nessuna stazione selezionata',
+    noRecentStations: 'Nessuna stazione recente'
   },
   
   el: {
@@ -281,7 +301,11 @@ const translations = {
     
     // Footer
     version: 'Έκδοση',
-    starOnGitHub: 'GitHub'
+    starOnGitHub: 'GitHub',
+    
+    // Station dropdown
+    noStationSelected: 'Δεν επιλέχθηκε σταθμός',
+    noRecentStations: 'Δεν υπάρχουν πρόσφατοι σταθμοί'
   },
   
   fa: {
@@ -328,7 +352,11 @@ const translations = {
     
     // Footer
     version: 'نسخه',
-    starOnGitHub: 'GitHub'
+    starOnGitHub: 'GitHub',
+    
+    // Station dropdown
+    noStationSelected: 'هیچ ایستگاهی انتخاب نشده',
+    noRecentStations: 'ایستگاه اخیر وجود ندارد'
   },
   
   hi: {
@@ -375,7 +403,11 @@ const translations = {
     
     // Footer
     version: 'संस्करण',
-    starOnGitHub: 'GitHub'
+    starOnGitHub: 'GitHub',
+    
+    // Station dropdown
+    noStationSelected: 'कोई स्टेशन चयनित नहीं',
+    noRecentStations: 'कोई हालिया स्टेशन नहीं'
   }
 };
 

@@ -1,18 +1,19 @@
 // Minimal UI helpers: create container and manage departure list
 import { t } from '../i18n.js';
 import { VERSION } from '../config.js';
+import { createStationDropdown } from './station-dropdown.js';
 
-export function createBoardElements(stationName){
+export function createBoardElements(stationName, onStationSelect){
   const el = document.createElement('div'); el.className='board';
-  // station title (used by app.js as .station-title)
-  const header = document.createElement('div'); header.className='station-title'; header.textContent = stationName || '';
+  // station dropdown (replaces simple title)
+  const stationDropdown = createStationDropdown(stationName, onStationSelect);
   // status chip (Live / Demo) should appear under the station title
   const status = document.createElement('div'); status.className='status-chip'; status.style.display='none';
   const list = document.createElement('div'); list.className='departures';
   const headerWrap = document.createElement('div'); headerWrap.className='header-wrap';
   // header-left stacks title and status vertically; header-controls (gear) live to the right
   const headerLeft = document.createElement('div'); headerLeft.className = 'header-left';
-  headerLeft.append(header, status);
+  headerLeft.append(stationDropdown, status);
   headerWrap.append(headerLeft);
   
   // Footer with version and GitHub link
@@ -29,6 +30,8 @@ export function createBoardElements(stationName){
   el.append(headerWrap, list, footer);
   // expose header-wrap for other modules to attach controls
   el.headerWrap = headerWrap;
+  // expose station dropdown for updating
+  el.stationDropdown = stationDropdown;
   const debug = document.createElement('pre'); debug.className='debug-panel';
   // expose helper to set debug content; keep it minimal so callers can append
   debug.setDebug = (obj) => {

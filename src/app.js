@@ -7,6 +7,7 @@ import { createOptionsPanel } from './ui/options.js';
 import { createDepartureNode, updateDepartureCountdown } from './ui/departure.js';
 import { fetchDepartures, lookupStopId } from './entur.js';
 import { initLanguage, t } from './i18n.js';
+import { addRecentStation } from './ui/station-dropdown.js';
 
 // Initialize language on startup
 initLanguage();
@@ -41,7 +42,38 @@ async function init(){
     }
   }catch(e){/*ignore*/}
 
-  const board = createBoardElements(DEFAULTS.STATION_NAME);
+  // Handler for when user selects a station from recent dropdown
+  function handleStationSelect(station) {
+    DEFAULTS.STATION_NAME = station.name;
+    DEFAULTS.STOP_ID = station.stopId;
+    
+    // Update dropdown title
+    board.stationDropdown.updateTitle(station.name);
+    
+    // Move this station to top of recent list
+    addRecentStation(station.name, station.stopId);
+    board.stationDropdown.refresh();
+    
+    // Update document title
+    try { document.title = station.name || document.title; } catch(e) {}
+    
+    // Trigger refresh with new station
+    (async () => {
+      try {
+        await doRefresh({ fallbackToDemo: false });
+      } catch(e) { 
+        console.warn('Station change refresh failed', e); 
+      }
+      startRefreshLoop();
+    })();
+    
+    // Save settings
+    try {
+      localStorage.setItem('departure:settings', JSON.stringify(DEFAULTS));
+    } catch(e) {/*ignore*/}
+  }
+
+  const board = createBoardElements(DEFAULTS.STATION_NAME, handleStationSelect);
   // track when the next automatic refresh will occur (epoch ms) so we can
   // show a per-second countdown in the header status chip.
   let nextRefreshAt = Date.now();
@@ -180,9 +212,17 @@ async function init(){
     DEFAULTS.NUM_DEPARTURES = newOpts.NUM_DEPARTURES;
     DEFAULTS.FETCH_INTERVAL = newOpts.FETCH_INTERVAL;
     DEFAULTS.TRANSPORT_MODES = newOpts.TRANSPORT_MODES;
-    // update header title (station displayed in header element)
-    const headerTitle = board.el.querySelector('.station-title');
-    if (headerTitle) headerTitle.textContent = DEFAULTS.STATION_NAME;
+    // update station dropdown
+    if (board.stationDropdown) {
+      board.stationDropdown.updateTitle(DEFAULTS.STATION_NAME);
+    }
+    // add to recent stations if we have both name and ID
+    if (DEFAULTS.STATION_NAME && DEFAULTS.STOP_ID) {
+      addRecentStation(DEFAULTS.STATION_NAME, DEFAULTS.STOP_ID);
+      if (board.stationDropdown) {
+        board.stationDropdown.refresh();
+      }
+    }
     try{ document.title = DEFAULTS.STATION_NAME || document.title; }catch(e){}
     // trigger a manual refresh (do not fallback to demo for manual refresh)
     (async ()=>{
@@ -206,9 +246,17 @@ async function init(){
     DEFAULTS.NUM_DEPARTURES = newOpts.NUM_DEPARTURES;
     DEFAULTS.FETCH_INTERVAL = newOpts.FETCH_INTERVAL;
     DEFAULTS.TRANSPORT_MODES = newOpts.TRANSPORT_MODES;
-    // update header title (station displayed in header element)
-    const headerTitle = board.el.querySelector('.station-title');
-    if (headerTitle) headerTitle.textContent = DEFAULTS.STATION_NAME;
+    // update station dropdown
+    if (board.stationDropdown) {
+      board.stationDropdown.updateTitle(DEFAULTS.STATION_NAME);
+    }
+    // add to recent stations if we have both name and ID
+    if (DEFAULTS.STATION_NAME && DEFAULTS.STOP_ID) {
+      addRecentStation(DEFAULTS.STATION_NAME, DEFAULTS.STOP_ID);
+      if (board.stationDropdown) {
+        board.stationDropdown.refresh();
+      }
+    }
     try{ document.title = DEFAULTS.STATION_NAME || document.title; }catch(e){}
     // trigger a manual refresh (do not fallback to demo for manual refresh)
     (async ()=>{
