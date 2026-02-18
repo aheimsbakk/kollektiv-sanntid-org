@@ -46,7 +46,7 @@ const translations = {
     
     // Footer
     version: 'Version',
-    starOnGitHub: 'Star on GitHub'
+    starOnGitHub: 'GitHub'
   },
   
   no: {
@@ -93,7 +93,7 @@ const translations = {
     
     // Footer
     version: 'Versjon',
-    starOnGitHub: 'Stjerne på GitHub'
+    starOnGitHub: 'GitHub'
   },
   
   de: {
@@ -140,7 +140,7 @@ const translations = {
     
     // Footer
     version: 'Version',
-    starOnGitHub: 'Stern auf GitHub'
+    starOnGitHub: 'GitHub'
   },
   
   es: {
@@ -187,7 +187,7 @@ const translations = {
     
     // Footer
     version: 'Versión',
-    starOnGitHub: 'Estrella en GitHub'
+    starOnGitHub: 'GitHub'
   },
   
   it: {
@@ -234,7 +234,7 @@ const translations = {
     
     // Footer
     version: 'Versione',
-    starOnGitHub: 'Stella su GitHub'
+    starOnGitHub: 'GitHub'
   },
   
   el: {
@@ -281,7 +281,7 @@ const translations = {
     
     // Footer
     version: 'Έκδοση',
-    starOnGitHub: 'Αστέρι στο GitHub'
+    starOnGitHub: 'GitHub'
   },
   
   fa: {
@@ -328,7 +328,7 @@ const translations = {
     
     // Footer
     version: 'نسخه',
-    starOnGitHub: 'ستاره در GitHub'
+    starOnGitHub: 'GitHub'
   },
   
   hi: {
@@ -375,7 +375,7 @@ const translations = {
     
     // Footer
     version: 'संस्करण',
-    starOnGitHub: 'GitHub पर स्टार दें'
+    starOnGitHub: 'GitHub'
   }
 };
 
