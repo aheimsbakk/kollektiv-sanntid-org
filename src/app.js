@@ -1,7 +1,7 @@
 import { DEFAULTS } from './config.js';
 import { getDemoData } from './data-loader.js';
 import { formatCountdown, isoToEpochMs } from './time.js';
-import { createBoardElements, clearList, findKey } from './ui/ui.js';
+import { createBoardElements, clearList, findKey, updateFooterTranslations } from './ui/ui.js';
 import { createHeaderToggle } from './ui/header.js';
 import { createOptionsPanel } from './ui/options.js';
 import { createDepartureNode, updateDepartureCountdown } from './ui/departure.js';
@@ -162,7 +162,7 @@ async function init(){
       // Remove old panel
       opts.panel.remove();
       // Create new panel with updated translations
-      const newOpts = createOptionsPanel(DEFAULTS, opts._onApply);
+      const newOpts = createOptionsPanel(DEFAULTS, opts._onApply, () => updateFooterTranslations(board.footer));
       document.body.appendChild(newOpts.panel);
       // Update reference
       Object.assign(opts, newOpts);
@@ -196,7 +196,7 @@ async function init(){
     try{ document.documentElement.classList.remove('text-size-tiny','text-size-small','text-size-medium','text-size-large','text-size-xlarge');
       document.documentElement.classList.add('text-size-'+(newOpts.TEXT_SIZE || 'large'));
     }catch(e){}
-  });
+  }, () => updateFooterTranslations(board.footer));
   // Store the onApply handler reference for language change reloads
   opts._onApply = (newOpts)=>{
     // apply new defaults and re-init fetch loop by reloading the page state

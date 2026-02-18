@@ -1,3 +1,7 @@
+// Version is defined here and in src/sw.js (service worker)
+// Both must be kept in sync - use scripts/bump-version.sh to update both
+export const VERSION = '1.5.0';
+
 export const DEFAULTS = {
   STATION_NAME: 'Jernbanetorget',
   STOP_ID: null, // When set, skip lookup and use this ID directly

@@ -1,4 +1,7 @@
 // Minimal UI helpers: create container and manage departure list
+import { t } from '../i18n.js';
+import { VERSION } from '../config.js';
+
 export function createBoardElements(stationName){
   const el = document.createElement('div'); el.className='board';
   // station title (used by app.js as .station-title)
@@ -11,7 +14,19 @@ export function createBoardElements(stationName){
   const headerLeft = document.createElement('div'); headerLeft.className = 'header-left';
   headerLeft.append(header, status);
   headerWrap.append(headerLeft);
-  el.append(headerWrap, list);
+  
+  // Footer with version and GitHub link
+  const footer = document.createElement('div'); footer.className='app-footer';
+  const versionText = document.createElement('span'); 
+  versionText.textContent = `${t('version')} ${VERSION}. `;
+  const githubLink = document.createElement('a');
+  githubLink.href = 'https://github.com/aheimsbakk/departure';
+  githubLink.target = '_blank';
+  githubLink.rel = 'noopener noreferrer';
+  githubLink.textContent = t('starOnGitHub');
+  footer.append(versionText, githubLink);
+  
+  el.append(headerWrap, list, footer);
   // expose header-wrap for other modules to attach controls
   el.headerWrap = headerWrap;
   const debug = document.createElement('pre'); debug.className='debug-panel';
@@ -24,7 +39,20 @@ export function createBoardElements(stationName){
     }catch(e){ debug.textContent = String(obj); }
   };
   el.append(debug);
-  return {el, header, list, status, debug};
+  return {el, header, list, status, debug, footer};
+}
+
+// Update footer translations when language changes
+export function updateFooterTranslations(footer) {
+  if (!footer) return;
+  const versionSpan = footer.querySelector('span');
+  const githubLink = footer.querySelector('a');
+  if (versionSpan) {
+    versionSpan.textContent = `${t('version')} ${VERSION}. `;
+  }
+  if (githubLink) {
+    githubLink.textContent = t('starOnGitHub');
+  }
 }
 
 export function clearList(listEl){

@@ -2,7 +2,7 @@
 import { searchStations } from '../entur.js';
 import { t, setLanguage, getLanguage, getLanguages } from '../i18n.js';
 
-export function createOptionsPanel(defaults, onApply){
+export function createOptionsPanel(defaults, onApply, onLanguageChange){
   const panel = document.createElement('aside'); panel.className = 'options-panel';
   const title = document.createElement('h3'); title.textContent = t('settings');
   panel.appendChild(title);
@@ -163,6 +163,10 @@ export function createOptionsPanel(defaults, onApply){
       btn.classList.add('active');
       // Update all translations in the panel
       updateTranslations();
+      // Notify external components (e.g., footer) of language change
+      if (typeof onLanguageChange === 'function') {
+        onLanguageChange();
+      }
       showToast(t('languageChanged'));
     });
     langWrap.appendChild(btn);

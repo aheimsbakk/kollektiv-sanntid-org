@@ -42,7 +42,11 @@ const translations = {
     
     // Status
     updatingIn: 'Updating in',
-    seconds: 's'
+    seconds: 's',
+    
+    // Footer
+    version: 'Version',
+    starOnGitHub: 'Star on GitHub'
   },
   
   no: {
@@ -85,7 +89,11 @@ const translations = {
     
     // Status
     updatingIn: 'Oppdaterer om',
-    seconds: 's'
+    seconds: 's',
+    
+    // Footer
+    version: 'Versjon',
+    starOnGitHub: 'Stjerne på GitHub'
   },
   
   de: {
@@ -128,7 +136,11 @@ const translations = {
     
     // Status
     updatingIn: 'Aktualisierung in',
-    seconds: 's'
+    seconds: 's',
+    
+    // Footer
+    version: 'Version',
+    starOnGitHub: 'Stern auf GitHub'
   },
   
   es: {
@@ -171,7 +183,11 @@ const translations = {
     
     // Status
     updatingIn: 'Actualizando en',
-    seconds: 's'
+    seconds: 's',
+    
+    // Footer
+    version: 'Versión',
+    starOnGitHub: 'Estrella en GitHub'
   },
   
   it: {
@@ -214,7 +230,11 @@ const translations = {
     
     // Status
     updatingIn: 'Aggiornamento tra',
-    seconds: 's'
+    seconds: 's',
+    
+    // Footer
+    version: 'Versione',
+    starOnGitHub: 'Stella su GitHub'
   },
   
   el: {
@@ -257,7 +277,11 @@ const translations = {
     
     // Status
     updatingIn: 'Ενημέρωση σε',
-    seconds: 'δ'
+    seconds: 'δ',
+    
+    // Footer
+    version: 'Έκδοση',
+    starOnGitHub: 'Αστέρι στο GitHub'
   },
   
   fa: {
@@ -300,7 +324,11 @@ const translations = {
     
     // Status
     updatingIn: 'به‌روزرسانی در',
-    seconds: 'ث'
+    seconds: 'ث',
+    
+    // Footer
+    version: 'نسخه',
+    starOnGitHub: 'ستاره در GitHub'
   },
   
   hi: {
@@ -343,7 +371,11 @@ const translations = {
     
     // Status
     updatingIn: 'अपडेट में',
-    seconds: 'से'
+    seconds: 'से',
+    
+    // Footer
+    version: 'संस्करण',
+    starOnGitHub: 'GitHub पर स्टार दें'
   }
 };
 

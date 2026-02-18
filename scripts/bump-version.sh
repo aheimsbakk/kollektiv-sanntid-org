@@ -1,12 +1,18 @@
 #!/usr/bin/env bash
-# Bump version in sw.js according to SemVer
+# Bump version in sw.js and config.js according to SemVer
 
 set -euo pipefail
 
 SW_FILE="src/sw.js"
+CONFIG_FILE="src/config.js"
 
 if [ ! -f "$SW_FILE" ]; then
   echo "Error: $SW_FILE not found" >&2
+  exit 1
+fi
+
+if [ ! -f "$CONFIG_FILE" ]; then
+  echo "Error: $CONFIG_FILE not found" >&2
   exit 1
 fi
 
@@ -49,5 +55,8 @@ NEW_VERSION="$MAJOR.$MINOR.$PATCH"
 # Update sw.js
 sed -i "s/const VERSION = '[0-9.]*';/const VERSION = '$NEW_VERSION';/" "$SW_FILE"
 
+# Update config.js
+sed -i "s/export const VERSION = '[0-9.]*';/export const VERSION = '$NEW_VERSION';/" "$CONFIG_FILE"
+
 echo "Version bumped: $CURRENT → $NEW_VERSION"
-echo "Updated: $SW_FILE"
+echo "Updated: $SW_FILE, $CONFIG_FILE"
