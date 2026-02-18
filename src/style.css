@@ -225,15 +225,59 @@ body.options-open .app-root {
 
 
 /* ----------------------------------------------------------------------
-   GEAR BUTTON (Settings)
+   BUTTONS
+   Unified button styles for all interactive elements
    ---------------------------------------------------------------------- */
 
+/* Base button style (used by options actions and language flags) */
+button {
+  padding: 8px 12px;
+  border-radius: 6px;
+  background: var(--overlay-medium);
+  color: var(--text-primary);
+  border: 1px solid var(--border-muted);
+  cursor: pointer;
+  font-size: inherit;
+  font-family: inherit;
+  transition: background 0.2s, color 0.2s;
+}
+
+button:hover {
+  background: var(--overlay-light);
+}
+
+button:active {
+  background: var(--overlay-strong);
+}
+
+/* Language flag buttons */
+.language-flag {
+  padding: 8px 12px;
+  font-size: 1.2em;
+  min-width: 44px;
+}
+
+.language-flag.active {
+  background: var(--text-primary);
+  color: #081021;
+  border-color: var(--text-primary);
+}
+
+.language-switcher {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+/* Gear button - special case with transparent background */
 .gear-btn {
   background: transparent;
   border: 0;
   color: var(--text-primary);
   font-size: 20px;
   cursor: pointer;
+  padding: 0;
 }
 
 /* Fixed gear button in top-right corner of viewport */
@@ -248,6 +292,7 @@ body.options-open .app-root {
   display: flex;
   align-items: center;
   justify-content: center;
+  border: 1px solid var(--border-muted);
 }
 
 .global-gear .gear-btn {
@@ -473,19 +518,6 @@ body.options-open .app-root {
   display: flex;
   justify-content: space-between;
   margin-top: 12px;
-}
-
-.options-actions button {
-  padding: 8px 12px;
-  border-radius: 6px;
-  background: var(--overlay-medium);
-  color: var(--text-primary);
-  border: 1px solid var(--border-muted);
-  cursor: pointer;
-}
-
-.options-actions button:hover {
-  background: var(--overlay-light);
 }
 
 .options-toast {
