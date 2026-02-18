@@ -315,34 +315,6 @@ async function init(){
         board.debug.style.display = 'none';
       }
     }
-
-  // refresh logic: clear cache and refetch every FETCH_INTERVAL seconds
-  setInterval(async ()=>{
-    try{
-      // clear entur cache to force network refetch
-      if(globalThis._enturCache) globalThis._enturCache.clear();
-      // Use stored STOP_ID if available, otherwise lookup by station name
-      let stopId = DEFAULTS.STOP_ID;
-      if (!stopId) {
-        stopId = await lookupStopId({ stationName: DEFAULTS.STATION_NAME, clientName: DEFAULTS.CLIENT_NAME });
-      }
-      let fresh = [];
-      if(stopId){
-        fresh = await fetchDepartures({ stopId, numDepartures: DEFAULTS.NUM_DEPARTURES, modes: DEFAULTS.TRANSPORT_MODES, apiUrl: DEFAULTS.API_URL, clientName: DEFAULTS.CLIENT_NAME });
-        liveFetchSucceeded = true;
-      }
-      if(!fresh || !fresh.length){
-        fresh = await getDemoData();
-      }
-      // re-render for now; later we can diff and patch
-      renderDepartures(board.list, fresh);
-      data = fresh;
-      // reset next refresh time to FETCH_INTERVAL from now
-      nextRefreshAt = Date.now() + (DEFAULTS.FETCH_INTERVAL * 1000);
-    }catch(err){
-      console.warn('Refresh failed', err);
-    }
-  }, DEFAULTS.FETCH_INTERVAL * 1000);
 }
 
 document.addEventListener('DOMContentLoaded', init);
