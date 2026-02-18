@@ -1,4 +1,4 @@
-const VERSION = '1.8.2';
+const VERSION = '1.8.3';
 const CACHE_NAME = `departures-v${VERSION}`;
 const ASSETS = [
   './', './index.html', './style.css', './app.js', './manifest.webmanifest'
@@ -48,6 +48,20 @@ self.addEventListener('fetch', (ev) => {
     return;
   }
 
-  // For other requests, prefer cache, fallback to network
-  ev.respondWith(caches.match(req).then(r => r || fetch(req)));
+  // For other requests (CSS, JS, etc), use cache-first from the current versioned cache only
+  ev.respondWith((async () => {
+    const cache = await caches.open(CACHE_NAME);
+    const cached = await cache.match(req);
+    if (cached) return cached;
+    
+    try {
+      const netRes = await fetch(req);
+      // Cache the response for future use
+      cache.put(req, netRes.clone()).catch(()=>{});
+      return netRes;
+    } catch (e) {
+      // Offline and not in cache
+      return new Response('Offline', { status: 503, statusText: 'Offline' });
+    }
+  })());
 });

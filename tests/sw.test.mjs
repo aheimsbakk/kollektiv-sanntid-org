@@ -130,6 +130,13 @@ function runTests() {
     }
   });
 
+  test('Service worker uses versioned cache (CACHE_NAME)', () => {
+    // Verify that fetch handler opens the versioned cache, not just any cache
+    if (!swContent.includes('caches.open(CACHE_NAME)')) {
+      throw new Error('Fetch handler should open CACHE_NAME to ensure version-specific cache');
+    }
+  });
+
   console.log('\n' + '='.repeat(50));
   console.log(`Tests: ${passed + failed} | Passed: ${passed} | Failed: ${failed}`);
   console.log('='.repeat(50));
