@@ -293,6 +293,19 @@ export function createOptionsPanel(defaults, onApply, onLanguageChange){
     }
   });
 
+  // Auto-select text on focus for easy editing
+  inpStation.addEventListener('focus', () => {
+    inpStation.select();
+  });
+
+  inpNum.addEventListener('focus', () => {
+    inpNum.select();
+  });
+
+  inpInt.addEventListener('focus', () => {
+    inpInt.select();
+  });
+
   // Station autocomplete behaviour: query after 3 characters and show up to 5 matches
   let acTimer = null;
   let lastQuery = '';
