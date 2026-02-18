@@ -19,12 +19,12 @@ export function createBoardElements(stationName, onStationSelect){
   // Footer with version and GitHub link
   const footer = document.createElement('div'); footer.className='app-footer';
   const versionText = document.createElement('span'); 
-  versionText.textContent = `${t('version')} ${VERSION}. `;
+  versionText.textContent = `${t('version')} ${VERSION} `;
   const githubLink = document.createElement('a');
   githubLink.href = 'https://github.com/aheimsbakk/departure';
   githubLink.target = '_blank';
   githubLink.rel = 'noopener noreferrer';
-  githubLink.textContent = t('starOnGitHub');
+  githubLink.textContent = '🔗';
   footer.append(versionText, githubLink);
   
   el.append(headerWrap, list, footer);
@@ -51,10 +51,10 @@ export function updateFooterTranslations(footer) {
   const versionSpan = footer.querySelector('span');
   const githubLink = footer.querySelector('a');
   if (versionSpan) {
-    versionSpan.textContent = `${t('version')} ${VERSION}. `;
+    versionSpan.textContent = `${t('version')} ${VERSION} `;
   }
   if (githubLink) {
-    githubLink.textContent = t('starOnGitHub');
+    githubLink.textContent = '🔗';
   }
 }
 
