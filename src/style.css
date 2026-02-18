@@ -253,8 +253,8 @@ button:active {
 /* Language flag buttons */
 .language-flag {
   padding: 8px 12px;
-  font-size: 1.2em;
-  min-width: 44px;
+  font-size: 1.8em;
+  min-width: 48px;
 }
 
 .language-flag.active {

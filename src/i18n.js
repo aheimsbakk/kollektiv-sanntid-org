@@ -408,19 +408,175 @@ const translations = {
     // Station dropdown
     noStationSelected: 'कोई स्टेशन चयनित नहीं',
     noRecentStations: 'कोई हालिया स्टेशन नहीं'
+  },
+  
+  is: {
+    // Options panel
+    settings: 'Stillingar',
+    stationName: 'Nafn stöðvar',
+    numberOfDepartures: 'Fjöldi brottfara',
+    fetchInterval: 'Uppfærslubil (sekúndur)',
+    textSize: 'Textastærð',
+    transportModes: 'Samgöngumátar (sía)',
+    switchLanguage: 'Skipta um tungumál',
+    apply: 'Nota',
+    close: 'Loka',
+    
+    // Text sizes
+    tiny: 'Örsmátt',
+    small: 'Lítið',
+    medium: 'Miðlungs',
+    large: 'Stórt',
+    extraLarge: 'Mjög stórt',
+    
+    // Transport modes
+    bus: 'Strætó',
+    tram: 'Sporvagn',
+    metro: 'Neðanjarðarlest',
+    rail: 'Lest',
+    water: 'Skip',
+    coach: 'Hraðbraut',
+    
+    // Toast messages
+    settingsApplied: 'Stillingar vistaðar',
+    filtersUpdated: 'Síur uppfærðar',
+    textSizeUpdated: 'Textastærð uppfærð',
+    languageChanged: 'Tungumáli breytt',
+    
+    // Update toast
+    newVersionAvailable: 'Ný útgáfa tiltæk',
+    reload: 'Endurhlaða',
+    dismiss: 'Hafna',
+    
+    // Status
+    updatingIn: 'Uppfærir eftir',
+    seconds: 's',
+    
+    // Footer
+    version: 'Útgáfa',
+    starOnGitHub: 'GitHub',
+    
+    // Station dropdown
+    noStationSelected: 'Engin stöð valin',
+    noRecentStations: 'Engar nýlegar stöðvar'
+  },
+  
+  uk: {
+    // Options panel
+    settings: 'Налаштування',
+    stationName: 'Назва станції',
+    numberOfDepartures: 'Кількість відправлень',
+    fetchInterval: 'Інтервал оновлення (секунди)',
+    textSize: 'Розмір тексту',
+    transportModes: 'Транспортні засоби (фільтр)',
+    switchLanguage: 'Змінити мову',
+    apply: 'Застосувати',
+    close: 'Закрити',
+    
+    // Text sizes
+    tiny: 'Дуже малий',
+    small: 'Малий',
+    medium: 'Середній',
+    large: 'Великий',
+    extraLarge: 'Дуже великий',
+    
+    // Transport modes
+    bus: 'Автобус',
+    tram: 'Трамвай',
+    metro: 'Метро',
+    rail: 'Поїзд',
+    water: 'Судно',
+    coach: 'Міжміський автобус',
+    
+    // Toast messages
+    settingsApplied: 'Налаштування застосовано',
+    filtersUpdated: 'Фільтри оновлено',
+    textSizeUpdated: 'Розмір тексту оновлено',
+    languageChanged: 'Мову змінено',
+    
+    // Update toast
+    newVersionAvailable: 'Доступна нова версія',
+    reload: 'Перезавантажити',
+    dismiss: 'Відхилити',
+    
+    // Status
+    updatingIn: 'Оновлення через',
+    seconds: 'с',
+    
+    // Footer
+    version: 'Версія',
+    starOnGitHub: 'GitHub',
+    
+    // Station dropdown
+    noStationSelected: 'Станцію не вибрано',
+    noRecentStations: 'Немає недавніх станцій'
+  },
+  
+  fr: {
+    // Options panel
+    settings: 'Paramètres',
+    stationName: 'Nom de la station',
+    numberOfDepartures: 'Nombre de départs',
+    fetchInterval: 'Intervalle de mise à jour (secondes)',
+    textSize: 'Taille du texte',
+    transportModes: 'Modes de transport (filtre)',
+    switchLanguage: 'Changer de langue',
+    apply: 'Appliquer',
+    close: 'Fermer',
+    
+    // Text sizes
+    tiny: 'Très petit',
+    small: 'Petit',
+    medium: 'Moyen',
+    large: 'Grand',
+    extraLarge: 'Très grand',
+    
+    // Transport modes
+    bus: 'Bus',
+    tram: 'Tramway',
+    metro: 'Métro',
+    rail: 'Train',
+    water: 'Bateau',
+    coach: 'Autocar',
+    
+    // Toast messages
+    settingsApplied: 'Paramètres appliqués',
+    filtersUpdated: 'Filtres mis à jour',
+    textSizeUpdated: 'Taille du texte mise à jour',
+    languageChanged: 'Langue modifiée',
+    
+    // Update toast
+    newVersionAvailable: 'Nouvelle version disponible',
+    reload: 'Recharger',
+    dismiss: 'Ignorer',
+    
+    // Status
+    updatingIn: 'Mise à jour dans',
+    seconds: 's',
+    
+    // Footer
+    version: 'Version',
+    starOnGitHub: 'GitHub',
+    
+    // Station dropdown
+    noStationSelected: 'Aucune station sélectionnée',
+    noRecentStations: 'Aucune station récente'
   }
 };
 
 // Language metadata with flags
 const languages = [
   { code: 'no', flag: '🇳🇴', name: 'Norsk' },
-  { code: 'en', flag: '🇬🇧', name: 'English' },
   { code: 'de', flag: '🇩🇪', name: 'Deutsch' },
+  { code: 'en', flag: '🇬🇧', name: 'English' },
   { code: 'es', flag: '🇪🇸', name: 'Español' },
-  { code: 'it', flag: '🇮🇹', name: 'Italiano' },
+  { code: 'fr', flag: '🇫🇷', name: 'Français' },
   { code: 'el', flag: '🇬🇷', name: 'Ελληνικά' },
+  { code: 'hi', flag: '🇮🇳', name: 'हिन्दी' },
+  { code: 'is', flag: '🇮🇸', name: 'Íslenska' },
+  { code: 'it', flag: '🇮🇹', name: 'Italiano' },
   { code: 'fa', flag: '🇮🇷', name: 'فارسی' },
-  { code: 'hi', flag: '🇮🇳', name: 'हिन्दी' }
+  { code: 'uk', flag: '🇺🇦', name: 'Українська' }
 ];
 
 let currentLanguage = 'en';
