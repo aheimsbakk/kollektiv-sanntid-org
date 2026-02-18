@@ -1,4 +1,4 @@
-import { DEFAULTS } from './config.js';
+import { DEFAULTS, VERSION } from './config.js';
 import { getDemoData } from './data-loader.js';
 import { formatCountdown, isoToEpochMs } from './time.js';
 import { createBoardElements, clearList, findKey, updateFooterTranslations } from './ui/ui.js';
@@ -131,17 +131,35 @@ async function init(){
     try {
       navigator.serviceWorker.register('./sw.js').then(reg => {
         // helper to show a brief update notification and auto-reload
-        const showUpdateNotification = (worker) => {
+        const showUpdateNotification = async (worker) => {
           // avoid creating multiple prompts
           if (document.getElementById('sw-update-toast')) return;
+          
+          // Hide the footer version while showing update
+          const footer = document.querySelector('.app-footer');
+          if (footer) footer.style.display = 'none';
+          
+          // Get new version from the waiting service worker
+          let newVersion = 'new version';
+          try {
+            // Fetch the new service worker to extract version
+            const swResponse = await fetch('./sw.js');
+            const swText = await swResponse.text();
+            const versionMatch = swText.match(/VERSION\s*=\s*['"]([^'"]+)['"]/);
+            if (versionMatch) {
+              newVersion = versionMatch[1];
+            }
+          } catch (e) {
+            // If we can't get the version, just use generic text
+          }
+          
           const toast = document.createElement('div');
           toast.id = 'sw-update-toast';
-          toast.className = 'options-toast';
           
-          // Show countdown timer
+          // Show countdown timer with version upgrade info
           let countdown = 5;
           const updateCountdown = () => {
-            toast.innerHTML = `<span>${t('newVersionAvailable')} ${t('updatingIn')} ${countdown}${t('seconds')}</span>`;
+            toast.innerHTML = `<div>${t('newVersionAvailable')}</div><div>Upgrading from ${VERSION} to ${newVersion}</div><div>${t('updatingIn')} ${countdown}${t('seconds')}</div>`;
           };
           updateCountdown();
           
