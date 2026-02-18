@@ -10,6 +10,8 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const swPath = join(__dirname, '../src/sw.js');
+const configPath = join(__dirname, '../src/config.js');
+const appPath = join(__dirname, '../src/app.js');
 
 function runTests() {
   let passed = 0;
@@ -29,6 +31,8 @@ function runTests() {
 
   // Read service worker file
   const swContent = readFileSync(swPath, 'utf-8');
+  const configContent = readFileSync(configPath, 'utf-8');
+  const appContent = readFileSync(appPath, 'utf-8');
 
   test('Service worker has VERSION constant', () => {
     const hasVersion = /const VERSION = '[0-9]+\.[0-9]+\.[0-9]+';/.test(swContent);
@@ -91,6 +95,38 @@ function runTests() {
   test('Service worker handles SKIP_WAITING message', () => {
     if (!swContent.includes('SKIP_WAITING') || !swContent.includes('skipWaiting')) {
       throw new Error('SKIP_WAITING message handler not found');
+    }
+  });
+
+  test('VERSION in sw.js matches VERSION in config.js', () => {
+    const swVersionMatch = swContent.match(/const VERSION = '([0-9]+\.[0-9]+\.[0-9]+)';/);
+    const configVersionMatch = configContent.match(/export const VERSION = '([0-9]+\.[0-9]+\.[0-9]+)';/);
+    
+    if (!swVersionMatch) {
+      throw new Error('VERSION not found in sw.js');
+    }
+    if (!configVersionMatch) {
+      throw new Error('VERSION not found in config.js');
+    }
+    
+    const swVersion = swVersionMatch[1];
+    const configVersion = configVersionMatch[1];
+    
+    if (swVersion !== configVersion) {
+      throw new Error(`Version mismatch: sw.js has '${swVersion}' but config.js has '${configVersion}'`);
+    }
+  });
+
+  test('App uses auto-reload mechanism (no manual reload buttons)', () => {
+    // The old implementation had manual buttons with ids: sw-refresh-btn and sw-dismiss-btn
+    // The new implementation should NOT have these
+    if (appContent.includes('sw-refresh-btn') || appContent.includes('sw-dismiss-btn')) {
+      throw new Error('App still contains manual reload/dismiss buttons (old update mechanism)');
+    }
+    
+    // Verify the new auto-reload mechanism is present
+    if (!appContent.includes('showUpdateNotification')) {
+      throw new Error('Auto-reload notification function not found');
     }
   });
 
