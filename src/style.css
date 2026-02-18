@@ -26,8 +26,8 @@
   --shadow-color: rgba(0, 0, 0, 0.3);
   --border-muted: rgba(255, 255, 255, 0.1);
   
-  /* Text shadows (light glow effect visible on dark background) */
-  --text-shadow-light: 0 0 8px rgba(255, 255, 255, 0.5), 0 0 12px rgba(255, 255, 255, 0.3);
+  /* Text shadows (subtle light glow effect visible on dark background) */
+  --text-shadow-light: 0 0 4px rgba(255, 255, 255, 0.3), 0 0 8px rgba(255, 255, 255, 0.15);
   
   /* Layout spacing - adjust these to control vertical rhythm */
   --vertical-gap: 0em;         /* Gap between departure rows */
