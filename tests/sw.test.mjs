@@ -66,7 +66,14 @@ function runTests() {
   });
 
   test('Service worker caches required assets', () => {
-    const requiredAssets = ['index.html', 'style.css', 'app.js', 'manifest.webmanifest'];
+    const requiredAssets = [
+      'index.html',
+      'style.css', 
+      'app.js',
+      'config.js',  // Contains VERSION displayed in footer
+      'i18n.js',    // Translation strings
+      'manifest.webmanifest'
+    ];
     requiredAssets.forEach(asset => {
       if (!swContent.includes(`'./${asset}'`) && !swContent.includes(`"./${asset}"`)) {
         throw new Error(`Required asset not found in ASSETS: ${asset}`);
