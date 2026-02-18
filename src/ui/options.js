@@ -181,6 +181,16 @@ export function createOptionsPanel(defaults, onApply, onLanguageChange){
 
   panel.append(rowStation, rowNum, rowInt, rowSize, rowModes, rowLang, actions);
 
+  // Track initial values to detect changes
+  let initialValues = {
+    STATION_NAME: '',
+    STOP_ID: null,
+    NUM_DEPARTURES: 0,
+    FETCH_INTERVAL: 0,
+    TRANSPORT_MODES: [],
+    TEXT_SIZE: ''
+  };
+
   function open(){ panel.classList.add('open'); }
   function close(){ panel.classList.remove('open'); }
 
@@ -204,15 +214,37 @@ export function createOptionsPanel(defaults, onApply, onLanguageChange){
     
     const newOpts = {
       STATION_NAME: inpStation.value || defaults.STATION_NAME,
-      STOP_ID: inpStation.dataset.stopId || null, // Use stored stopId from autocomplete if available
+      STOP_ID: inpStation.dataset.stopId || null,
       NUM_DEPARTURES: numDepartures,
       FETCH_INTERVAL: fetchInterval,
       TRANSPORT_MODES: chosen.length ? chosen : defaults.TRANSPORT_MODES,
       TEXT_SIZE: selSize.value || (defaults.TEXT_SIZE || 'large')
     };
-    try{ onApply && onApply(newOpts); }catch(e){ console.warn('onApply failed', e); }
-    // persist settings immediately
-    try{ localStorage.setItem('departure:settings', JSON.stringify(newOpts)); }catch(e){}
+    
+    // Check if anything actually changed
+    const hasChanged = 
+      newOpts.STATION_NAME !== initialValues.STATION_NAME ||
+      newOpts.STOP_ID !== initialValues.STOP_ID ||
+      newOpts.NUM_DEPARTURES !== initialValues.NUM_DEPARTURES ||
+      newOpts.FETCH_INTERVAL !== initialValues.FETCH_INTERVAL ||
+      newOpts.TEXT_SIZE !== initialValues.TEXT_SIZE ||
+      JSON.stringify(newOpts.TRANSPORT_MODES.sort()) !== JSON.stringify(initialValues.TRANSPORT_MODES.sort());
+    
+    if (hasChanged) {
+      try{ onApply && onApply(newOpts); }catch(e){ console.warn('onApply failed', e); }
+      // persist settings immediately
+      try{ localStorage.setItem('departure:settings', JSON.stringify(newOpts)); }catch(e){}
+      // Update initial values to the new values
+      initialValues = {
+        STATION_NAME: newOpts.STATION_NAME,
+        STOP_ID: newOpts.STOP_ID,
+        NUM_DEPARTURES: newOpts.NUM_DEPARTURES,
+        FETCH_INTERVAL: newOpts.FETCH_INTERVAL,
+        TRANSPORT_MODES: newOpts.TRANSPORT_MODES.slice(),
+        TEXT_SIZE: newOpts.TEXT_SIZE
+      };
+    }
+    
     if (shouldClose) close();
   }
 
@@ -455,6 +487,18 @@ export function createOptionsPanel(defaults, onApply, onLanguageChange){
     document.body.classList.add('options-open');
     // focus management: save previously focused element and then focus first focusable in panel
     open._prevFocus = document.activeElement;
+    
+    // Capture initial values when opening the panel
+    const chosen = Array.from(modesWrap.querySelectorAll('input[type=checkbox]:checked')).map(i=>i.value);
+    initialValues = {
+      STATION_NAME: inpStation.value || defaults.STATION_NAME,
+      STOP_ID: inpStation.dataset.stopId || null,
+      NUM_DEPARTURES: Number(inpNum.value) || defaults.NUM_DEPARTURES,
+      FETCH_INTERVAL: Number(inpInt.value) || defaults.FETCH_INTERVAL,
+      TRANSPORT_MODES: chosen.slice(),
+      TEXT_SIZE: selSize.value || (defaults.TEXT_SIZE || 'large')
+    };
+    
     origOpen();
     // set focus to first input
     const first = panel.querySelector('input, button, [tabindex]');
