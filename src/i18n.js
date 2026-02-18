@@ -36,7 +36,7 @@ const translations = {
     languageChanged: 'Language changed',
     
     // Update toast
-    newVersionAvailable: 'New version available',
+    newVersionAvailable: 'New version available, reloading...',
     reload: 'Reload',
     dismiss: 'Dismiss',
     
@@ -87,7 +87,7 @@ const translations = {
     languageChanged: 'Språk endret',
     
     // Update toast
-    newVersionAvailable: 'Ny versjon tilgjengelig',
+    newVersionAvailable: 'Ny versjon tilgjengelig, laster inn på nytt...',
     reload: 'Last inn på nytt',
     dismiss: 'Avvis',
     
@@ -138,7 +138,7 @@ const translations = {
     languageChanged: 'Sprache geändert',
     
     // Update toast
-    newVersionAvailable: 'Neue Version verfügbar',
+    newVersionAvailable: 'Neue Version verfügbar, wird neu geladen...',
     reload: 'Neu laden',
     dismiss: 'Verwerfen',
     
@@ -189,7 +189,7 @@ const translations = {
     languageChanged: 'Idioma cambiado',
     
     // Update toast
-    newVersionAvailable: 'Nueva versión disponible',
+    newVersionAvailable: 'Nueva versión disponible, recargando...',
     reload: 'Recargar',
     dismiss: 'Descartar',
     
@@ -240,7 +240,7 @@ const translations = {
     languageChanged: 'Lingua cambiata',
     
     // Update toast
-    newVersionAvailable: 'Nuova versione disponibile',
+    newVersionAvailable: 'Nuova versione disponibile, ricaricamento...',
     reload: 'Ricarica',
     dismiss: 'Ignora',
     
@@ -291,7 +291,7 @@ const translations = {
     languageChanged: 'Η γλώσσα άλλαξε',
     
     // Update toast
-    newVersionAvailable: 'Διαθέσιμη νέα έκδοση',
+    newVersionAvailable: 'Διαθέσιμη νέα έκδοση, επαναφόρτωση...',
     reload: 'Επαναφόρτωση',
     dismiss: 'Απόρριψη',
     
@@ -342,7 +342,7 @@ const translations = {
     languageChanged: 'زبان تغییر کرد',
     
     // Update toast
-    newVersionAvailable: 'نسخه جدید موجود است',
+    newVersionAvailable: 'نسخه جدید موجود است، در حال بارگذاری مجدد...',
     reload: 'بارگذاری مجدد',
     dismiss: 'نادیده گرفتن',
     
@@ -393,7 +393,7 @@ const translations = {
     languageChanged: 'भाषा बदल गई',
     
     // Update toast
-    newVersionAvailable: 'नया संस्करण उपलब्ध है',
+    newVersionAvailable: 'नया संस्करण उपलब्ध है, फिर से लोड किया जा रहा है...',
     reload: 'फिर से लोड करें',
     dismiss: 'खारिज करें',
     
@@ -444,7 +444,7 @@ const translations = {
     languageChanged: 'Tungumáli breytt',
     
     // Update toast
-    newVersionAvailable: 'Ný útgáfa tiltæk',
+    newVersionAvailable: 'Ný útgáfa tiltæk, endurnýja...',
     reload: 'Endurhlaða',
     dismiss: 'Hafna',
     
@@ -495,7 +495,7 @@ const translations = {
     languageChanged: 'Мову змінено',
     
     // Update toast
-    newVersionAvailable: 'Доступна нова версія',
+    newVersionAvailable: 'Доступна нова версія, перезавантаження...',
     reload: 'Перезавантажити',
     dismiss: 'Відхилити',
     
@@ -546,7 +546,7 @@ const translations = {
     languageChanged: 'Langue modifiée',
     
     // Update toast
-    newVersionAvailable: 'Nouvelle version disponible',
+    newVersionAvailable: 'Nouvelle version disponible, rechargement...',
     reload: 'Recharger',
     dismiss: 'Ignorer',
     

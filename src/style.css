@@ -231,7 +231,7 @@ body.options-open .app-root {
 
 /* Base button style (used by options actions and language flags) */
 button {
-  padding: 8px 12px;
+  padding: 8px 8px;
   border-radius: 6px;
   background: var(--overlay-medium);
   color: var(--text-primary);
@@ -252,9 +252,8 @@ button:active {
 
 /* Language flag buttons */
 .language-flag {
-  padding: 8px 12px;
-  font-size: 1.8em;
-  min-width: 48px;
+  padding: 2px 2px;
+  font-size: 1.1em;
 }
 
 .language-flag.active {
