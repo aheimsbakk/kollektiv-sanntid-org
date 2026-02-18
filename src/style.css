@@ -163,7 +163,8 @@ body.options-open .app-root {
 .station-dropdown-menu {
   position: absolute;
   top: 100%;
-  left: 0;
+  left: 50%;
+  transform: translateX(-50%);
   margin-top: 8px;
   background: var(--overlay-medium);
   border-radius: 6px;
