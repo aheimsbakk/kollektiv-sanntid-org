@@ -266,7 +266,6 @@ export function createOptionsPanel(defaults, onApply, onLanguageChange){
           inpNum.value = 1;
         }
       }
-      applyChanges(false);
       inpInt.focus();
     }
   });
@@ -285,7 +284,6 @@ export function createOptionsPanel(defaults, onApply, onLanguageChange){
           inpInt.value = 20;
         }
       }
-      applyChanges(false);
       selSize.focus();
     }
   });
@@ -358,7 +356,10 @@ export function createOptionsPanel(defaults, onApply, onLanguageChange){
     inpStation.value = c.title || c.id || '';
     inpStation.dataset.stopId = String(c.id || '');
     clearAutocomplete();
-    applyChanges(false);
+    
+    // Check all transport mode checkboxes when selecting a new station
+    const checkboxes = modesWrap.querySelectorAll('input[type=checkbox]');
+    checkboxes.forEach(cb => { cb.checked = true; });
   }
   function showCandidates(cands){
     lastCandidates = Array.isArray(cands) ? cands.slice(0) : [];
@@ -468,18 +469,6 @@ export function createOptionsPanel(defaults, onApply, onLanguageChange){
       }, 1400);
     }catch(e){/*ignore*/}
   }
-
-  // apply on checkbox toggles but debounce rapid toggles to avoid frequent fetches
-  let modesDebounceTimer = null;
-  modesWrap.addEventListener('change', (e)=>{
-    if (e.target && e.target.type === 'checkbox'){
-      clearTimeout(modesDebounceTimer);
-      modesDebounceTimer = setTimeout(()=>{ applyChanges(false); showToast(t('filtersUpdated')); }, 500);
-    }
-  });
-
-  // apply immediately when text size selection changes
-  selSize.addEventListener('change', ()=>{ applyChanges(false); showToast(t('textSizeUpdated')); });
 
   // when opening/closing, toggle a body class so we can shift the app content
   const origOpen = open;
