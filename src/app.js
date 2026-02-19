@@ -47,11 +47,16 @@ async function init(){
     DEFAULTS.STATION_NAME = station.name;
     DEFAULTS.STOP_ID = station.stopId;
     
+    // Load saved transport modes if available
+    if (station.modes && Array.isArray(station.modes)) {
+      DEFAULTS.TRANSPORT_MODES = station.modes;
+    }
+    
     // Update dropdown title
     board.stationDropdown.updateTitle(station.name);
     
-    // Move this station to top of recent list
-    addRecentStation(station.name, station.stopId);
+    // Move this station to top of recent list (with its modes)
+    addRecentStation(station.name, station.stopId, station.modes || []);
     board.stationDropdown.refresh();
     
     // Update document title
@@ -253,7 +258,7 @@ async function init(){
     }
     // add to recent stations if we have both name and ID
     if (DEFAULTS.STATION_NAME && DEFAULTS.STOP_ID) {
-      addRecentStation(DEFAULTS.STATION_NAME, DEFAULTS.STOP_ID);
+      addRecentStation(DEFAULTS.STATION_NAME, DEFAULTS.STOP_ID, DEFAULTS.TRANSPORT_MODES);
       if (board.stationDropdown) {
         board.stationDropdown.refresh();
       }
@@ -287,7 +292,7 @@ async function init(){
     }
     // add to recent stations if we have both name and ID
     if (DEFAULTS.STATION_NAME && DEFAULTS.STOP_ID) {
-      addRecentStation(DEFAULTS.STATION_NAME, DEFAULTS.STOP_ID);
+      addRecentStation(DEFAULTS.STATION_NAME, DEFAULTS.STOP_ID, DEFAULTS.TRANSPORT_MODES);
       if (board.stationDropdown) {
         board.stationDropdown.refresh();
       }
