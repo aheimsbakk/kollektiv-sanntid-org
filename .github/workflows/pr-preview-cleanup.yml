@@ -1,0 +1,52 @@
+name: PR Preview Cleanup
+
+on:
+  pull_request:
+    types: [closed]
+    branches: ["main"]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  cleanup-preview:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout gh-pages branch
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+
+      - name: Remove PR subfolder
+        run: |
+          PR_NUMBER=${{ github.event.pull_request.number }}
+          PR_FOLDER="pr-${PR_NUMBER}"
+          
+          if [ -d "${PR_FOLDER}" ]; then
+            rm -rf "${PR_FOLDER}"
+            
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            
+            git add .
+            git commit -m "Remove PR #${PR_NUMBER} preview"
+            git push origin gh-pages
+            
+            echo "✅ Removed preview folder: ${PR_FOLDER}"
+          else
+            echo "⚠️ Preview folder not found: ${PR_FOLDER}"
+          fi
+
+      - name: Comment on PR
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const prNumber = context.payload.pull_request.number;
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber,
+              body: `## 🧹 Preview deployment cleaned up\n\nThe preview folder \`pr-${prNumber}/\` has been removed from gh-pages branch.`
+            });
+

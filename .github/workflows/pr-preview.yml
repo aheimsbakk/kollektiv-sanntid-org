@@ -1,0 +1,98 @@
+name: PR Preview Deployment
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches: ["main"]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: pr-preview-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  deploy-preview:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Checkout gh-pages branch
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          path: gh-pages-content
+
+      - name: Deploy PR to subfolder
+        run: |
+          PR_NUMBER=${{ github.event.pull_request.number }}
+          PR_FOLDER="gh-pages-content/pr-${PR_NUMBER}"
+          
+          # Create/update PR subfolder
+          mkdir -p "${PR_FOLDER}"
+          rsync -av --delete src/ "${PR_FOLDER}/"
+          
+          cd gh-pages-content
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          
+          git add .
+          git commit -m "Deploy PR #${PR_NUMBER} preview from ${GITHUB_SHA::7}" || echo "No changes"
+          git push origin gh-pages
+
+      - name: Comment PR with preview URL
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const prNumber = context.payload.pull_request.number;
+            const repo = context.repo.repo;
+            const owner = context.repo.owner;
+            
+            // Construct preview URL (adjust if using custom domain)
+            const previewUrl = `https://${owner}.github.io/${repo}/pr-${prNumber}/`;
+            
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: owner,
+              repo: repo,
+              issue_number: prNumber,
+            });
+            
+            const botComment = comments.find(comment => 
+              comment.user.type === 'Bot' && 
+              comment.body.includes('Preview deployment')
+            );
+            
+            const commentBody = `## 🚀 Preview deployment ready!
+            
+            Your changes are deployed and ready for review:
+            
+            **Preview URL:** ${previewUrl}
+            
+            **Folder:** \`pr-${prNumber}/\`
+            
+            ---
+            
+            > ℹ️ This preview will be automatically updated when you push new commits to this PR.
+            > It will be removed when the PR is closed or merged.`;
+            
+            if (botComment) {
+              await github.rest.issues.updateComment({
+                owner: owner,
+                repo: repo,
+                comment_id: botComment.id,
+                body: commentBody
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: owner,
+                repo: repo,
+                issue_number: prNumber,
+                body: commentBody
+              });
+            }
+
