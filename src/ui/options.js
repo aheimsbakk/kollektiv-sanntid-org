@@ -488,6 +488,19 @@ export function createOptionsPanel(defaults, onApply, onLanguageChange){
     // focus management: save previously focused element and then focus first focusable in panel
     open._prevFocus = document.activeElement;
     
+    // Update input fields with current defaults before opening
+    inpStation.value = defaults.STATION_NAME || '';
+    inpStation.dataset.stopId = defaults.STOP_ID || '';
+    inpNum.value = defaults.NUM_DEPARTURES || 2;
+    inpInt.value = defaults.FETCH_INTERVAL || 60;
+    selSize.value = defaults.TEXT_SIZE || 'medium';
+    
+    // Update transport mode checkboxes
+    const checkboxes = modesWrap.querySelectorAll('input[type=checkbox]');
+    checkboxes.forEach(cb => {
+      cb.checked = (defaults.TRANSPORT_MODES || []).includes(cb.value);
+    });
+    
     // Capture initial values when opening the panel
     const chosen = Array.from(modesWrap.querySelectorAll('input[type=checkbox]:checked')).map(i=>i.value);
     initialValues = {
