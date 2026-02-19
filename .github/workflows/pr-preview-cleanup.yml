@@ -17,6 +17,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: gh-pages
+          fetch-depth: 0
 
       - name: Remove PR subfolder
         run: |
@@ -31,7 +32,7 @@ jobs:
             
             git add .
             git commit -m "Remove PR #${PR_NUMBER} preview"
-            git push origin gh-pages
+            git push
             
             echo "✅ Removed preview folder: ${PR_FOLDER}"
           else

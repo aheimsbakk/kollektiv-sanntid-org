@@ -1,6 +1,6 @@
 Overall Context: Kollektiv.Sanntid.org - dependency-free real-time departure board with Entur APIs, Norwegian kollektivtrafikk focus. Versioned service worker, multilingual (12 languages), auto-select inputs, transport mode filters. PR preview deployments via gh-pages branch with sub-folder structure.
 
-Current Goal: Test PR preview workflow with renamed app on new branch.
+Current Goal: Test PR preview workflow with workflow fixes on branch a-19512.
 
 Last 3 Changes:
 - agents/worklogs/2026-02-19-17-03-app-rename.md
@@ -8,5 +8,5 @@ Last 3 Changes:
 - agents/worklogs/2026-02-19-16-31-pr-preview-deployment.md
 
 Next Steps:
-- Commit app rename changes
-- Push branch and test PR preview workflow
+- Push branch a-19512 with workflow fixes
+- Verify PR preview deployment works correctly
