@@ -16,11 +16,13 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Prepare output (copy site)
+      - name: Prepare output (copy site) to temp directory
         if: ${{ github.event.action != 'closed' }}
         run: |
-          mkdir -p out
-          cp -r src/* out/
+          # create a temp dir outside the repo worktree to avoid conflicts when switching branches
+          TMP_OUT=$(mktemp -d)
+          echo "TMP_OUT=${TMP_OUT}" >> $GITHUB_ENV
+          cp -r src/* "${TMP_OUT}/"
 
       - name: Prepare gh-pages and update preview folder
         run: |
@@ -41,9 +43,15 @@ jobs:
           PR_DIR="pr-${{ github.event.number }}"
 
           if [ "${{ github.event.action }}" != "closed" ]; then
+            if [ -z "${TMP_OUT:-}" ]; then
+              echo "TMP_OUT not set" >&2
+              exit 1
+            fi
             rm -rf "$PR_DIR"
             mkdir -p "$PR_DIR"
-            cp -r out/* "$PR_DIR"/
+            cp -r "${TMP_OUT}/"* "$PR_DIR"/
+            # cleanup TMP_OUT
+            rm -rf "${TMP_OUT}"
           else
             rm -rf "$PR_DIR"
           fi
