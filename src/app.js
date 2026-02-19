@@ -7,9 +7,13 @@ import { createDepartureNode, updateDepartureCountdown } from './ui/departure.js
 import { fetchDepartures, lookupStopId } from './entur.js';
 import { initLanguage, t } from './i18n.js';
 import { addRecentStation } from './ui/station-dropdown.js';
+import { initTheme, createThemeToggle } from './ui/theme-toggle.js';
 
 // Initialize language on startup
 initLanguage();
+
+// Initialize theme on startup
+initTheme();
 
 const ROOT = document.getElementById('app');
 
@@ -331,9 +335,15 @@ async function init(){
     }catch(e){}
     if(typeof prevApply === 'function') prevApply(s);
   };
-  // add a global fixed gear in top-right for easy access that toggles the panel
+  // add a global fixed header controls in top-right for easy access
   const gWrap = document.createElement('div'); gWrap.className='global-gear';
-  const gBtn = document.createElement('button'); gBtn.className='gear-btn'; gBtn.type='button'; gBtn.innerHTML='&#9881;'; gBtn.title='Settings';
+  
+  // theme toggle button
+  const themeBtn = createThemeToggle();
+  gWrap.appendChild(themeBtn);
+  
+  // settings gear button
+  const gBtn = document.createElement('button'); gBtn.className='gear-btn'; gBtn.type='button'; gBtn.textContent='⚙️'; gBtn.title='Settings';
   gBtn.addEventListener('click', ()=> {
     if (opts && typeof opts.open === 'function' && typeof opts.close === 'function'){
       // toggle based on presence of body class
@@ -341,6 +351,7 @@ async function init(){
     } else if (opts && typeof opts.open === 'function') opts.open();
   });
   gWrap.appendChild(gBtn);
+  
   document.body.appendChild(gWrap);
   ROOT.appendChild(board.el);
   
