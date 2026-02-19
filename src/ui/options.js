@@ -354,6 +354,33 @@ export function createOptionsPanel(defaults, onApply, onLanguageChange, onSave){
     inpInt.select();
   });
 
+  // Function to update panel fields with current defaults (useful when station changes while panel is open)
+  function updateFields() {
+    // Update input fields with current defaults
+    inpStation.value = defaults.STATION_NAME || '';
+    inpStation.dataset.stopId = defaults.STOP_ID || '';
+    inpNum.value = defaults.NUM_DEPARTURES || 2;
+    inpInt.value = defaults.FETCH_INTERVAL || 60;
+    selSize.value = defaults.TEXT_SIZE || 'medium';
+    
+    // Update transport mode checkboxes
+    const checkboxes = modesWrap.querySelectorAll('input[type=checkbox]');
+    checkboxes.forEach(cb => {
+      cb.checked = (defaults.TRANSPORT_MODES || []).includes(cb.value);
+    });
+    
+    // Update initial values to match current state
+    const chosen = Array.from(modesWrap.querySelectorAll('input[type=checkbox]:checked')).map(i=>i.value);
+    initialValues = {
+      STATION_NAME: inpStation.value || defaults.STATION_NAME,
+      STOP_ID: inpStation.dataset.stopId || null,
+      NUM_DEPARTURES: Number(inpNum.value) || defaults.NUM_DEPARTURES,
+      FETCH_INTERVAL: Number(inpInt.value) || defaults.FETCH_INTERVAL,
+      TRANSPORT_MODES: chosen.slice(),
+      TEXT_SIZE: selSize.value || (defaults.TEXT_SIZE || 'large')
+    };
+  }
+
   // Station autocomplete behaviour: query after 3 characters and show up to 5 matches
   let acTimer = null;
   let lastQuery = '';
@@ -511,28 +538,7 @@ export function createOptionsPanel(defaults, onApply, onLanguageChange, onSave){
     open._prevFocus = document.activeElement;
     
     // Update input fields with current defaults before opening
-    inpStation.value = defaults.STATION_NAME || '';
-    inpStation.dataset.stopId = defaults.STOP_ID || '';
-    inpNum.value = defaults.NUM_DEPARTURES || 2;
-    inpInt.value = defaults.FETCH_INTERVAL || 60;
-    selSize.value = defaults.TEXT_SIZE || 'medium';
-    
-    // Update transport mode checkboxes
-    const checkboxes = modesWrap.querySelectorAll('input[type=checkbox]');
-    checkboxes.forEach(cb => {
-      cb.checked = (defaults.TRANSPORT_MODES || []).includes(cb.value);
-    });
-    
-    // Capture initial values when opening the panel
-    const chosen = Array.from(modesWrap.querySelectorAll('input[type=checkbox]:checked')).map(i=>i.value);
-    initialValues = {
-      STATION_NAME: inpStation.value || defaults.STATION_NAME,
-      STOP_ID: inpStation.dataset.stopId || null,
-      NUM_DEPARTURES: Number(inpNum.value) || defaults.NUM_DEPARTURES,
-      FETCH_INTERVAL: Number(inpInt.value) || defaults.FETCH_INTERVAL,
-      TRANSPORT_MODES: chosen.slice(),
-      TEXT_SIZE: selSize.value || (defaults.TEXT_SIZE || 'large')
-    };
+    updateFields();
     
     origOpen();
     // set focus to first input
@@ -568,5 +574,5 @@ export function createOptionsPanel(defaults, onApply, onLanguageChange, onSave){
     }
   }
 
-  return { panel, open, close };
+  return { panel, open, close, updateFields };
 }

@@ -54,6 +54,11 @@ async function init(){
     // Update dropdown title
     board.stationDropdown.updateTitle(station.name, station.modes || DEFAULTS.TRANSPORT_MODES);
     
+    // Update options panel if it's open
+    if (window.__APP_OPTIONS__ && window.__APP_OPTIONS__.updateFields && document.body.classList.contains('options-open')) {
+      window.__APP_OPTIONS__.updateFields();
+    }
+    
     // Move this station to top of recent list (with its modes)
     addRecentStation(station.name, station.stopId, station.modes || []);
     board.stationDropdown.refresh();
