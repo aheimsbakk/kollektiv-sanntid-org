@@ -31,8 +31,8 @@ jobs:
 
       - name: Deploy to root of gh-pages
         run: |
-          # Copy src/ contents to root of gh-pages (preserving PR folders)
-          rsync -av --delete --exclude='pr-*/' --exclude='.git' src/ gh-pages-content/
+          # Copy src/ contents to root of gh-pages (preserving PR folders and CNAME)
+          rsync -av --delete --exclude='pr-*/' --exclude='.git' --exclude='CNAME' src/ gh-pages-content/
           
           cd gh-pages-content
           
@@ -40,13 +40,14 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           
-          # Check if we're on the right branch
-          git status
+          # Pull latest changes to avoid conflicts
+          git pull --rebase
           
           git add .
           if git diff --staged --quiet; then
             echo "No changes to deploy"
           else
             git commit -m "Deploy main site from ${GITHUB_SHA::7}"
-            git push
+            # Retry push with pull if there's a conflict
+            git push || (git pull --rebase && git push)
           fi
