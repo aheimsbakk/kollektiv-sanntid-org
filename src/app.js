@@ -396,16 +396,6 @@ async function init(){
   }
   tickCountdowns();
   setInterval(tickCountdowns, 1000);
-  // departure-specific situation lines are shown per-item; global banner removed
-  // show diagnostics when live fetch returned empty results
-    if (board.debug) {
-      if (liveFetchSucceeded && data.length === 0) {
-        board.debug.style.display = 'block';
-        board.debug.textContent = 'Live fetch succeeded but returned 0 departures. Possible reasons: remote has no upcoming departures or request params filter results.\nCheck network requests for details.';
-      } else {
-        board.debug.style.display = 'none';
-      }
-    }
 }
 
 document.addEventListener('DOMContentLoaded', init);
