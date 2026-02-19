@@ -1,0 +1,93 @@
+name: PR Preview -> gh-pages
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, edited, closed]
+
+permissions:
+  contents: write
+
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Prepare output (copy site)
+        if: ${{ github.event.action != 'closed' }}
+        run: |
+          mkdir -p out
+          cp -r src/* out/
+
+      - name: Prepare gh-pages and update preview folder
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          # Fetch or create gh-pages
+          if git ls-remote --exit-code origin gh-pages; then
+            git fetch origin gh-pages:gh-pages
+            git checkout gh-pages
+            git pull --ff-only origin gh-pages || true
+          else
+            git checkout --orphan gh-pages
+            git rm -rf . || true
+          fi
+
+          PR_DIR="pr-${{ github.event.number }}"
+
+          if [ "${{ github.event.action }}" != "closed" ]; then
+            rm -rf "$PR_DIR"
+            mkdir -p "$PR_DIR"
+            cp -r out/* "$PR_DIR"/
+          else
+            rm -rf "$PR_DIR"
+          fi
+
+          # Only commit/push if there are changes
+          if [ -n "$(git status --porcelain)" ]; then
+            git add -A
+            git commit -m "chore(preview): update ${PR_DIR} preview"
+            git push origin gh-pages
+          else
+            echo "No changes to gh-pages for ${PR_DIR}"
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Post or update preview comment
+        if: ${{ github.event.action != 'closed' }}
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pr = context.payload.number;
+            const url = `https://${context.repo.owner}.github.io/${context.repo.repo}/pr-${pr}/`;
+            const marker = '<!-- pr-preview -->';
+            const body = `${marker}\nPreview: ${url}`;
+
+            // find existing comment from this workflow (marker)
+            const { data: comments } = await github.issues.listComments({ owner: context.repo.owner, repo: context.repo.repo, issue_number: pr });
+            const existing = comments.find(c => c.body && c.body.includes(marker) && c.user && c.user.type === 'Bot');
+            if (existing) {
+              await github.issues.updateComment({ owner: context.repo.owner, repo: context.repo.repo, comment_id: existing.id, body });
+            } else {
+              await github.issues.createComment({ owner: context.repo.owner, repo: context.repo.repo, issue_number: pr, body });
+            }
+
+      - name: Remove preview when PR closed
+        if: ${{ github.event.action == 'closed' }}
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pr = context.payload.number;
+            const marker = '<!-- pr-preview -->';
+            // remove comment if exists
+            const { data: comments } = await github.issues.listComments({ owner: context.repo.owner, repo: context.repo.repo, issue_number: pr });
+            const existing = comments.find(c => c.body && c.body.includes(marker) && c.user && c.user.type === 'Bot');
+            if (existing) {
+              await github.issues.updateComment({ owner: context.repo.owner, repo: context.repo.repo, comment_id: existing.id, body: `${marker}\nPreview removed` });
+            }
