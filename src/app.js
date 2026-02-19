@@ -1,5 +1,4 @@
 import { DEFAULTS, VERSION } from './config.js';
-import { getDemoData } from './data-loader.js';
 import { formatCountdown, isoToEpochMs } from './time.js';
 import { createBoardElements, clearList, findKey, updateFooterTranslations } from './ui/ui.js';
 import { createHeaderToggle } from './ui/header.js';
@@ -87,9 +86,8 @@ async function init(){
   // id for the refresh interval so we can restart it when FETCH_INTERVAL changes
   let refreshTimerId = null;
 
-  // perform a refresh: fetch live data when possible, optionally fallback to demo
-  // fallbackToDemo: when false, leave an explicit empty state if live API returns no items
-  async function doRefresh({ fallbackToDemo = true } = {}){
+  // perform a refresh: fetch live data and render results (or empty state)
+  async function doRefresh(){
     try{
       if(globalThis._enturCache) globalThis._enturCache.clear();
       // Use stored STOP_ID if available, otherwise lookup by station name
@@ -101,13 +99,6 @@ async function init(){
       if(stopId){
         fresh = await fetchDepartures({ stopId, numDepartures: DEFAULTS.NUM_DEPARTURES, modes: DEFAULTS.TRANSPORT_MODES, apiUrl: DEFAULTS.API_URL, clientName: DEFAULTS.CLIENT_NAME });
         liveFetchSucceeded = true;
-      }
-      if(!fresh || !fresh.length){
-        if (fallbackToDemo) {
-          fresh = await getDemoData();
-        } else {
-          fresh = [];
-        }
       }
       renderDepartures(board.list, fresh);
       data = fresh;
@@ -227,44 +218,44 @@ async function init(){
 
   // options panel
   const opts = createOptionsPanel(DEFAULTS, (newOpts)=>{
-    // If language changed, reload the entire options panel
-    if (newOpts._languageChanged) {
-      // Close current panel
-      opts.close();
-      // Remove old panel
-      opts.panel.remove();
-      // Create new panel with updated translations
-      const newOpts = createOptionsPanel(DEFAULTS, opts._onApply, () => updateFooterTranslations(board.footer), opts._onSave);
-      document.body.appendChild(newOpts.panel);
-      // Update reference
-      Object.assign(opts, newOpts);
-      // Store the handlers for future language changes
-      opts._onApply = arguments[0];
-      // Reopen the panel
-      setTimeout(() => opts.open(), 50);
-      return;
-    }
-    
-    // apply new defaults and re-init fetch loop by reloading the page state
-    // for now just update the UI and re-run first fetch cycle
-    DEFAULTS.STATION_NAME = newOpts.STATION_NAME;
-    DEFAULTS.STOP_ID = newOpts.STOP_ID || null;
-    DEFAULTS.NUM_DEPARTURES = newOpts.NUM_DEPARTURES;
-    DEFAULTS.FETCH_INTERVAL = newOpts.FETCH_INTERVAL;
-    DEFAULTS.TRANSPORT_MODES = newOpts.TRANSPORT_MODES;
-    // update station dropdown title
-    if (board.stationDropdown) {
-      board.stationDropdown.updateTitle(DEFAULTS.STATION_NAME);
-    }
-    try{ document.title = DEFAULTS.STATION_NAME || document.title; }catch(e){}
-    // trigger a manual refresh (do not fallback to demo for manual refresh)
-    (async ()=>{
-      try{
-        await doRefresh({ fallbackToDemo: false });
-      }catch(e){ console.warn('Manual refresh failed', e); }
-      // restart periodic refresh loop so it uses the updated FETCH_INTERVAL
-      startRefreshLoop();
-    })();
+      // If language changed, reload the entire options panel
+      if (newOpts._languageChanged) {
+        // Close current panel
+        opts.close();
+        // Remove old panel
+        opts.panel.remove();
+        // Create new panel with updated translations
+        const newOpts = createOptionsPanel(DEFAULTS, opts._onApply, () => updateFooterTranslations(board.footer), opts._onSave);
+        document.body.appendChild(newOpts.panel);
+        // Update reference
+        Object.assign(opts, newOpts);
+        // Store the handlers for future language changes
+        opts._onApply = arguments[0];
+        // Reopen the panel
+        setTimeout(() => opts.open(), 50);
+        return;
+      }
+      
+      // apply new defaults and re-init fetch loop by reloading the page state
+      // for now just update the UI and re-run first fetch cycle
+      DEFAULTS.STATION_NAME = newOpts.STATION_NAME;
+      DEFAULTS.STOP_ID = newOpts.STOP_ID || null;
+      DEFAULTS.NUM_DEPARTURES = newOpts.NUM_DEPARTURES;
+      DEFAULTS.FETCH_INTERVAL = newOpts.FETCH_INTERVAL;
+      DEFAULTS.TRANSPORT_MODES = newOpts.TRANSPORT_MODES;
+      // update station dropdown title
+      if (board.stationDropdown) {
+        board.stationDropdown.updateTitle(DEFAULTS.STATION_NAME);
+      }
+      try{ document.title = DEFAULTS.STATION_NAME || document.title; }catch(e){}
+      // trigger a manual refresh
+      (async ()=>{
+        try{
+          await doRefresh();
+        }catch(e){ console.warn('Manual refresh failed', e); }
+        // restart periodic refresh loop so it uses the updated FETCH_INTERVAL
+        startRefreshLoop();
+      })();
     // apply text size immediately
     try{ document.documentElement.classList.remove('text-size-tiny','text-size-small','text-size-medium','text-size-large','text-size-xlarge');
       document.documentElement.classList.add('text-size-'+(newOpts.TEXT_SIZE || 'large'));
@@ -292,10 +283,10 @@ async function init(){
       board.stationDropdown.updateTitle(DEFAULTS.STATION_NAME);
     }
     try{ document.title = DEFAULTS.STATION_NAME || document.title; }catch(e){}
-    // trigger a manual refresh (do not fallback to demo for manual refresh)
+    // trigger a manual refresh
     (async ()=>{
       try{
-        await doRefresh({ fallbackToDemo: false });
+        await doRefresh();
       }catch(e){ console.warn('Manual refresh failed', e); }
       // restart periodic refresh loop so it uses the updated FETCH_INTERVAL
       startRefreshLoop();
@@ -343,8 +334,8 @@ async function init(){
   gWrap.appendChild(gBtn);
   document.body.appendChild(gWrap);
   ROOT.appendChild(board.el);
-  // Debugging was removed: emoji debug panel and floating debug button are no longer added to the UI.
-  // Try live data first, fall back to demo
+  
+  // Try live data on initial load
   let data = [];
   try{
     // Use stored STOP_ID if available, otherwise lookup by station name
@@ -353,8 +344,8 @@ async function init(){
       stopId = await lookupStopId({ stationName: DEFAULTS.STATION_NAME, clientName: DEFAULTS.CLIENT_NAME });
     }
     if(stopId && DEFAULTS.API_URL){
-      // use the new helper to perform the first refresh but do not fallback to demo
-      await doRefresh({ fallbackToDemo: false });
+      // use the helper to perform the first refresh
+      await doRefresh();
       // ensure the status chip is visible; its textContent will be driven by the
       // per-second ticker below to show "Next update in XX seconds."
       if (board.status) {
@@ -364,11 +355,11 @@ async function init(){
       }
     }
   }catch(e){
-    console.warn('Live fetch failed, falling back to demo', e && e.message ? e.message : e);
-    if(board.status){ board.status.classList.add('visible'); board.status.textContent = 'Demo'; }
+    console.warn('Live fetch failed', e && e.message ? e.message : e);
+    if(board.status){ board.status.classList.add('visible'); board.status.textContent = 'Error'; }
   }
   if(!data || !data.length){
-    // Don't auto-fallback to demo here; show an explicit empty state handled by renderDepartures
+    // Show empty state if no data
     data = [];
   }
   // run initial render (doRefresh already rendered when live fetch succeeded)

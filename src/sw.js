@@ -1,4 +1,4 @@
-const VERSION = '1.13.1';
+const VERSION = '1.14.0';
 const CACHE_NAME = `departures-v${VERSION}`;
 const ASSETS = [
   './',
@@ -6,7 +6,6 @@ const ASSETS = [
   './style.css',
   './app.js',
   './config.js',
-  './data-loader.js',
   './entur.js',
   './i18n.js',
   './time.js',
@@ -15,8 +14,7 @@ const ASSETS = [
   './ui/header.js',
   './ui/options.js',
   './ui/station-dropdown.js',
-  './manifest.webmanifest',
-  './demo.json'
+  './manifest.webmanifest'
 ];
 
 // Install: cache core assets. Do NOT call skipWaiting here so we can
