@@ -1,0 +1,18 @@
+{
+  "data": {
+    "stopPlace": {
+      "estimatedCalls": [
+        {
+          "expectedDepartureTime": "2026-02-14T15:10:00Z",
+          "destinationDisplay": { "frontText": "Central" },
+          "situations": []
+        },
+        {
+          "expectedDepartureTime": "2026-02-14T15:20:00Z",
+          "destinationDisplay": { "frontText": "Airport" },
+          "situations": [ { "description": [ { "value": "Delay", "language": "no" } ] } ]
+        }
+      ]
+    }
+  }
+}
