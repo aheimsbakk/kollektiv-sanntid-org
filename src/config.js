@@ -3,11 +3,11 @@
 export const VERSION = '1.9.2';
 
 export const DEFAULTS = {
-  STATION_NAME: 'Jernbanetorget',
+  STATION_NAME: 'Jernbanetorget, Oslo',
   STOP_ID: null, // When set, skip lookup and use this ID directly
-  NUM_DEPARTURES: 2,
+  NUM_DEPARTURES: 5,
   FETCH_INTERVAL: 60,
   TRANSPORT_MODES: ['bus','tram','metro','rail','water','coach'],
-  CLIENT_NAME: 'personal-js-app'
-  ,API_URL: 'https://api.entur.io/journey-planner/v3/graphql'
+  CLIENT_NAME: 'kollektiv-sanntid-org',
+  API_URL: 'https://api.entur.io/journey-planner/v3/graphql'
 };
