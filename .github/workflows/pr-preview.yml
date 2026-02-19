@@ -42,13 +42,21 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           
-          # Pull latest changes to avoid conflicts
-          git pull --rebase
-          
           git add .
-          git commit -m "Deploy PR #${PR_NUMBER} preview from ${GITHUB_SHA::7}" || echo "No changes"
-          # Retry push with pull if there's a conflict
-          git push || (git pull --rebase && git push)
+          
+          # Check if there are changes
+          if git diff --staged --quiet; then
+            echo "No changes to deploy"
+            exit 0
+          fi
+          
+          # Pull latest changes (with autostash to handle any conflicts)
+          git pull --rebase --autostash || true
+          
+          # Commit and push
+          git commit -m "Deploy PR #${PR_NUMBER} preview from ${GITHUB_SHA::7}"
+          git push || (git pull --rebase --autostash && git push)
+
 
 
       - name: Comment PR with preview URL
