@@ -4,7 +4,7 @@ import { t, setLanguage, getLanguage, getLanguages } from '../i18n.js';
 
 export function createOptionsPanel(defaults, onApply, onLanguageChange){
   const panel = document.createElement('aside'); panel.className = 'options-panel';
-  const title = document.createElement('h3'); title.textContent = t('settings');
+  const title = document.createElement('h3'); title.textContent = 'Kollektiv.Sanntid.org';
   panel.appendChild(title);
 
   // station name
@@ -119,7 +119,7 @@ export function createOptionsPanel(defaults, onApply, onLanguageChange){
   
   // Function to update all translatable UI elements
   function updateTranslations() {
-    title.textContent = t('settings');
+    // Title is not translated - it's the app name
     lblStation.textContent = t('stationName');
     lblNum.textContent = t('numberOfDepartures');
     lblInt.textContent = t('fetchInterval');
