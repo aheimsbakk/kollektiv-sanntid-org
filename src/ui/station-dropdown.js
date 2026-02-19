@@ -30,11 +30,19 @@ function getModeIcon(mode) {
 
 /**
  * Get mode icons in consistent order (as they appear in options panel)
+ * Returns empty string if all modes are selected (default state)
  * @param {Array<string>} modes 
  * @returns {string} Space-separated emoji string
  */
 function getModesDisplay(modes) {
   if (!modes || modes.length === 0) return '';
+  
+  // If all modes are selected, don't show any icons (default state)
+  if (modes.length === MODE_ORDER.length) {
+    const allSelected = MODE_ORDER.every(mode => modes.includes(mode));
+    if (allSelected) return '';
+  }
+  
   // Sort by MODE_ORDER
   const sorted = modes.slice().sort((a, b) => {
     const idxA = MODE_ORDER.indexOf(a);
