@@ -280,10 +280,17 @@ export function createStationDropdown(currentStationName, onStationSelect) {
     });
   }
   
-  // Update station title
-  function updateTitle(name) {
+  // Update station title with optional transport mode icons
+  function updateTitle(name, modes = []) {
     const arrowText = arrow.textContent;
     titleBtn.textContent = name || t('noStationSelected');
+    
+    // Add mode icons if there's a filter (not all modes selected)
+    const modesDisplay = getModesDisplay(modes);
+    if (modesDisplay) {
+      titleBtn.textContent += ' ' + modesDisplay;
+    }
+    
     arrow.textContent = arrowText;
     titleBtn.appendChild(arrow);
   }
