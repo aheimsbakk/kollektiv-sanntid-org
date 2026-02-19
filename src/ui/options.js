@@ -356,6 +356,10 @@ export function createOptionsPanel(defaults, onApply, onLanguageChange){
     inpStation.value = c.title || c.id || '';
     inpStation.dataset.stopId = String(c.id || '');
     clearAutocomplete();
+    
+    // Check all transport mode checkboxes when selecting a new station
+    const checkboxes = modesWrap.querySelectorAll('input[type=checkbox]');
+    checkboxes.forEach(cb => { cb.checked = true; });
   }
   function showCandidates(cands){
     lastCandidates = Array.isArray(cands) ? cands.slice(0) : [];
