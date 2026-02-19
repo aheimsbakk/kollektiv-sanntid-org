@@ -30,9 +30,13 @@ jobs:
             git config user.name "github-actions[bot]"
             git config user.email "github-actions[bot]@users.noreply.github.com"
             
+            # Pull latest changes to avoid conflicts
+            git pull --rebase
+            
             git add .
             git commit -m "Remove PR #${PR_NUMBER} preview"
-            git push
+            # Retry push with pull if there's a conflict
+            git push || (git pull --rebase && git push)
             
             echo "✅ Removed preview folder: ${PR_FOLDER}"
           else
