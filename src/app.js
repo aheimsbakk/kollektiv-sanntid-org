@@ -52,7 +52,7 @@ async function init(){
     }
     
     // Update dropdown title
-    board.stationDropdown.updateTitle(station.name);
+    board.stationDropdown.updateTitle(station.name, station.modes || DEFAULTS.TRANSPORT_MODES);
     
     // Move this station to top of recent list (with its modes)
     addRecentStation(station.name, station.stopId, station.modes || []);
@@ -78,6 +78,10 @@ async function init(){
   }
 
   const board = createBoardElements(DEFAULTS.STATION_NAME, handleStationSelect);
+  // Update title with current transport modes (show icons if filtered)
+  if (board.stationDropdown) {
+    board.stationDropdown.updateTitle(DEFAULTS.STATION_NAME, DEFAULTS.TRANSPORT_MODES);
+  }
   // track when the next automatic refresh will occur (epoch ms) so we can
   // show a per-second countdown in the header status chip.
   let nextRefreshAt = Date.now();
@@ -245,7 +249,7 @@ async function init(){
       DEFAULTS.TRANSPORT_MODES = newOpts.TRANSPORT_MODES;
       // update station dropdown title
       if (board.stationDropdown) {
-        board.stationDropdown.updateTitle(DEFAULTS.STATION_NAME);
+        board.stationDropdown.updateTitle(DEFAULTS.STATION_NAME, DEFAULTS.TRANSPORT_MODES);
       }
       try{ document.title = DEFAULTS.STATION_NAME || document.title; }catch(e){}
       // trigger a manual refresh
@@ -280,7 +284,7 @@ async function init(){
     DEFAULTS.TRANSPORT_MODES = newOpts.TRANSPORT_MODES;
     // update station dropdown title
     if (board.stationDropdown) {
-      board.stationDropdown.updateTitle(DEFAULTS.STATION_NAME);
+      board.stationDropdown.updateTitle(DEFAULTS.STATION_NAME, DEFAULTS.TRANSPORT_MODES);
     }
     try{ document.title = DEFAULTS.STATION_NAME || document.title; }catch(e){}
     // trigger a manual refresh
