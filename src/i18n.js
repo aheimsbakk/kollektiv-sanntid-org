@@ -10,7 +10,7 @@ const translations = {
     textSize: 'Text size',
     transportModes: 'Transport modes (filter)',
     switchLanguage: 'Switch language',
-    apply: 'Apply',
+    save: 'Save',
     close: 'Close',
     
     // Text sizes
@@ -32,6 +32,7 @@ const translations = {
     settingsApplied: 'Settings applied',
     filtersUpdated: 'Filters updated',
     textSizeUpdated: 'Text size updated',
+    savedToFavorites: 'Saved to favorites',
     languageChanged: 'Language changed',
     
     // Update toast
@@ -59,6 +60,7 @@ const translations = {
     transportModes: 'Transportmidler (filter)',
     switchLanguage: 'Bytt språk',
     apply: 'Bruk',
+    save: 'Lagre',
     close: 'Lukk',
     
     // Text sizes
@@ -80,6 +82,7 @@ const translations = {
     settingsApplied: 'Innstillinger lagret',
     filtersUpdated: 'Filter oppdatert',
     textSizeUpdated: 'Tekststørrelse oppdatert',
+    savedToFavorites: 'Lagret i favoritter',
     languageChanged: 'Språk endret',
     
     // Update toast
@@ -107,6 +110,7 @@ const translations = {
     transportModes: 'Verkehrsmittel (Filter)',
     switchLanguage: 'Sprache wechseln',
     apply: 'Anwenden',
+    save: 'Speichern',
     close: 'Schließen',
     
     // Text sizes
@@ -128,6 +132,7 @@ const translations = {
     settingsApplied: 'Einstellungen gespeichert',
     filtersUpdated: 'Filter aktualisiert',
     textSizeUpdated: 'Textgröße aktualisiert',
+    savedToFavorites: 'In Favoriten gespeichert',
     languageChanged: 'Sprache geändert',
     
     // Update toast
@@ -155,6 +160,7 @@ const translations = {
     transportModes: 'Modos de transporte (filtro)',
     switchLanguage: 'Cambiar idioma',
     apply: 'Aplicar',
+    save: 'Guardar',
     close: 'Cerrar',
     
     // Text sizes
@@ -176,6 +182,7 @@ const translations = {
     settingsApplied: 'Configuración aplicada',
     filtersUpdated: 'Filtros actualizados',
     textSizeUpdated: 'Tamaño de texto actualizado',
+    savedToFavorites: 'Guardado en favoritos',
     languageChanged: 'Idioma cambiado',
     
     // Update toast
@@ -203,6 +210,7 @@ const translations = {
     transportModes: 'Mezzi di trasporto (filtro)',
     switchLanguage: 'Cambia lingua',
     apply: 'Applica',
+    save: 'Salva',
     close: 'Chiudi',
     
     // Text sizes
@@ -224,6 +232,7 @@ const translations = {
     settingsApplied: 'Impostazioni applicate',
     filtersUpdated: 'Filtri aggiornati',
     textSizeUpdated: 'Dimensione testo aggiornata',
+    savedToFavorites: 'Salvato nei preferiti',
     languageChanged: 'Lingua cambiata',
     
     // Update toast
@@ -251,6 +260,7 @@ const translations = {
     transportModes: 'Μέσα μεταφοράς (φίλτρο)',
     switchLanguage: 'Αλλαγή γλώσσας',
     apply: 'Εφαρμογή',
+    save: 'Αποθήκευση',
     close: 'Κλείσιμο',
     
     // Text sizes
@@ -272,6 +282,7 @@ const translations = {
     settingsApplied: 'Οι ρυθμίσεις εφαρμόστηκαν',
     filtersUpdated: 'Τα φίλτρα ενημερώθηκαν',
     textSizeUpdated: 'Το μέγεθος κειμένου ενημερώθηκε',
+    savedToFavorites: 'Αποθηκεύτηκε στα αγαπημένα',
     languageChanged: 'Η γλώσσα άλλαξε',
     
     // Update toast
@@ -299,6 +310,7 @@ const translations = {
     transportModes: 'وسایل نقلیه (فیلتر)',
     switchLanguage: 'تغییر زبان',
     apply: 'اعمال',
+    save: 'ذخیره',
     close: 'بستن',
     
     // Text sizes
@@ -320,6 +332,7 @@ const translations = {
     settingsApplied: 'تنظیمات اعمال شد',
     filtersUpdated: 'فیلترها به‌روزرسانی شد',
     textSizeUpdated: 'اندازه متن به‌روزرسانی شد',
+    savedToFavorites: 'در علاقه‌مندی‌ها ذخیره شد',
     languageChanged: 'زبان تغییر کرد',
     
     // Update toast
@@ -347,6 +360,7 @@ const translations = {
     transportModes: 'परिवहन साधन (फ़िल्टर)',
     switchLanguage: 'भाषा बदलें',
     apply: 'लागू करें',
+    save: 'सहेजें',
     close: 'बंद करें',
     
     // Text sizes
@@ -368,7 +382,8 @@ const translations = {
     settingsApplied: 'सेटिंग्स लागू की गईं',
     filtersUpdated: 'फ़िल्टर अपडेट किए गए',
     textSizeUpdated: 'पाठ का आकार अपडेट किया गया',
-    languageChanged: 'भाषा बदल गई',
+    savedToFavorites: 'पसंदीदा में सहेजा गया',
+    languageChanged: 'भाषा बदली गई',
     
     // Update toast
     newVersionAvailable: 'नया संस्करण उपलब्ध है, फिर से लोड किया जा रहा है...',
@@ -395,6 +410,7 @@ const translations = {
     transportModes: 'Samgöngumátar (sía)',
     switchLanguage: 'Skipta um tungumál',
     apply: 'Nota',
+    save: 'Vista',
     close: 'Loka',
     
     // Text sizes
@@ -416,6 +432,7 @@ const translations = {
     settingsApplied: 'Stillingar vistaðar',
     filtersUpdated: 'Síur uppfærðar',
     textSizeUpdated: 'Textastærð uppfærð',
+    savedToFavorites: 'Vistað í eftirlæti',
     languageChanged: 'Tungumáli breytt',
     
     // Update toast
@@ -443,6 +460,7 @@ const translations = {
     transportModes: 'Транспортні засоби (фільтр)',
     switchLanguage: 'Змінити мову',
     apply: 'Застосувати',
+    save: 'Зберегти',
     close: 'Закрити',
     
     // Text sizes
@@ -464,6 +482,7 @@ const translations = {
     settingsApplied: 'Налаштування застосовано',
     filtersUpdated: 'Фільтри оновлено',
     textSizeUpdated: 'Розмір тексту оновлено',
+    savedToFavorites: 'Збережено в обране',
     languageChanged: 'Мову змінено',
     
     // Update toast
@@ -491,6 +510,7 @@ const translations = {
     transportModes: 'Modes de transport (filtre)',
     switchLanguage: 'Changer de langue',
     apply: 'Appliquer',
+    save: 'Enregistrer',
     close: 'Fermer',
     
     // Text sizes
@@ -512,6 +532,7 @@ const translations = {
     settingsApplied: 'Paramètres appliqués',
     filtersUpdated: 'Filtres mis à jour',
     textSizeUpdated: 'Taille du texte mise à jour',
+    savedToFavorites: 'Enregistré dans les favoris',
     languageChanged: 'Langue modifiée',
     
     // Update toast
@@ -539,6 +560,7 @@ const translations = {
     transportModes: 'Środki transportu (filtr)',
     switchLanguage: 'Zmień język',
     apply: 'Zastosuj',
+    save: 'Zapisz',
     close: 'Zamknij',
     
     // Text sizes
@@ -560,6 +582,7 @@ const translations = {
     settingsApplied: 'Ustawienia zastosowane',
     filtersUpdated: 'Filtry zaktualizowane',
     textSizeUpdated: 'Rozmiar tekstu zaktualizowany',
+    savedToFavorites: 'Zapisano w ulubionych',
     languageChanged: 'Język zmieniony',
     
     // Update toast

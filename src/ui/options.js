@@ -2,7 +2,7 @@
 import { searchStations } from '../entur.js';
 import { t, setLanguage, getLanguage, getLanguages } from '../i18n.js';
 
-export function createOptionsPanel(defaults, onApply, onLanguageChange){
+export function createOptionsPanel(defaults, onApply, onLanguageChange, onSave){
   const panel = document.createElement('aside'); panel.className = 'options-panel';
   const title = document.createElement('h3'); title.textContent = 'Kollektiv.Sanntid.org';
   panel.appendChild(title);
@@ -126,7 +126,7 @@ export function createOptionsPanel(defaults, onApply, onLanguageChange){
     lblSize.textContent = t('textSize');
     lblModes.textContent = t('transportModes');
     lblLang.textContent = t('switchLanguage');
-    btnSave.textContent = t('apply');
+    btnSave.textContent = t('save');
     btnClose.textContent = t('close');
     
     // Update text size options
@@ -175,7 +175,7 @@ export function createOptionsPanel(defaults, onApply, onLanguageChange){
   rowLang.append(lblLang, langWrap);
 
   const actions = document.createElement('div'); actions.className='options-actions';
-  const btnSave = document.createElement('button'); btnSave.type='button'; btnSave.textContent = t('apply');
+  const btnSave = document.createElement('button'); btnSave.type='button'; btnSave.textContent = t('save');
   const btnClose = document.createElement('button'); btnClose.type='button'; btnClose.textContent = t('close');
   actions.append(btnClose, btnSave);
 
@@ -194,8 +194,8 @@ export function createOptionsPanel(defaults, onApply, onLanguageChange){
   function open(){ panel.classList.add('open'); }
   function close(){ panel.classList.remove('open'); }
 
-  // apply changes without closing the panel unless shouldClose === true
-  function applyChanges(shouldClose){
+  // apply changes immediately to DEFAULTS and trigger refresh
+  function applyChanges(){
     const chosen = Array.from(modesWrap.querySelectorAll('input[type=checkbox]:checked')).map(i=>i.value);
     
     // Validate number of departures
@@ -244,14 +244,30 @@ export function createOptionsPanel(defaults, onApply, onLanguageChange){
         TEXT_SIZE: newOpts.TEXT_SIZE
       };
     }
+  }
+  
+  // Save current station + modes to favorites dropdown (only triggered by Save button)
+  function saveToFavorites(){
+    // Apply any pending changes first
+    applyChanges();
     
-    if (shouldClose) close();
+    // Call the onSave callback if provided
+    if (onSave && typeof onSave === 'function') {
+      try {
+        onSave();
+        showToast(t('savedToFavorites'));
+      } catch(e) {
+        console.warn('onSave failed', e);
+      }
+    }
+    
+    close();
   }
 
   btnClose.addEventListener('click', ()=> close());
-  btnSave.addEventListener('click', ()=> applyChanges(true));
+  btnSave.addEventListener('click', ()=> saveToFavorites());
 
-  // Enter key navigation: station -> departures -> interval -> text size -> Apply
+  // Enter key navigation: station -> departures -> interval -> text size -> Save
   inpNum.addEventListener('keydown', (e) => {
     if (e.key === 'Enter'){
       e.preventDefault();
@@ -266,6 +282,7 @@ export function createOptionsPanel(defaults, onApply, onLanguageChange){
           inpNum.value = 1;
         }
       }
+      applyChanges();
       inpInt.focus();
     }
   });
@@ -284,6 +301,7 @@ export function createOptionsPanel(defaults, onApply, onLanguageChange){
           inpInt.value = 20;
         }
       }
+      applyChanges();
       selSize.focus();
     }
   });
@@ -360,6 +378,9 @@ export function createOptionsPanel(defaults, onApply, onLanguageChange){
     // Check all transport mode checkboxes when selecting a new station
     const checkboxes = modesWrap.querySelectorAll('input[type=checkbox]');
     checkboxes.forEach(cb => { cb.checked = true; });
+    
+    // Apply changes immediately
+    applyChanges();
   }
   function showCandidates(cands){
     lastCandidates = Array.isArray(cands) ? cands.slice(0) : [];
@@ -469,6 +490,18 @@ export function createOptionsPanel(defaults, onApply, onLanguageChange){
       }, 1400);
     }catch(e){/*ignore*/}
   }
+
+  // Apply immediately on checkbox toggles (debounced)
+  let modesDebounceTimer = null;
+  modesWrap.addEventListener('change', (e)=>{
+    if (e.target && e.target.type === 'checkbox'){
+      clearTimeout(modesDebounceTimer);
+      modesDebounceTimer = setTimeout(()=>{ applyChanges(); showToast(t('filtersUpdated')); }, 500);
+    }
+  });
+
+  // Apply immediately when text size selection changes
+  selSize.addEventListener('change', ()=>{ applyChanges(); showToast(t('textSizeUpdated')); });
 
   // when opening/closing, toggle a body class so we can shift the app content
   const origOpen = open;

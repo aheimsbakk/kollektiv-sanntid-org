@@ -1,12 +1,12 @@
-Overall Context: Kollektiv.Sanntid.org - station dropdown saves transport modes per station. Auto-checks all modes when new station selected from autocomplete (v1.12.4). Clean UX for mode filtering.
+Overall Context: Kollektiv.Sanntid.org - options panel now applies changes immediately (station, modes, text size, intervals) while Save button only adds to favorites. Version 1.13.0.
 
-Current Goal: Ready for user testing.
+Current Goal: Ready for user testing and deployment.
 
 Last 3 Changes:
+- agents/worklogs/2026-02-19-18-32-immediate-updates-save-button.md
 - agents/worklogs/2026-02-19-18-18-reset-modes-on-station-select.md
 - agents/worklogs/2026-02-19-18-10-hide-all-modes-icons.md
-- agents/worklogs/2026-02-19-18-05-widen-dropdown.md
 
 Next Steps:
-- Commit UX improvement
 - User testing
+- Monitor for feedback

@@ -234,11 +234,11 @@ async function init(){
       // Remove old panel
       opts.panel.remove();
       // Create new panel with updated translations
-      const newOpts = createOptionsPanel(DEFAULTS, opts._onApply, () => updateFooterTranslations(board.footer));
+      const newOpts = createOptionsPanel(DEFAULTS, opts._onApply, () => updateFooterTranslations(board.footer), opts._onSave);
       document.body.appendChild(newOpts.panel);
       // Update reference
       Object.assign(opts, newOpts);
-      // Store the onApply handler for future language changes
+      // Store the handlers for future language changes
       opts._onApply = arguments[0];
       // Reopen the panel
       setTimeout(() => opts.open(), 50);
@@ -252,16 +252,9 @@ async function init(){
     DEFAULTS.NUM_DEPARTURES = newOpts.NUM_DEPARTURES;
     DEFAULTS.FETCH_INTERVAL = newOpts.FETCH_INTERVAL;
     DEFAULTS.TRANSPORT_MODES = newOpts.TRANSPORT_MODES;
-    // update station dropdown
+    // update station dropdown title
     if (board.stationDropdown) {
       board.stationDropdown.updateTitle(DEFAULTS.STATION_NAME);
-    }
-    // add to recent stations if we have both name and ID
-    if (DEFAULTS.STATION_NAME && DEFAULTS.STOP_ID) {
-      addRecentStation(DEFAULTS.STATION_NAME, DEFAULTS.STOP_ID, DEFAULTS.TRANSPORT_MODES);
-      if (board.stationDropdown) {
-        board.stationDropdown.refresh();
-      }
     }
     try{ document.title = DEFAULTS.STATION_NAME || document.title; }catch(e){}
     // trigger a manual refresh (do not fallback to demo for manual refresh)
@@ -276,8 +269,16 @@ async function init(){
     try{ document.documentElement.classList.remove('text-size-tiny','text-size-small','text-size-medium','text-size-large','text-size-xlarge');
       document.documentElement.classList.add('text-size-'+(newOpts.TEXT_SIZE || 'large'));
     }catch(e){}
-  }, () => updateFooterTranslations(board.footer));
-  // Store the onApply handler reference for language change reloads
+  }, () => updateFooterTranslations(board.footer), ()=>{
+    // onSave callback - only adds to favorites, doesn't apply changes
+    if (DEFAULTS.STATION_NAME && DEFAULTS.STOP_ID) {
+      addRecentStation(DEFAULTS.STATION_NAME, DEFAULTS.STOP_ID, DEFAULTS.TRANSPORT_MODES);
+      if (board.stationDropdown) {
+        board.stationDropdown.refresh();
+      }
+    }
+  });
+  // Store the handlers for future language change reloads
   opts._onApply = (newOpts)=>{
     // apply new defaults and re-init fetch loop by reloading the page state
     // for now just update the UI and re-run first fetch cycle
@@ -286,16 +287,9 @@ async function init(){
     DEFAULTS.NUM_DEPARTURES = newOpts.NUM_DEPARTURES;
     DEFAULTS.FETCH_INTERVAL = newOpts.FETCH_INTERVAL;
     DEFAULTS.TRANSPORT_MODES = newOpts.TRANSPORT_MODES;
-    // update station dropdown
+    // update station dropdown title
     if (board.stationDropdown) {
       board.stationDropdown.updateTitle(DEFAULTS.STATION_NAME);
-    }
-    // add to recent stations if we have both name and ID
-    if (DEFAULTS.STATION_NAME && DEFAULTS.STOP_ID) {
-      addRecentStation(DEFAULTS.STATION_NAME, DEFAULTS.STOP_ID, DEFAULTS.TRANSPORT_MODES);
-      if (board.stationDropdown) {
-        board.stationDropdown.refresh();
-      }
     }
     try{ document.title = DEFAULTS.STATION_NAME || document.title; }catch(e){}
     // trigger a manual refresh (do not fallback to demo for manual refresh)
@@ -310,6 +304,15 @@ async function init(){
     try{ document.documentElement.classList.remove('text-size-tiny','text-size-small','text-size-medium','text-size-large','text-size-xlarge');
       document.documentElement.classList.add('text-size-'+(newOpts.TEXT_SIZE || 'large'));
     }catch(e){}
+  };
+  opts._onSave = ()=>{
+    // onSave callback - only adds to favorites
+    if (DEFAULTS.STATION_NAME && DEFAULTS.STOP_ID) {
+      addRecentStation(DEFAULTS.STATION_NAME, DEFAULTS.STOP_ID, DEFAULTS.TRANSPORT_MODES);
+      if (board.stationDropdown) {
+        board.stationDropdown.refresh();
+      }
+    }
   };
   document.body.appendChild(opts.panel);
   // expose control so header toggle can call opts.open()
