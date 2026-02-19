@@ -1,4 +1,4 @@
-# Simple workflow for deploying static content to GitHub Pages
+# Deploy main site to previews branch root
 name: Deploy static content to Pages
 
 on:
@@ -9,35 +9,47 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
-# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
-  contents: read
-  pages: write
-  id-token: write
+  contents: write
 
-# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
-# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
+# Allow only one concurrent deployment
 concurrency:
-  group: "pages"
+  group: "pages-main"
   cancel-in-progress: false
 
 jobs:
-  # Single deploy job since we're just deploying
   deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout main branch
         uses: actions/checkout@v4
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
         with:
-          # Upload entire repository
-          path: 'src/'
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+          path: main-source
+
+      - name: Checkout previews branch
+        uses: actions/checkout@v4
+        with:
+          ref: previews
+          path: previews-branch
+
+      - name: Deploy main site to previews branch root
+        run: |
+          # Remove old root files (but keep pr-* folders)
+          cd previews-branch
+          find . -maxdepth 1 -type f -not -name '.git*' -delete
+          
+          # Copy src/ to root (this becomes the main site)
+          cp -r ../main-source/src/* .
+          
+          # Configure git
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          
+          # Commit and push
+          git add .
+          if git diff --staged --quiet; then
+            echo "No changes to main site"
+          else
+            git commit -m "Deploy main site from ${GITHUB_SHA::7}"
+            git push origin previews
+          fi

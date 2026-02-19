@@ -6,9 +6,7 @@ on:
     branches: ["main"]
 
 permissions:
-  contents: read
-  pages: write
-  id-token: write
+  contents: write
   pull-requests: write
 
 # Allow only one concurrent deployment per PR
@@ -18,39 +16,63 @@ concurrency:
 
 jobs:
   deploy-preview:
-    environment:
-      name: pr-preview-${{ github.event.pull_request.number }}
-      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout PR branch
         uses: actions/checkout@v4
         with:
           ref: ${{ github.event.pull_request.head.sha }}
+          path: pr-source
 
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
-
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+      - name: Checkout previews branch
+        uses: actions/checkout@v4
         with:
-          path: 'src/'
+          ref: previews
+          path: previews-branch
 
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+      - name: Deploy PR to previews branch
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          # Remove old preview if exists
+          rm -rf "previews-branch/pr-${PR_NUMBER}"
+          
+          # Copy src/ to pr-N/ folder
+          mkdir -p "previews-branch/pr-${PR_NUMBER}"
+          cp -r pr-source/src/* "previews-branch/pr-${PR_NUMBER}/"
+          
+          # Configure git
+          cd previews-branch
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          
+          # Commit and push
+          git add .
+          if git diff --staged --quiet; then
+            echo "No changes to preview"
+          else
+            git commit -m "Update PR #${PR_NUMBER} preview"
+            git push origin previews
+          fi
 
       - name: Comment PR with preview URL
         uses: actions/github-script@v7
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
         with:
           script: |
-            const prNumber = context.payload.pull_request.number;
-            const deploymentUrl = '${{ steps.deployment.outputs.page_url }}';
+            const prNumber = process.env.PR_NUMBER;
+            const repo = context.repo.repo;
+            const owner = context.repo.owner;
+            
+            // Construct preview URL
+            // Format: https://owner.github.io/repo/pr-N/
+            const previewUrl = `https://${owner}.github.io/${repo}/pr-${prNumber}/`;
             
             // Find existing comment
             const { data: comments } = await github.rest.issues.listComments({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
+              owner,
+              repo,
               issue_number: prNumber,
             });
             
@@ -63,9 +85,9 @@ jobs:
             
             Your changes are deployed and ready for review:
             
-            **Preview URL:** ${deploymentUrl}
+            **Preview URL:** ${previewUrl}
             
-            **Environment:** \`pr-preview-${prNumber}\`
+            **Branch:** \`previews\` → \`pr-${prNumber}/\`
             
             ---
             
@@ -74,15 +96,15 @@ jobs:
             
             if (botComment) {
               await github.rest.issues.updateComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
+                owner,
+                repo,
                 comment_id: botComment.id,
                 body: commentBody
               });
             } else {
               await github.rest.issues.createComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
+                owner,
+                repo,
                 issue_number: prNumber,
                 body: commentBody
               });
