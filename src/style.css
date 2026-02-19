@@ -169,8 +169,6 @@ body.options-open .app-root {
   background: var(--overlay-medium);
   border-radius: 6px;
   padding: 6px;
-  min-width: 250px;
-  max-width: 400px;
   width: max-content;
   max-height: 300px;
   overflow-y: auto;
