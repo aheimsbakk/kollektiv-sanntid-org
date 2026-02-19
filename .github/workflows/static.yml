@@ -1,20 +1,16 @@
-# Deploy main site to previews branch root
-name: Deploy static content to Pages
+# Deploy main site to root of gh-pages branch
+name: Deploy Production to Pages
 
 on:
-  # Runs on pushes targeting the default branch
   push:
     branches: ["main"]
-
-  # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
 permissions:
   contents: write
 
-# Allow only one concurrent deployment
 concurrency:
-  group: "pages-main"
+  group: "production-deploy"
   cancel-in-progress: false
 
 jobs:
@@ -24,32 +20,27 @@ jobs:
       - name: Checkout main branch
         uses: actions/checkout@v4
         with:
-          path: main-source
+          ref: main
 
-      - name: Checkout previews branch
+      - name: Checkout gh-pages branch
         uses: actions/checkout@v4
         with:
-          ref: previews
-          path: previews-branch
+          ref: gh-pages
+          path: gh-pages-content
 
-      - name: Deploy main site to previews branch root
+      - name: Deploy to root of gh-pages
         run: |
-          # Remove old root files (but keep pr-* folders)
-          cd previews-branch
-          find . -maxdepth 1 -type f -not -name '.git*' -delete
+          # Copy src/ contents to root of gh-pages (preserving PR folders)
+          rsync -av --delete --exclude='pr-*/' src/ gh-pages-content/
           
-          # Copy src/ to root (this becomes the main site)
-          cp -r ../main-source/src/* .
-          
-          # Configure git
+          cd gh-pages-content
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           
-          # Commit and push
           git add .
           if git diff --staged --quiet; then
-            echo "No changes to main site"
+            echo "No changes to deploy"
           else
             git commit -m "Deploy main site from ${GITHUB_SHA::7}"
-            git push origin previews
+            git push origin gh-pages
           fi

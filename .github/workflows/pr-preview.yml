@@ -9,7 +9,6 @@ permissions:
   contents: write
   pull-requests: write
 
-# Allow only one concurrent deployment per PR
 concurrency:
   group: pr-preview-${{ github.event.pull_request.number }}
   cancel-in-progress: true
@@ -22,57 +21,44 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: ${{ github.event.pull_request.head.sha }}
-          path: pr-source
 
-      - name: Checkout previews branch
+      - name: Checkout gh-pages branch
         uses: actions/checkout@v4
         with:
-          ref: previews
-          path: previews-branch
+          ref: gh-pages
+          path: gh-pages-content
 
-      - name: Deploy PR to previews branch
-        env:
-          PR_NUMBER: ${{ github.event.pull_request.number }}
+      - name: Deploy PR to subfolder
         run: |
-          # Remove old preview if exists
-          rm -rf "previews-branch/pr-${PR_NUMBER}"
+          PR_NUMBER=${{ github.event.pull_request.number }}
+          PR_FOLDER="gh-pages-content/pr-${PR_NUMBER}"
           
-          # Copy src/ to pr-N/ folder
-          mkdir -p "previews-branch/pr-${PR_NUMBER}"
-          cp -r pr-source/src/* "previews-branch/pr-${PR_NUMBER}/"
+          # Create/update PR subfolder
+          mkdir -p "${PR_FOLDER}"
+          rsync -av --delete src/ "${PR_FOLDER}/"
           
-          # Configure git
-          cd previews-branch
+          cd gh-pages-content
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           
-          # Commit and push
           git add .
-          if git diff --staged --quiet; then
-            echo "No changes to preview"
-          else
-            git commit -m "Update PR #${PR_NUMBER} preview"
-            git push origin previews
-          fi
+          git commit -m "Deploy PR #${PR_NUMBER} preview from ${GITHUB_SHA::7}" || echo "No changes"
+          git push origin gh-pages
 
       - name: Comment PR with preview URL
         uses: actions/github-script@v7
-        env:
-          PR_NUMBER: ${{ github.event.pull_request.number }}
         with:
           script: |
-            const prNumber = process.env.PR_NUMBER;
+            const prNumber = context.payload.pull_request.number;
             const repo = context.repo.repo;
             const owner = context.repo.owner;
             
-            // Construct preview URL
-            // Format: https://owner.github.io/repo/pr-N/
+            // Construct preview URL (adjust if using custom domain)
             const previewUrl = `https://${owner}.github.io/${repo}/pr-${prNumber}/`;
             
-            // Find existing comment
             const { data: comments } = await github.rest.issues.listComments({
-              owner,
-              repo,
+              owner: owner,
+              repo: repo,
               issue_number: prNumber,
             });
             
@@ -87,7 +73,7 @@ jobs:
             
             **Preview URL:** ${previewUrl}
             
-            **Branch:** \`previews\` → \`pr-${prNumber}/\`
+            **Folder:** \`pr-${prNumber}/\`
             
             ---
             
@@ -96,16 +82,17 @@ jobs:
             
             if (botComment) {
               await github.rest.issues.updateComment({
-                owner,
-                repo,
+                owner: owner,
+                repo: repo,
                 comment_id: botComment.id,
                 body: commentBody
               });
             } else {
               await github.rest.issues.createComment({
-                owner,
-                repo,
+                owner: owner,
+                repo: repo,
                 issue_number: prNumber,
                 body: commentBody
               });
             }
+
