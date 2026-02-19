@@ -1,6 +1,6 @@
-# Departure board — pure JavaScript + CSS
+# Kollektiv.Sanntid.org — pure JavaScript + CSS
 
-This repository is a small, dependency-free departure board implemented with vanilla JavaScript and CSS. It's a one-page app inspired by `departure.sh` and intended for local development, easy testing, and simple static deployment.
+Real-time public transport departure board for Norwegian kollektivtrafikk. This is a dependency-free web app implemented with vanilla JavaScript and CSS, showing live departures using Entur's API.
 
 ## Key features
 - No build step or external runtime dependencies — open `index.html` or serve the directory to run the app.
