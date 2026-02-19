@@ -4,7 +4,6 @@
 const translations = {
   en: {
     // Options panel
-    settings: 'Settings',
     stationName: 'Station name',
     numberOfDepartures: 'Number of departures',
     fetchInterval: 'Fetch interval (seconds)',
@@ -53,7 +52,6 @@ const translations = {
   
   no: {
     // Options panel
-    settings: 'Innstillinger',
     stationName: 'Stasjonsnavn',
     numberOfDepartures: 'Antall avganger',
     fetchInterval: 'Oppdateringsintervall (sekunder)',
@@ -102,7 +100,6 @@ const translations = {
   
   de: {
     // Options panel
-    settings: 'Einstellungen',
     stationName: 'Stationsname',
     numberOfDepartures: 'Anzahl Abfahrten',
     fetchInterval: 'Aktualisierungsintervall (Sekunden)',
@@ -151,7 +148,6 @@ const translations = {
   
   es: {
     // Options panel
-    settings: 'Configuración',
     stationName: 'Nombre de estación',
     numberOfDepartures: 'Número de salidas',
     fetchInterval: 'Intervalo de actualización (segundos)',
@@ -200,7 +196,6 @@ const translations = {
   
   it: {
     // Options panel
-    settings: 'Impostazioni',
     stationName: 'Nome stazione',
     numberOfDepartures: 'Numero di partenze',
     fetchInterval: 'Intervallo di aggiornamento (secondi)',
@@ -249,7 +244,6 @@ const translations = {
   
   el: {
     // Options panel
-    settings: 'Ρυθμίσεις',
     stationName: 'Όνομα σταθμού',
     numberOfDepartures: 'Αριθμός αναχωρήσεων',
     fetchInterval: 'Διάστημα ενημέρωσης (δευτερόλεπτα)',
@@ -298,7 +292,6 @@ const translations = {
   
   fa: {
     // Options panel
-    settings: 'تنظیمات',
     stationName: 'نام ایستگاه',
     numberOfDepartures: 'تعداد حرکت‌ها',
     fetchInterval: 'فاصله به‌روزرسانی (ثانیه)',
@@ -347,7 +340,6 @@ const translations = {
   
   hi: {
     // Options panel
-    settings: 'सेटिंग्स',
     stationName: 'स्टेशन का नाम',
     numberOfDepartures: 'प्रस्थान की संख्या',
     fetchInterval: 'अपडेट अंतराल (सेकंड)',
@@ -396,7 +388,6 @@ const translations = {
   
   is: {
     // Options panel
-    settings: 'Stillingar',
     stationName: 'Nafn stöðvar',
     numberOfDepartures: 'Fjöldi brottfara',
     fetchInterval: 'Uppfærslubil (sekúndur)',
@@ -445,7 +436,6 @@ const translations = {
   
   uk: {
     // Options panel
-    settings: 'Налаштування',
     stationName: 'Назва станції',
     numberOfDepartures: 'Кількість відправлень',
     fetchInterval: 'Інтервал оновлення (секунди)',
@@ -494,7 +484,6 @@ const translations = {
   
   fr: {
     // Options panel
-    settings: 'Paramètres',
     stationName: 'Nom de la station',
     numberOfDepartures: 'Nombre de départs',
     fetchInterval: 'Intervalle de mise à jour (secondes)',
@@ -543,7 +532,6 @@ const translations = {
   
   pl: {
     // Options panel
-    settings: 'Ustawienia',
     stationName: 'Nazwa stacji',
     numberOfDepartures: 'Liczba odjazdów',
     fetchInterval: 'Interwał odświeżania (sekundy)',

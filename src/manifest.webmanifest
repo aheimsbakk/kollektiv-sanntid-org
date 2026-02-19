@@ -1,6 +1,6 @@
 {
-  "name": "Departure Board",
-  "short_name": "Departures",
+  "name": "Kollektiv.Sanntid.org",
+  "short_name": "Kollektiv",
   "start_url": ".",
   "display": "standalone",
   "background_color": "#081021",
