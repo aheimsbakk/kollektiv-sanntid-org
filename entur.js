@@ -111,9 +111,14 @@ export function parseEnturResponse(json){
 
     // explicit paths to check (preferred)
     let explicitMode = null;
+    let publicCode = null;
     try{
       const sj = call.serviceJourney;
       if (sj){
+        // Extract publicCode (line number) for display
+        if (sj.journeyPattern && sj.journeyPattern.line && sj.journeyPattern.line.publicCode) {
+          publicCode = sj.journeyPattern.line.publicCode;
+        }
         // path: serviceJourney.journeyPattern.line.transportMode
         const jpLineMode = sj.journeyPattern && sj.journeyPattern.line && sj.journeyPattern.line.transportMode;
         if (jpLineMode) explicitMode = mapTokenToCanonical(jpLineMode);
@@ -129,11 +134,12 @@ export function parseEnturResponse(json){
           if (pc.startsWith('t') || pc.startsWith('m')) explicitMode = pc.startsWith('t') ? 'tram' : 'metro';
         }
       }
-    }catch(e){ explicitMode = null; }
+    }catch(e){ explicitMode = null; publicCode = null; }
 
     const mode = explicitMode || detectModeFromRaw(call);
     return {
-      destination, 
+      destination,
+      publicCode,
       expectedDepartureISO, 
       situations, 
       raw: call, 
