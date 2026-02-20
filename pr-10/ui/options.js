@@ -344,9 +344,11 @@ export function createOptionsPanel(defaults, onApply, onLanguageChange, onSave){
     }
   });
 
-  // Auto-select text on focus for easy editing
+  // Auto-select text on focus for easy editing and clear lastQuery to allow re-searching
   inpStation.addEventListener('focus', () => {
     inpStation.select();
+    // Clear lastQuery so typing triggers new search even if same text
+    lastQuery = '';
   });
 
   inpNum.addEventListener('focus', () => {
@@ -498,7 +500,8 @@ export function createOptionsPanel(defaults, onApply, onLanguageChange, onSave){
   inpStation.addEventListener('blur', () => { 
     setTimeout(() => { 
       // If autocomplete is still open, auto-select first item before clearing
-      if (acList && acList.classList.contains('open') && lastCandidates.length > 0) {
+      // But only if user actually typed something (stopId is empty = user was typing)
+      if (acList && acList.classList.contains('open') && lastCandidates.length > 0 && !inpStation.dataset.stopId) {
         selectCandidateIndex(0);
       }
       clearAutocomplete(); 
