@@ -56,9 +56,16 @@ async function init(){
     }
   }catch(e){/*ignore*/}
 
-  // Check for shared board URL parameter (?b= or legacy ?board=)
+  // Check for URL parameters
   try {
     const urlParams = new URLSearchParams(window.location.search);
+    
+    // Clear cache-busting timestamp parameter if present (from SW update reload)
+    if (urlParams.has('t')) {
+      window.history.replaceState({}, '', window.location.pathname);
+    }
+    
+    // Check for shared board URL parameter (?b= or legacy ?board=)
     const boardParam = urlParams.get('b') || urlParams.get('board');
     if (boardParam) {
       const sharedSettings = decodeSettings(boardParam);
