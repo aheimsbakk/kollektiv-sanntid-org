@@ -53,6 +53,25 @@ function getModesDisplay(modes) {
 }
 
 /**
+ * Compare two mode arrays for equality (order doesn't matter)
+ * @param {Array<string>} modes1 
+ * @param {Array<string>} modes2 
+ * @returns {boolean}
+ */
+export function modesEqual(modes1, modes2) {
+  const m1 = modes1 || [];
+  const m2 = modes2 || [];
+  
+  if (m1.length !== m2.length) return false;
+  
+  // Sort both arrays and compare
+  const sorted1 = m1.slice().sort();
+  const sorted2 = m2.slice().sort();
+  
+  return sorted1.every((mode, i) => mode === sorted2[i]);
+}
+
+/**
  * Get recent stations from localStorage
  * @returns {Array<{name: string, stopId: string, modes?: Array<string>}>}
  */
