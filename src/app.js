@@ -297,13 +297,17 @@ async function init(){
         opts.close();
         // Remove old panel
         opts.panel.remove();
+        // Preserve handlers before recreation
+        const savedOnApply = opts._onApply;
+        const savedOnSave = opts._onSave;
         // Create new panel with updated translations
-        const newOpts = createOptionsPanel(DEFAULTS, opts._onApply, () => updateFooterTranslations(board.footer), opts._onSave);
+        const newOpts = createOptionsPanel(DEFAULTS, savedOnApply, () => updateFooterTranslations(board.footer), savedOnSave);
         document.body.appendChild(newOpts.panel);
         // Update reference
         Object.assign(opts, newOpts);
-        // Store the handlers for future language changes
-        opts._onApply = arguments[0];
+        // Restore the handlers for future language changes
+        opts._onApply = savedOnApply;
+        opts._onSave = savedOnSave;
         
         // Update tooltips on global buttons
         updateGlobalButtonTooltips();
