@@ -1,12 +1,12 @@
-Overall Context: Kollektiv.Sanntid.org - Detect stale input on first keystroke. Version 1.27.7.
+Overall Context: Kollektiv.Sanntid.org - Debug why autocomplete test passes but browser fails. Version 1.27.9.
 
-Current Goal: Fix autocomplete on first load when select() fails.
+Current Goal: Identify root cause of first load autocomplete bug via browser debug logs.
 
 Last 3 Changes:
+- agents/worklogs/2026-02-20-19-47-add-debug-logging.md
+- agents/worklogs/2026-02-20-19-44-ignore-programmatic-input.md
 - agents/worklogs/2026-02-20-19-33-detect-stale-input.md
-- agents/worklogs/2026-02-20-19-28-fix-autocomplete-first-load.md
-- agents/worklogs/2026-02-20-19-11-fix-sw-missing-assets.md
 
 Next Steps:
-- Commit version 1.27.7
-- User to test first load scenario in Chrome/Firefox
+- Commit debug version 1.27.9
+- User tests in browser console to see actual event sequence
