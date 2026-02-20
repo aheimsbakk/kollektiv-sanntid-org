@@ -1,12 +1,12 @@
-Overall Context: Kollektiv.Sanntid.org - Fixed all i18n, favorites, share, and options panel bugs. Version 1.25.3.
+Overall Context: Kollektiv.Sanntid.org - Fixed all i18n, favorites, share, options panel, and autocomplete bugs. Version 1.25.4.
 
-Current Goal: Clean URL parameters after their intended use is complete.
+Current Goal: Fix autocomplete hanging on current station name when typing.
 
 Last 3 Changes:
+- agents/worklogs/2026-02-20-17-32-fix-autocomplete-hang.md
 - agents/worklogs/2026-02-20-17-07-clear-timestamp-param.md
 - agents/worklogs/2026-02-20-17-05-clear-url-after-import.md
-- agents/worklogs/2026-02-20-16-56-fix-text-size-persistence.md
 
 Next Steps:
-- Commit v1.25.3 with worklog
+- Commit v1.25.4 with worklog
 - Ready for browser testing and deployment
