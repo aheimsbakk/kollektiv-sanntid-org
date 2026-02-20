@@ -191,8 +191,9 @@ export async function fetchDepartures({stopId, numDepartures=2, modes=['bus'], a
     // cancellation, predictionInaccurate, quay info, and situations
     const modeFields = includeModeFields ? `
         serviceJourney {
+          transportSubmode
           journeyPattern { 
-            line { publicCode transportMode }
+            line { publicCode transportMode transportSubmode }
           }
         }` : '';
     const query = `query ${varSig} {
