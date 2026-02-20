@@ -1,12 +1,12 @@
-Overall Context: Kollektiv.Sanntid.org - Fixed SW caching wrong API responses. Version 1.28.0.
+Overall Context: Kollektiv.Sanntid.org - Fixed autocomplete bug caused by SW cache. Version 1.28.1 (cleaned).
 
-Current Goal: Test that autocomplete now returns correct search results.
+Current Goal: Ready for user testing of autocomplete functionality.
 
 Last 3 Changes:
+- agents/worklogs/2026-02-20-20-25-debug-cleanup.md
 - agents/worklogs/2026-02-20-20-18-fix-sw-api-caching.md
 - agents/worklogs/2026-02-20-20-16-debug-text-parameter.md
-- agents/worklogs/2026-02-20-20-04-debug-venue-filter.md
 
 Next Steps:
-- Commit SW fix v1.28.0
-- User tests autocomplete - should now work correctly
+- User tests autocomplete in browser
+- If good, ready to merge to main

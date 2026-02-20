@@ -451,24 +451,13 @@ function mapModesToGeocoderCategories(modes){
   // We'll filter client-side to show only transport stops and return the requested limit
   const fetchSize = Math.max(50, limit * 10);
   const url = `${geocodeUrl}?text=${encodeURIComponent(text)}&lang=no&size=${fetchSize}`;
-  console.log('[DEBUG] searchStations - text parameter:', text);
-  console.log('[DEBUG] searchStations - encodeURIComponent(text):', encodeURIComponent(text));
-  console.log('[DEBUG] searchStations - URL:', url);
   try{
     const r = await fetchFn(url, { headers: { 'ET-Client-Name': clientName } });
-    console.log('[DEBUG] searchStations - Fetch completed, response.url:', r.url);
     if (!r) return [];
     if (typeof r.ok !== 'undefined' && r.ok === false) return [];
     const contentType = (r.headers && (typeof r.headers.get === 'function')) ? r.headers.get('content-type') : (r.headers && (r.headers['content-type'] || r.headers['Content-Type'])) || '';
     if (contentType && !/application\/json/i.test(contentType)) return [];
     const j = await r.json();
-    console.log('[DEBUG] searchStations - API returned', j.features?.length, 'features');
-    console.log('[DEBUG] searchStations - Raw features:', j.features?.map(f => ({
-      name: f.properties?.name,
-      label: f.properties?.label, 
-      layer: f.properties?.layer,
-      id: f.properties?.id
-    })));
     if (!j || !Array.isArray(j.features)) return [];
     // Filter to only transport stops (venue layer only)
     // This prevents address/place results from appearing, even if they have NSR: IDs
@@ -480,11 +469,6 @@ function mapModesToGeocoderCategories(modes){
       // Only include venue layer results (actual transport stops/stations)
       return layer === 'venue';
     });
-    console.log('[DEBUG] searchStations - After venue filter:', transportStops.map(f => ({
-      name: f.properties?.name,
-      label: f.properties?.label,
-      layer: f.properties?.layer
-    })));
     
     // Re-rank results to prioritize closer matches to the search query
     // This helps "Støren stasjon" rank higher than "Storeng" when searching "Støren"
@@ -513,11 +497,8 @@ function mapModesToGeocoderCategories(modes){
     // Sort by score descending, then keep original order for ties
     scoredStops.sort((a, b) => b.score - a.score);
     
-    console.log('[DEBUG] searchStations - After filtering/scoring:', scoredStops.length, 'transport stops');
-    
     // Map features into a lightweight candidate shape consumed by the UI
     const results = scoredStops.slice(0, limit).map(({ feature: f }) => ({ id: f && f.properties && f.properties.id ? f.properties.id : null, title: f && f.properties && (f.properties.label || f.properties.name || f.properties.title) ? (f.properties.label || f.properties.name || f.properties.title) : (f && f.text ? f.text : ''), raw: f }));
-    console.log('[DEBUG] searchStations - Returning', results.length, 'results:', results.map(r => r.title));
     return results;
   }catch(e){
     return [];
