@@ -2,27 +2,26 @@
 import { t } from '../i18n.js';
 
 /**
- * Encode settings to compressed base64 URL parameter
+ * Encode settings to compact base64 URL parameter
+ * Uses array format instead of JSON object for 20-30% size reduction
  * @param {Object} settings - Full settings object
- * @returns {string} Base64-encoded compressed settings
+ * @returns {string} Base64-encoded compact settings
  */
 export function encodeSettings(settings) {
   try {
-    // Create minimal settings object
-    const data = {
-      n: settings.STATION_NAME,
-      s: settings.STOP_ID,
-      m: settings.TRANSPORT_MODES,
-      d: settings.NUM_DEPARTURES,
-      i: settings.FETCH_INTERVAL,
-      t: settings.TEXT_SIZE,
-      l: settings.language
-    };
+    // Encode as compact array: [name, stopId, modes, departures, interval, size, lang]
+    // This saves ~30% vs JSON object keys
+    const data = [
+      settings.STATION_NAME,
+      settings.STOP_ID,
+      settings.TRANSPORT_MODES,
+      settings.NUM_DEPARTURES,
+      settings.FETCH_INTERVAL,
+      settings.TEXT_SIZE,
+      settings.language
+    ];
     
     const json = JSON.stringify(data);
-    
-    // Simple compression: use URL-safe base64
-    // For better compression in future, could use pako or similar
     const base64 = btoa(unescape(encodeURIComponent(json)));
     
     // Make URL-safe
@@ -51,6 +50,17 @@ export function decodeSettings(encoded) {
     const json = decodeURIComponent(escape(atob(base64)));
     const data = JSON.parse(json);
     
+    // Support both array format (new) and object format (legacy)
+    let n, s, m, d, i, t, l;
+    
+    if (Array.isArray(data)) {
+      // New array format: [name, stopId, modes, departures, interval, size, lang]
+      [n, s, m, d, i, t, l] = data;
+    } else {
+      // Legacy object format
+      ({ n, s, m, d, i, t, l } = data);
+    }
+    
     // Validate all fields
     const settings = {
       stationName: null,
@@ -63,47 +73,47 @@ export function decodeSettings(encoded) {
     };
     
     // Validate station name (required string)
-    if (typeof data.n === 'string' && data.n.length > 0 && data.n.length < 200) {
-      settings.stationName = data.n;
+    if (typeof n === 'string' && n.length > 0 && n.length < 200) {
+      settings.stationName = n;
     } else {
       return null;
     }
     
     // Validate stop ID (required string, NSR format)
-    if (typeof data.s === 'string' && data.s.length > 0 && data.s.length < 100) {
-      settings.stopId = data.s;
+    if (typeof s === 'string' && s.length > 0 && s.length < 100) {
+      settings.stopId = s;
     } else {
       return null;
     }
     
     // Validate transport modes (array of valid modes)
     const validModes = ['bus', 'tram', 'metro', 'rail', 'water', 'coach'];
-    if (Array.isArray(data.m)) {
-      const modes = data.m.filter(m => validModes.includes(m));
+    if (Array.isArray(m)) {
+      const modes = m.filter(mode => validModes.includes(mode));
       settings.transportModes = modes.length > 0 ? modes : validModes;
     } else {
       settings.transportModes = validModes;
     }
     
     // Validate number of departures (1-20)
-    if (typeof data.d === 'number' && data.d >= 1 && data.d <= 20) {
-      settings.numDepartures = Math.floor(data.d);
+    if (typeof d === 'number' && d >= 1 && d <= 20) {
+      settings.numDepartures = Math.floor(d);
     }
     
     // Validate fetch interval (minimum 20 seconds, max 300)
-    if (typeof data.i === 'number' && data.i >= 20 && data.i <= 300) {
-      settings.fetchInterval = Math.floor(data.i);
+    if (typeof i === 'number' && i >= 20 && i <= 300) {
+      settings.fetchInterval = Math.floor(i);
     }
     
     // Validate text size (one of the valid sizes)
     const validSizes = ['tiny', 'small', 'medium', 'large', 'xlarge'];
-    if (typeof data.t === 'string' && validSizes.includes(data.t)) {
-      settings.textSize = data.t;
+    if (typeof t === 'string' && validSizes.includes(t)) {
+      settings.textSize = t;
     }
     
     // Validate language (2-3 letter code)
-    if (typeof data.l === 'string' && /^[a-z]{2,3}$/.test(data.l)) {
-      settings.language = data.l;
+    if (typeof l === 'string' && /^[a-z]{2,3}$/.test(l)) {
+      settings.language = l;
     }
     
     return settings;
