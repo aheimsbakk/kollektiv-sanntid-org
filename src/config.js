@@ -1,6 +1,6 @@
 // Version is defined here and in src/sw.js (service worker)
 // Both must be kept in sync - use scripts/bump-version.sh to update both
-export const VERSION = '1.21.2';
+export const VERSION = '1.21.3';
 
 export const DEFAULTS = {
   STATION_NAME: 'Jernbanetorget, Oslo',
@@ -11,6 +11,9 @@ export const DEFAULTS = {
   CLIENT_NAME: 'kollektiv-sanntid-org',
   API_URL: 'https://api.entur.io/journey-planner/v3/graphql'
 };
+
+// Immutable list of all transport modes for fallback when no modes are selected
+export const ALL_TRANSPORT_MODES = ['bus','tram','metro','rail','water','coach'];
 
 // Realtime data indicators
 // Used in the departure line template via {indicator} placeholder
