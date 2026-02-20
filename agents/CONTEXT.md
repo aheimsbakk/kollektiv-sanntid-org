@@ -1,13 +1,12 @@
-Overall Context: Kollektiv.Sanntid.org - live-only app with reactive options panel and theme toggle. Version 1.16.5.
+Overall Context: Kollektiv.Sanntid.org - live-only app with reactive options panel and theme toggle. Version 1.21.2.
 
-Current Goal: Production ready - user-controlled updates with reliable cache bypass on reload.
+Current Goal: Documentation updated. All major features complete and documented.
 
 Last 3 Changes:
-- agents/worklogs/2026-02-20-11-12-remove-periodic-updates.md
-- agents/worklogs/2026-02-20-11-08-force-sw-updates.md
-- agents/worklogs/2026-02-20-11-03-fix-sw-cache-updates.md
+- agents/worklogs/2026-02-20-14-03-update-readme.md
+- agents/worklogs/2026-02-20-14-00-update-app-icons.md
+- agents/worklogs/2026-02-20-13-52-cancellation-styling.md
 
 Next Steps:
-- Test PR preview updates when user reloads
-- Verify tooltips and version updates work correctly
-- Deploy to production
+- Test all features with live data
+- Consider deployment to production
