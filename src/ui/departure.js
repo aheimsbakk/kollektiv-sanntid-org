@@ -1,4 +1,4 @@
-import { PLATFORM_SYMBOLS } from '../config.js';
+import { PLATFORM_SYMBOLS, LINE_NUMBER_SEPARATOR } from '../config.js';
 
 export function createDepartureNode(item){
   const container = document.createElement('div'); container.className='departure';
@@ -122,7 +122,7 @@ export function createDepartureNode(item){
   // render emoji inline with destination text so it wraps naturally on small screens
   const emoji = emojiForMode(mode);
   const destinationText = (item && item.destination) ? String(item.destination) : '—';
-  const lineNumber = (item && item.publicCode) ? String(item.publicCode) + ' · ' : '';
+  const lineNumber = (item && item.publicCode) ? String(item.publicCode) + LINE_NUMBER_SEPARATOR : '';
   
   // Build platform/quay display with stacked format: {emoji} <span>{symbol}<br>{code}</span>
   // Detect quay type from publicCode format:
