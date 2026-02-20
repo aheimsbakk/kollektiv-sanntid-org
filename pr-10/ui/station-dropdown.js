@@ -1,4 +1,5 @@
 import { t } from '../i18n.js';
+import { TRANSPORT_MODE_EMOJIS } from '../config.js';
 
 const STORAGE_KEY = 'recent-stations';
 const MAX_RECENT = 5;
@@ -17,15 +18,15 @@ const MODE_ORDER = ['bus', 'metro', 'tram', 'rail', 'water', 'coach'];
  * @returns {string}
  */
 function getModeIcon(mode) {
-  if (!mode) return '🚆';
+  if (!mode) return TRANSPORT_MODE_EMOJIS.default;
   const m = String(mode).toLowerCase();
-  if (m === 'bus') return '🚌';
-  if (m === 'tram') return '🚋';
-  if (m === 'metro') return '🚇';
-  if (m === 'rail') return '🚅';
-  if (m === 'water') return '🛳️';
-  if (m === 'coach') return '🚍';
-  return '🚆';
+  if (m === 'bus') return TRANSPORT_MODE_EMOJIS.bus;
+  if (m === 'tram') return TRANSPORT_MODE_EMOJIS.tram;
+  if (m === 'metro') return TRANSPORT_MODE_EMOJIS.metro;
+  if (m === 'rail') return TRANSPORT_MODE_EMOJIS.rail;
+  if (m === 'water') return TRANSPORT_MODE_EMOJIS.water;
+  if (m === 'coach') return TRANSPORT_MODE_EMOJIS.coach;
+  return TRANSPORT_MODE_EMOJIS.default;
 }
 
 /**
