@@ -17,6 +17,9 @@ const translations = {
     stationNameTooltip: 'Click to show your saved favorites',
     settingsTooltip: 'Open settings panel',
     themeTooltip: 'Change theme',
+    shareBoard: 'Share this departure board',
+    noStationToShare: 'No station selected to share',
+    shareFailed: 'Failed to create share link',
     
     // Text sizes
     tiny: 'Tiny',
@@ -72,6 +75,9 @@ const translations = {
     stationNameTooltip: 'Klikk for å vise dine lagrede favoritter',
     settingsTooltip: 'Åpne innstillinger',
     themeTooltip: 'Bytt tema',
+    shareBoard: 'Del denne avgangstavlen',
+    noStationToShare: 'Ingen stasjon valgt å dele',
+    shareFailed: 'Kunne ikke lage delingslenke',
     
     // Text sizes
     tiny: 'Veldig liten',
@@ -127,6 +133,9 @@ const translations = {
     stationNameTooltip: 'Klicken, um Ihre gespeicherten Favoriten anzuzeigen',
     settingsTooltip: 'Einstellungen öffnen',
     themeTooltip: 'Thema ändern',
+    shareBoard: 'Diese Anzeigetafel teilen',
+    noStationToShare: 'Keine Station zum Teilen ausgewählt',
+    shareFailed: 'Fehler beim Erstellen des Freigabelinks',
     
     // Text sizes
     tiny: 'Sehr klein',
@@ -182,6 +191,9 @@ const translations = {
     stationNameTooltip: 'Haz clic para ver tus favoritos guardados',
     settingsTooltip: 'Abrir panel de configuración',
     themeTooltip: 'Cambiar tema',
+    shareBoard: 'Compartir este tablero',
+    noStationToShare: 'No hay estación seleccionada para compartir',
+    shareFailed: 'Error al crear el enlace',
     
     // Text sizes
     tiny: 'Muy pequeño',
@@ -237,6 +249,9 @@ const translations = {
     stationNameTooltip: 'Clicca per mostrare i tuoi preferiti salvati',
     settingsTooltip: 'Apri pannello impostazioni',
     themeTooltip: 'Cambia tema',
+    shareBoard: 'Condividi questa bacheca',
+    noStationToShare: 'Nessuna stazione selezionata da condividere',
+    shareFailed: 'Impossibile creare il link',
     
     // Text sizes
     tiny: 'Piccolissimo',
@@ -292,6 +307,9 @@ const translations = {
     stationNameTooltip: 'Κάντε κλικ για να δείτε τα αποθηκευμένα αγαπημένα σας',
     settingsTooltip: 'Άνοιγμα πίνακα ρυθμίσεων',
     themeTooltip: 'Αλλαγή θέματος',
+    shareBoard: 'Κοινοποίηση αυτού του πίνακα',
+    noStationToShare: 'Δεν επιλέχθηκε σταθμός για κοινοποίηση',
+    shareFailed: 'Αποτυχία δημιουργίας συνδέσμου',
     
     // Text sizes
     tiny: 'Πολύ μικρό',
@@ -383,7 +401,12 @@ const translations = {
     
     // Station dropdown
     noStationSelected: 'هیچ ایستگاهی انتخاب نشده',
-    noRecentStations: 'ایستگاه اخیر وجود ندارد'
+    noRecentStations: 'ایستگاه اخیر وجود ندارد',
+    
+    // Share button
+    shareBoard: 'اشتراک‌گذاری این تابلو',
+    noStationToShare: 'هیچ ایستگاهی برای اشتراک‌گذاری انتخاب نشده',
+    shareFailed: 'ایجاد لینک اشتراک‌گذاری ناموفق بود'
   },
   
   hi: {
@@ -438,7 +461,12 @@ const translations = {
     
     // Station dropdown
     noStationSelected: 'कोई स्टेशन चयनित नहीं',
-    noRecentStations: 'कोई हालिया स्टेशन नहीं'
+    noRecentStations: 'कोई हालिया स्टेशन नहीं',
+    
+    // Share button
+    shareBoard: 'इस बोर्ड को साझा करें',
+    noStationToShare: 'साझा करने के लिए कोई स्टेशन नहीं चुना गया',
+    shareFailed: 'शेयर लिंक बनाने में विफल'
   },
   
   is: {
@@ -493,7 +521,12 @@ const translations = {
     
     // Station dropdown
     noStationSelected: 'Engin stöð valin',
-    noRecentStations: 'Engar nýlegar stöðvar'
+    noRecentStations: 'Engar nýlegar stöðvar',
+    
+    // Share button
+    shareBoard: 'Deila þessari töflu',
+    noStationToShare: 'Engin stöð valin til að deila',
+    shareFailed: 'Mistókst að búa til deilingartengil'
   },
   
   uk: {
@@ -548,7 +581,12 @@ const translations = {
     
     // Station dropdown
     noStationSelected: 'Станцію не вибрано',
-    noRecentStations: 'Немає недавніх станцій'
+    noRecentStations: 'Немає недавніх станцій',
+    
+    // Share button
+    shareBoard: 'Поділитися цією дошкою',
+    noStationToShare: 'Не вибрано станцію для спільного доступу',
+    shareFailed: 'Не вдалося створити посилання'
   },
   
   fr: {
@@ -603,7 +641,12 @@ const translations = {
     
     // Station dropdown
     noStationSelected: 'Aucune station sélectionnée',
-    noRecentStations: 'Aucune station récente'
+    noRecentStations: 'Aucune station récente',
+    
+    // Share button
+    shareBoard: 'Partager ce tableau',
+    noStationToShare: 'Aucune station sélectionnée à partager',
+    shareFailed: 'Échec de création du lien'
   },
   
   pl: {
@@ -658,7 +701,12 @@ const translations = {
     
     // Station dropdown
     noStationSelected: 'Nie wybrano stacji',
-    noRecentStations: 'Brak ostatnich stacji'
+    noRecentStations: 'Brak ostatnich stacji',
+    
+    // Share button
+    shareBoard: 'Udostępnij tę tablicę',
+    noStationToShare: 'Nie wybrano stacji do udostępnienia',
+    shareFailed: 'Nie udało się utworzyć linku'
   }
 };
 

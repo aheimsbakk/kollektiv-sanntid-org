@@ -106,36 +106,6 @@ export function addRecentStation(name, stopId, modes = [], settings = {}) {
 }
 
 /**
- * Add or update a station in recent list (moves to top)
- * Each unique combination of station + modes is a separate entry
- * @param {string} name - Station name
- * @param {string} stopId - Station stop ID
- * @param {Array<string>} modes - Transport modes (e.g., ['bus', 'tram'])
- */
-export function addRecentStation(name, stopId, modes = []) {
-  if (!name || !stopId) return;
-  
-  let recent = getRecentStations();
-  
-  // Remove exact duplicate (same stopId AND same modes)
-  recent = recent.filter(s => !(s.stopId === stopId && modesEqual(s.modes, modes)));
-  
-  // Add to top
-  recent.unshift({ name, stopId, modes: modes || [] });
-  
-  // Keep only MAX_RECENT
-  if (recent.length > MAX_RECENT) {
-    recent = recent.slice(0, MAX_RECENT);
-  }
-  
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(recent));
-  } catch (e) {
-    console.error('Failed to save recent stations:', e);
-  }
-}
-
-/**
  * Create station dropdown component
  * @param {string} currentStationName - Current station name
  * @param {Function} onStationSelect - Callback when station is selected (receives {name, stopId})

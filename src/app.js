@@ -8,6 +8,7 @@ import { fetchDepartures, lookupStopId } from './entur.js';
 import { initLanguage, t, getLanguage } from './i18n.js';
 import { addRecentStation } from './ui/station-dropdown.js';
 import { initTheme, createThemeToggle } from './ui/theme-toggle.js';
+import { createShareButton, decodeSettings } from './ui/share-button.js';
 
 // Initialize language on startup
 initLanguage();
@@ -44,6 +45,46 @@ async function init(){
       Object.assign(DEFAULTS, s);
     }
   }catch(e){/*ignore*/}
+
+  // Check for shared board URL parameter
+  try {
+    const urlParams = new URLSearchParams(window.location.search);
+    const boardParam = urlParams.get('board');
+    if (boardParam) {
+      const sharedSettings = decodeSettings(boardParam);
+      if (sharedSettings) {
+        // Apply all decoded settings to DEFAULTS
+        DEFAULTS.STATION_NAME = sharedSettings.stationName;
+        DEFAULTS.STOP_ID = sharedSettings.stopId;
+        DEFAULTS.TRANSPORT_MODES = sharedSettings.transportModes;
+        DEFAULTS.NUM_DEPARTURES = sharedSettings.numDepartures;
+        DEFAULTS.FETCH_INTERVAL = sharedSettings.fetchInterval;
+        DEFAULTS.TEXT_SIZE = sharedSettings.textSize;
+        
+        // Apply language if valid
+        if (sharedSettings.language) {
+          try {
+            localStorage.setItem('departure:language', sharedSettings.language);
+            // Re-initialize language with new setting
+            initLanguage();
+          } catch(e) {/*ignore*/}
+        }
+        
+        // Automatically add to favorites with all settings
+        addRecentStation(sharedSettings.stationName, sharedSettings.stopId, sharedSettings.transportModes, {
+          numDepartures: sharedSettings.numDepartures,
+          fetchInterval: sharedSettings.fetchInterval,
+          textSize: sharedSettings.textSize,
+          language: sharedSettings.language
+        });
+        
+        // Clean URL by removing the board parameter (optional - keeps URL clean)
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
+    }
+  } catch(e) {
+    console.warn('Failed to decode shared board URL', e);
+  }
 
   // Handler for when user selects a station from recent dropdown
   function handleStationSelect(station) {
@@ -357,6 +398,24 @@ async function init(){
   // add a global fixed header controls in top-right for easy access
   const gWrap = document.createElement('div'); gWrap.className='global-gear';
   
+  // share button (left of theme toggle)
+  const shareComponents = createShareButton(() => {
+    // Return current settings for sharing
+    if (!DEFAULTS.STATION_NAME || !DEFAULTS.STOP_ID) {
+      return null; // No station to share
+    }
+    return {
+      STATION_NAME: DEFAULTS.STATION_NAME,
+      STOP_ID: DEFAULTS.STOP_ID,
+      TRANSPORT_MODES: DEFAULTS.TRANSPORT_MODES,
+      NUM_DEPARTURES: DEFAULTS.NUM_DEPARTURES,
+      FETCH_INTERVAL: DEFAULTS.FETCH_INTERVAL,
+      TEXT_SIZE: DEFAULTS.TEXT_SIZE,
+      language: getLanguage()
+    };
+  });
+  gWrap.appendChild(shareComponents.button);
+  
   // theme toggle button
   const themeBtn = createThemeToggle();
   gWrap.appendChild(themeBtn);
@@ -372,6 +431,10 @@ async function init(){
   gWrap.appendChild(gBtn);
   
   document.body.appendChild(gWrap);
+  
+  // Add share URL box to body (for fallback display)
+  document.body.appendChild(shareComponents.urlBox);
+  
   ROOT.appendChild(board.el);
   
   // Try live data on initial load
