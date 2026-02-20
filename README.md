@@ -80,63 +80,9 @@ Your theme choice is saved automatically.
 - Press **Escape** to close the settings panel
 - Tab through settings panel fields when open
 
-## Customization
-
-For advanced users, the app supports extensive customization via `src/config.js`:
-
-### Departure Display Template
-
-Customize the order and format of departure information by editing `DEPARTURE_LINE_TEMPLATE`:
-
-```javascript
-// Default format: Destination first with realtime indicator
-'{destination} {indicator} {lineNumber} {emoji} {platform}'
-
-// Other examples:
-'{lineNumber} · {destination} {emoji}{platform}'  // Line number first
-'{emoji} {lineNumber} - {destination}{platform}'  // Emoji first
-'{destination} {emoji}{platform} ({lineNumber})'  // Line in parentheses
-```
-
-Available placeholders:
-- `{destination}` - Where the service is headed (e.g., "Ski", "Myrvoll stasjon")
-- `{lineNumber}` - Route number (e.g., "L2", "81", "17")
-- `{emoji}` - Transport mode icon (🚌 🚋 🚇 🚅 🛳️ 🚍)
-- `{indicator}` - Realtime status (● live data, ○ scheduled)
-- `{platform}` - Platform/gate/stop information (⚏10, ◆A, ▪B)
-
-### Realtime Indicators
-
-Change the symbols that indicate realtime vs scheduled departures:
-
-```javascript
-export const REALTIME_INDICATORS = {
-  realtime: '●',    // Live tracking data
-  scheduled: '○'    // Static timetable
-};
-```
-
-### Platform Symbols
-
-Customize symbols for different stop types:
-
-```javascript
-export const PLATFORM_SYMBOLS = {
-  platform: '⚏',  // Train/metro platforms (numeric codes)
-  gate: '◆',      // Bus station gates (letter codes)
-  stop: '▪',      // Tram/bus stops (letter codes)
-  berth: '⚓',     // Ferry berths
-  default: '•'    // Unknown types
-};
-```
-
-### Cancellation Styling
-
-Modify how cancelled departures appear by editing the CSS class `.departure-cancelled` in `src/style.css`.
-
 ## Updates
 
-When a new version is available, you'll see a notification counting down from 5 seconds. The app will automatically reload with the latest features. All your settings and favorites are preserved.
+Reload the web page. When a new version is available, you'll see a notification counting down from 5 seconds. The app will automatically reload with the latest features. All your settings and favorites are preserved.
 
 ## Technical Details
 
