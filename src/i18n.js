@@ -53,7 +53,7 @@ const translations = {
   
   no: {
     // Options panel
-    stationName: 'Stasjons- eller stoppnavn',
+    stationName: 'Stasjons- eller holdeplassnavn',
     numberOfDepartures: 'Antall avganger',
     fetchInterval: 'Oppdateringsintervall (sekunder)',
     textSize: 'Tekststørrelse',
@@ -403,7 +403,7 @@ const translations = {
   
   is: {
     // Options panel
-    stationName: 'Nafn stöðvar eða stoppistöðvar',
+    stationName: 'Nafn stöðvar eða biðstöðvar',
     numberOfDepartures: 'Fjöldi brottfara',
     fetchInterval: 'Uppfærslubil (sekúndur)',
     textSize: 'Textastærð',
