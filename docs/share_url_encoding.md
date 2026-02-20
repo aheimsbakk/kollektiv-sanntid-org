@@ -6,10 +6,17 @@ This document describes the URL encoding format used for sharing departure board
 
 The share button allows users to share their current departure board configuration via URL. The URL contains all settings (station, modes, preferences) encoded as a compact base64 string.
 
-**URL Format:**
+**URL Format (v1.24.0+):**
+```
+https://kollektiv.sanntid.org/?b=<base64-encoded-settings>
+```
+
+**Legacy URL Format (pre-v1.24.0):**
 ```
 https://kollektiv.sanntid.org/?board=<base64-encoded-settings>
 ```
+
+Both formats are supported for backward compatibility.
 
 ## Encoding Format
 
@@ -64,9 +71,14 @@ The decoder automatically detects and supports both formats.
 
 ## Compression Comparison
 
+**URL Parameter:**
+- **New (v1.24.0+):** `?b=` (1 char) saves 5 bytes per share
+- **Legacy:** `?board=` (6 chars)
+
 | Format | Example Size | Typical URL | Savings |
 |--------|--------------|-------------|---------|
-| **Array (new)** | 114 bytes | 151 bytes | **24.5%** |
+| **Array + short param** | 114 bytes | 146 bytes | **28.7%** |
+| Array + long param | 114 bytes | 151 bytes | 24.5% |
 | Object (legacy) | 151 bytes | 191 bytes | baseline |
 
 **Worst-case scenario** (long station name + all transport modes):
@@ -172,18 +184,19 @@ We evaluated three compression strategies:
 
 ## User Experience
 
-**Sharing:**
+**Sharing (v1.24.0+):**
 1. User clicks 🔗 share button in top-right
-2. URL is copied to clipboard (shows ✓ for 2 seconds)
-3. If clipboard API unavailable, modal displays URL for manual copy
+2. URL is copied to clipboard
+3. Browser navigates to the shareable URL (shows `?b=...` in address bar)
+4. User can now copy the full URL from the browser address bar or share the already-copied link
 
 **Opening Shared Link:**
-1. User visits shared URL (`?board=...`)
+1. User visits shared URL (`?b=...` or legacy `?board=...`)
 2. Settings are decoded and validated
 3. Board immediately shows shared station
 4. Settings are saved to localStorage (persist across refreshes)
-5. Station is auto-added to favorites
-6. URL is cleaned (removes `?board=` parameter)
+5. URL parameter remains visible (allows user to see and share the link)
+6. Shared boards are NOT automatically added to favorites (user can manually save if desired)
 
 ## Browser Compatibility
 

@@ -56,10 +56,10 @@ async function init(){
     }
   }catch(e){/*ignore*/}
 
-  // Check for shared board URL parameter
+  // Check for shared board URL parameter (?b= or legacy ?board=)
   try {
     const urlParams = new URLSearchParams(window.location.search);
-    const boardParam = urlParams.get('board');
+    const boardParam = urlParams.get('b') || urlParams.get('board');
     if (boardParam) {
       const sharedSettings = decodeSettings(boardParam);
       if (sharedSettings) {
@@ -80,21 +80,16 @@ async function init(){
           } catch(e) {/*ignore*/}
         }
         
-        // Automatically add to favorites with all settings
-        addRecentStation(sharedSettings.stationName, sharedSettings.stopId, sharedSettings.transportModes, {
-          numDepartures: sharedSettings.numDepartures,
-          fetchInterval: sharedSettings.fetchInterval,
-          textSize: sharedSettings.textSize,
-          language: sharedSettings.language
-        });
+        // Don't automatically add shared boards to favorites
+        // User can manually save if they want to keep it
         
         // Save shared settings to localStorage so they persist after URL is cleaned
         try {
           localStorage.setItem('departure:settings', JSON.stringify(DEFAULTS));
         } catch(e) {/*ignore*/}
         
-        // Clean URL by removing the board parameter (optional - keeps URL clean)
-        window.history.replaceState({}, document.title, window.location.pathname);
+        // Don't clean the URL - keep the share parameter visible
+        // This allows users to see the full shareable link in their browser
       }
     }
   } catch(e) {

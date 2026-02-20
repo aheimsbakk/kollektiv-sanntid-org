@@ -17,7 +17,7 @@ const translations = {
     stationNameTooltip: 'Click to show your saved favorites',
     settingsTooltip: 'Open settings panel',
     themeTooltip: 'Change theme',
-    shareBoard: 'Share this departure board',
+    shareBoard: 'Copy link to clipboard',
     noStationToShare: 'No station selected to share',
     shareFailed: 'Failed to create share link',
     
@@ -75,7 +75,7 @@ const translations = {
     stationNameTooltip: 'Klikk for å vise dine lagrede favoritter',
     settingsTooltip: 'Åpne innstillinger',
     themeTooltip: 'Bytt tema',
-    shareBoard: 'Del denne avgangstavlen',
+    shareBoard: 'Kopier lenke til utklippstavle',
     noStationToShare: 'Ingen stasjon valgt å dele',
     shareFailed: 'Kunne ikke lage delingslenke',
     
@@ -133,7 +133,7 @@ const translations = {
     stationNameTooltip: 'Klicken, um Ihre gespeicherten Favoriten anzuzeigen',
     settingsTooltip: 'Einstellungen öffnen',
     themeTooltip: 'Thema ändern',
-    shareBoard: 'Diese Anzeigetafel teilen',
+    shareBoard: 'Link in Zwischenablage kopieren',
     noStationToShare: 'Keine Station zum Teilen ausgewählt',
     shareFailed: 'Fehler beim Erstellen des Freigabelinks',
     
@@ -191,7 +191,7 @@ const translations = {
     stationNameTooltip: 'Haz clic para ver tus favoritos guardados',
     settingsTooltip: 'Abrir panel de configuración',
     themeTooltip: 'Cambiar tema',
-    shareBoard: 'Compartir este tablero',
+    shareBoard: 'Copiar enlace al portapapeles',
     noStationToShare: 'No hay estación seleccionada para compartir',
     shareFailed: 'Error al crear el enlace',
     

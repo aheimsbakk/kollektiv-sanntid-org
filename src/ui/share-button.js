@@ -186,26 +186,20 @@ export function createShareButton(getSettings) {
       return;
     }
     
-    const url = `${window.location.origin}${window.location.pathname}?board=${encoded}`;
+    const url = `${window.location.origin}${window.location.pathname}?b=${encoded}`;
     
     // Try to copy to clipboard
     try {
       if (navigator.clipboard && window.isSecureContext) {
         await navigator.clipboard.writeText(url);
-        // Show brief success indicator
-        const originalText = button.textContent;
-        button.textContent = '✓';
-        setTimeout(() => {
-          button.textContent = originalText;
-        }, 2000);
-      } else {
-        // Fallback: show URL in box
-        showUrlBox(url);
       }
     } catch (e) {
-      // Fallback: show URL in box
-      showUrlBox(url);
+      // Ignore clipboard errors - we'll navigate anyway
     }
+    
+    // Navigate to the URL with the share parameter
+    // This allows user to see the full link and share it easily
+    window.location.href = url;
   });
   
   return { button, urlBox, showUrlBox };
