@@ -5,7 +5,7 @@ import { createHeaderToggle } from './ui/header.js';
 import { createOptionsPanel } from './ui/options.js';
 import { createDepartureNode, updateDepartureCountdown } from './ui/departure.js';
 import { fetchDepartures, lookupStopId } from './entur.js';
-import { initLanguage, t } from './i18n.js';
+import { initLanguage, t, getLanguage } from './i18n.js';
 import { addRecentStation } from './ui/station-dropdown.js';
 import { initTheme, createThemeToggle } from './ui/theme-toggle.js';
 
@@ -63,8 +63,13 @@ async function init(){
       window.__APP_OPTIONS__.updateFields();
     }
     
-    // Move this station to top of recent list (with its modes)
-    addRecentStation(station.name, station.stopId, station.modes || []);
+    // Move this station to top of recent list (with its modes and current settings)
+    addRecentStation(station.name, station.stopId, station.modes || [], {
+      numDepartures: DEFAULTS.NUM_DEPARTURES,
+      fetchInterval: DEFAULTS.FETCH_INTERVAL,
+      textSize: DEFAULTS.TEXT_SIZE,
+      language: getLanguage()
+    });
     board.stationDropdown.refresh();
     
     // Update document title
@@ -280,7 +285,12 @@ async function init(){
   }, () => updateFooterTranslations(board.footer), ()=>{
     // onSave callback - only adds to favorites, doesn't apply changes
     if (DEFAULTS.STATION_NAME && DEFAULTS.STOP_ID) {
-      addRecentStation(DEFAULTS.STATION_NAME, DEFAULTS.STOP_ID, DEFAULTS.TRANSPORT_MODES);
+      addRecentStation(DEFAULTS.STATION_NAME, DEFAULTS.STOP_ID, DEFAULTS.TRANSPORT_MODES, {
+        numDepartures: DEFAULTS.NUM_DEPARTURES,
+        fetchInterval: DEFAULTS.FETCH_INTERVAL,
+        textSize: DEFAULTS.TEXT_SIZE,
+        language: getLanguage()
+      });
       if (board.stationDropdown) {
         board.stationDropdown.refresh();
       }
@@ -316,7 +326,12 @@ async function init(){
   opts._onSave = ()=>{
     // onSave callback - only adds to favorites
     if (DEFAULTS.STATION_NAME && DEFAULTS.STOP_ID) {
-      addRecentStation(DEFAULTS.STATION_NAME, DEFAULTS.STOP_ID, DEFAULTS.TRANSPORT_MODES);
+      addRecentStation(DEFAULTS.STATION_NAME, DEFAULTS.STOP_ID, DEFAULTS.TRANSPORT_MODES, {
+        numDepartures: DEFAULTS.NUM_DEPARTURES,
+        fetchInterval: DEFAULTS.FETCH_INTERVAL,
+        textSize: DEFAULTS.TEXT_SIZE,
+        language: getLanguage()
+      });
       if (board.stationDropdown) {
         board.stationDropdown.refresh();
       }
