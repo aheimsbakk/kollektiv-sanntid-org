@@ -1,9 +1,10 @@
-const VERSION = '1.27.4';
+const VERSION = '1.27.5';
 const CACHE_NAME = `departures-v${VERSION}`;
 const ASSETS = [
   './',
   './index.html',
   './style.css',
+  './icons.css',
   './app.js',
   './config.js',
   './entur.js',
@@ -13,6 +14,7 @@ const ASSETS = [
   './ui/departure.js',
   './ui/header.js',
   './ui/options.js',
+  './ui/share-button.js',
   './ui/station-dropdown.js',
   './ui/theme-toggle.js',
   './manifest.webmanifest'
