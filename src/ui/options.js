@@ -344,11 +344,16 @@ export function createOptionsPanel(defaults, onApply, onLanguageChange, onSave){
     }
   });
 
-  // Auto-select text on focus for easy editing and clear lastQuery to allow re-searching
+  // Clear input on focus to allow fresh search
+  // This ensures mobile browsers don't have issues with selected text
   inpStation.addEventListener('focus', () => {
-    inpStation.select();
-    // Clear lastQuery so typing triggers new search even if same text
+    // Clear the input value and stopId to start fresh
+    inpStation.value = '';
+    inpStation.dataset.stopId = '';
+    // Clear lastQuery so typing triggers new search
     lastQuery = '';
+    // Clear any stale autocomplete
+    clearAutocomplete();
   });
 
   inpNum.addEventListener('focus', () => {
