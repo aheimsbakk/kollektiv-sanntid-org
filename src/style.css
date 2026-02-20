@@ -30,6 +30,10 @@
   --autocomplete-highlight-bg: #ffffff;
   --autocomplete-highlight-fg: #081021;
   
+  /* Dropdown highlight - Dark Theme */
+  --dropdown-highlight-bg: #ffffff;
+  --dropdown-highlight-fg: #081021;
+  
   /* Typography */
   --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, 'Roboto Mono', 'Courier New', monospace;
   --large-scale: 6vw; /* Base font size for large displays */
@@ -74,6 +78,10 @@
   /* Autocomplete highlight - Light Theme */
   --autocomplete-highlight-bg: #1a1a1a;
   --autocomplete-highlight-fg: #ffffff;
+  
+  /* Dropdown highlight - Light Theme */
+  --dropdown-highlight-bg: #1a1a1a;
+  --dropdown-highlight-fg: #ffffff;
 }
 
 /* Mobile breakpoint - increase base font scale on small screens */
@@ -230,8 +238,8 @@ body.options-open .app-root {
 
 .station-dropdown-item:hover,
 .station-dropdown-item.selected {
-  background: var(--text-primary);
-  color: #081021;
+  background: var(--dropdown-highlight-bg);
+  color: var(--dropdown-highlight-fg);
 }
 
 .station-dropdown-empty {
