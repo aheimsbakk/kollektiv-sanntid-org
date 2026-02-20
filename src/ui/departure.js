@@ -1,4 +1,4 @@
-import { PLATFORM_SYMBOLS, DEPARTURE_LINE_TEMPLATE, REALTIME_INDICATORS, CANCELLATION_WRAPPER } from '../config.js';
+import { PLATFORM_SYMBOLS, DEPARTURE_LINE_TEMPLATE, REALTIME_INDICATORS, CANCELLATION_WRAPPER, TRANSPORT_MODE_EMOJIS } from '../config.js';
 
 export function createDepartureNode(item){
   const container = document.createElement('div'); container.className='departure';
@@ -91,15 +91,15 @@ export function createDepartureNode(item){
   };
 
   function emojiForMode(mode){
-    if(!mode) return '🚆';
+    if(!mode) return TRANSPORT_MODE_EMOJIS.default;
     const m = String(mode).toLowerCase();
-    if(m.includes('bus')) return '🚌';
-    if(m.includes('tram')) return '🚋';
-    if(m.includes('metro')) return '🚇';
-    if(m.includes('rail') || m.includes('train')) return '🚅';
-    if(m.includes('water') || m.includes('ferry')) return '🛳️';
-    if(m.includes('coach')) return '🚍';
-    return '🚆';
+    if(m.includes('bus')) return TRANSPORT_MODE_EMOJIS.bus;
+    if(m.includes('tram')) return TRANSPORT_MODE_EMOJIS.tram;
+    if(m.includes('metro')) return TRANSPORT_MODE_EMOJIS.metro;
+    if(m.includes('rail') || m.includes('train')) return TRANSPORT_MODE_EMOJIS.rail;
+    if(m.includes('water') || m.includes('ferry')) return TRANSPORT_MODE_EMOJIS.water;
+    if(m.includes('coach')) return TRANSPORT_MODE_EMOJIS.coach;
+    return TRANSPORT_MODE_EMOJIS.default;
   }
 
   const mode = detectMode();

@@ -22,6 +22,18 @@ Your departure board will now show live times for the next departures from your 
 
 Click the **station name** at the top of the screen to open your favorites list. This shows your recently viewed stations with their transport filters. Click any favorite to instantly switch to that station.
 
+Your favorites list stores up to 5 stations with all their settings (transport modes, text size, update interval). The most recently used station appears at the top.
+
+### Sharing Your Board
+
+Click the **📋 share** button (next to the theme toggle) to copy a shareable link to your clipboard. This link includes:
+- Your current station
+- Selected transport modes
+- Display settings (text size, update interval, number of departures)
+- Language preference
+
+When someone opens your link, the station is automatically added to their favorites with all your settings.
+
 ## Features
 
 ### Live Departures

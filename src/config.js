@@ -1,6 +1,6 @@
 // Version is defined here and in src/sw.js (service worker)
 // Both must be kept in sync - use scripts/bump-version.sh to update both
-export const VERSION = '1.25.3';
+export const VERSION = '1.27.1';
 
 export const DEFAULTS = {
   STATION_NAME: 'Jernbanetorget, Oslo',
@@ -20,6 +20,28 @@ export const ALL_TRANSPORT_MODES = ['bus','tram','metro','rail','water','coach']
 export const REALTIME_INDICATORS = {
   realtime: '●',    // Solid dot for live realtime data
   scheduled: '○'    // Hollow dot for scheduled/static data
+};
+
+// Transport mode emojis
+// Used to visually identify the type of transport in departures and UI
+export const TRANSPORT_MODE_EMOJIS = {
+  bus: '🚌',
+  tram: '🚋',
+  metro: '🚇',
+  rail: '🚅',
+  water: '🛳️',
+  coach: '🚍',
+  default: '🚆'  // Fallback for unknown transport types
+};
+
+// UI Button emojis
+export const UI_EMOJIS = {
+  settings: '⚙️',
+  share: '📋',
+  shareSuccess: '✓',
+  themeLight: '🌞',
+  themeAuto: '🌤️',
+  themeDark: '🌥️'
 };
 
 // Cancellation display wrapper
