@@ -11,5 +11,7 @@ import './ui.tick.test.mjs';
 import './station-dropdown.test.mjs';
 import './share-link.test.mjs';
 import './options-autocomplete.test.mjs';
+import './search-filtering.test.mjs';
 import './sw.test.mjs';
+import './sw-api-caching.test.mjs';
 console.log('All tests completed');

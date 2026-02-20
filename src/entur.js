@@ -498,7 +498,8 @@ function mapModesToGeocoderCategories(modes){
     scoredStops.sort((a, b) => b.score - a.score);
     
     // Map features into a lightweight candidate shape consumed by the UI
-    return scoredStops.slice(0, limit).map(({ feature: f }) => ({ id: f && f.properties && f.properties.id ? f.properties.id : null, title: f && f.properties && (f.properties.label || f.properties.name || f.properties.title) ? (f.properties.label || f.properties.name || f.properties.title) : (f && f.text ? f.text : ''), raw: f }));
+    const results = scoredStops.slice(0, limit).map(({ feature: f }) => ({ id: f && f.properties && f.properties.id ? f.properties.id : null, title: f && f.properties && (f.properties.label || f.properties.name || f.properties.title) ? (f.properties.label || f.properties.name || f.properties.title) : (f && f.text ? f.text : ''), raw: f }));
+    return results;
   }catch(e){
     return [];
   }

@@ -1,4 +1,4 @@
-const VERSION = '1.27.5';
+const VERSION = '1.29.1';
 const CACHE_NAME = `departures-v${VERSION}`;
 const ASSETS = [
   './',
@@ -65,9 +65,19 @@ self.addEventListener('fetch', (ev) => {
   }
 
   // For other requests (CSS, JS, etc), use cache-first from the current versioned cache only
+  // EXCEPTION: Don't cache API requests from external domains (like api.entur.io)
+  const url = new URL(req.url);
+  const isExternalAPI = url.hostname !== self.location.hostname;
+  
+  if (isExternalAPI) {
+    // Network-only for external API requests - don't cache them
+    ev.respondWith(fetch(req));
+    return;
+  }
+  
   ev.respondWith((async () => {
     const cache = await caches.open(CACHE_NAME);
-    // Try exact match first, then try ignoring query params
+    // Try exact match first, then try ignoring query params for local assets
     let cached = await cache.match(req);
     if (!cached) {
       cached = await cache.match(req, { ignoreSearch: true });
