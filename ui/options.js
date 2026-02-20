@@ -344,16 +344,20 @@ export function createOptionsPanel(defaults, onApply, onLanguageChange, onSave){
     }
   });
 
-  // Clear input on focus to allow fresh search
-  // This ensures mobile browsers don't have issues with selected text
+  // On focus: select text for easy editing, or clear if a station was previously selected
   inpStation.addEventListener('focus', () => {
-    // Clear the input value and stopId to start fresh
-    inpStation.value = '';
-    inpStation.dataset.stopId = '';
-    // Clear lastQuery so typing triggers new search
+    // If there's a stopId, it means user selected from autocomplete previously
+    // Clear it to force fresh search (fixes mobile select() issues)
+    if (inpStation.dataset.stopId) {
+      inpStation.value = '';
+      inpStation.dataset.stopId = '';
+      clearAutocomplete();
+    } else {
+      // No stopId means this is a default/typed value - just select it for editing
+      inpStation.select();
+    }
+    // Always clear lastQuery to allow re-searching
     lastQuery = '';
-    // Clear any stale autocomplete
-    clearAutocomplete();
   });
 
   inpNum.addEventListener('focus', () => {
