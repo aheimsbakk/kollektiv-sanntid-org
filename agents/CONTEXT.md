@@ -1,13 +1,13 @@
-Overall Context: Kollektiv.Sanntid.org - live-only app with reactive options panel and theme toggle. Version 1.16.3.
+Overall Context: Kollektiv.Sanntid.org - live-only app with reactive options panel and theme toggle. Version 1.16.4.
 
-Current Goal: Production ready - responsive, accessible UX with reliable service worker updates.
+Current Goal: Production ready - aggressive service worker update detection for reliable deployments.
 
 Last 3 Changes:
+- agents/worklogs/2026-02-20-11-08-force-sw-updates.md
 - agents/worklogs/2026-02-20-11-03-fix-sw-cache-updates.md
 - agents/worklogs/2026-02-20-10-59-fix-tooltip-placement.md
-- agents/worklogs/2026-02-20-10-53-improve-tooltips.md
 
 Next Steps:
-- Test service worker updates in browser
-- Verify tooltips appear correctly
+- Test PR preview updates with new SW cache settings
+- Verify version number updates in PR previews
 - Deploy to production
