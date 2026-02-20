@@ -1,4 +1,4 @@
-Overall Context: Kollektiv.Sanntid.org - live-only app with share button feature. Version 1.23.0.
+Overall Context: Kollektiv.Sanntid.org - live-only app with share button feature. Version 1.23.1.
 
 Current Goal: Share button feature complete and working correctly on fresh browsers.
 
