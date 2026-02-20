@@ -1,12 +1,12 @@
-Overall Context: Kollektiv.Sanntid.org - live-only app with i18n, share via ?b=, favorites by station+modes. Version 1.24.4.
+Overall Context: Kollektiv.Sanntid.org - Favorites store all settings (modes, departures, interval, size, lang) and preserve them on re-selection. Version 1.24.5.
 
-Current Goal: Favorites FIFO logic fixed with comprehensive test coverage.
+Current Goal: All favorites bugs fixed with 17 comprehensive unit tests.
 
 Last 3 Changes:
+- agents/worklogs/2026-02-20-16-41-preserve-favorite-settings.md
 - agents/worklogs/2026-02-20-16-28-fix-favorites-modes-matching.md
 - agents/worklogs/2026-02-20-16-18-fix-save-favorites-after-lang-change.md
-- agents/worklogs/2026-02-20-16-09-add-missing-translations.md
 
 Next Steps:
-- Test favorites save/update in browser
-- Verify station+modes matching works correctly
+- Test all favorites functionality in browser
+- Ready for production deployment

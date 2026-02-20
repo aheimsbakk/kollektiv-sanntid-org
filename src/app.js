@@ -114,12 +114,13 @@ async function init(){
       window.__APP_OPTIONS__.updateFields();
     }
     
-    // Move this station to top of recent list (with its modes and current settings)
+    // Move this station to top of recent list (preserve its stored settings)
+    // Use the station's own settings if available, otherwise use current DEFAULTS
     addRecentStation(station.name, station.stopId, station.modes || [], {
-      numDepartures: DEFAULTS.NUM_DEPARTURES,
-      fetchInterval: DEFAULTS.FETCH_INTERVAL,
-      textSize: DEFAULTS.TEXT_SIZE,
-      language: getLanguage()
+      numDepartures: station.numDepartures !== undefined ? station.numDepartures : DEFAULTS.NUM_DEPARTURES,
+      fetchInterval: station.fetchInterval !== undefined ? station.fetchInterval : DEFAULTS.FETCH_INTERVAL,
+      textSize: station.textSize || DEFAULTS.TEXT_SIZE,
+      language: station.language || getLanguage()
     });
     board.stationDropdown.refresh();
     
