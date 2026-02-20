@@ -138,7 +138,10 @@ async function init(){
   // automatically reloads when a new service worker is installed.
   if ('serviceWorker' in navigator) {
     try {
-      navigator.serviceWorker.register('./sw.js').then(reg => {
+      navigator.serviceWorker.register('./sw.js', {
+        // Always fetch sw.js from network to detect updates immediately
+        updateViaCache: 'none'
+      }).then(reg => {
         // helper to show a brief update notification and auto-reload
         const showUpdateNotification = async (worker) => {
           // avoid creating multiple prompts
@@ -218,6 +221,11 @@ async function init(){
           refreshing = true;
           window.location.reload();
         });
+        
+        // Periodically check for updates (every 60 seconds)
+        setInterval(() => {
+          reg.update().catch(()=>{});
+        }, 60000);
       }).catch(()=>{});
     } catch (e) { /* ignore */ }
   }
