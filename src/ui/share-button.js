@@ -1,5 +1,6 @@
 // Share button component for sharing departure board configuration via URL
 import { t } from '../i18n.js';
+import { UI_EMOJIS } from '../config.js';
 
 /**
  * Encode settings to compact base64 URL parameter
@@ -133,7 +134,7 @@ export function createShareButton(getSettings) {
   button.className = 'header-button share-button';
   button.setAttribute('aria-label', t('shareBoard'));
   button.title = t('shareBoard');
-  button.textContent = '🔗';
+  button.textContent = UI_EMOJIS.share;
   
   // URL display box (fallback if clipboard fails)
   const urlBox = document.createElement('div');
@@ -203,7 +204,7 @@ export function createShareButton(getSettings) {
     
     // Show brief success indicator
     const originalText = button.textContent;
-    button.textContent = '✓';
+    button.textContent = UI_EMOJIS.shareSuccess;
     setTimeout(() => {
       button.textContent = originalText;
     }, 2000);

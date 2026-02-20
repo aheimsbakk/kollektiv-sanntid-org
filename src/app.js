@@ -1,4 +1,4 @@
-import { DEFAULTS, VERSION } from './config.js';
+import { DEFAULTS, VERSION, UI_EMOJIS } from './config.js';
 import { formatCountdown, isoToEpochMs } from './time.js';
 import { createBoardElements, clearList, findKey, updateFooterTranslations } from './ui/ui.js';
 import { createHeaderToggle } from './ui/header.js';
@@ -459,7 +459,7 @@ async function init(){
   gWrap.appendChild(themeBtn);
   
   // settings gear button
-  const gBtn = document.createElement('button'); gBtn.className='gear-btn'; gBtn.type='button'; gBtn.textContent='⚙️'; gBtn.title=t('settingsTooltip');
+  const gBtn = document.createElement('button'); gBtn.className='gear-btn'; gBtn.type='button'; gBtn.textContent=UI_EMOJIS.settings; gBtn.title=t('settingsTooltip');
   gBtn.addEventListener('click', ()=> {
     if (opts && typeof opts.open === 'function' && typeof opts.close === 'function'){
       // toggle based on presence of body class

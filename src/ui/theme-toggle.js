@@ -4,13 +4,14 @@
  */
 
 import { t } from '../i18n.js';
+import { UI_EMOJIS } from '../config.js';
 
 const THEME_KEY = 'kollektiv-theme';
 const THEMES = ['light', 'auto', 'dark'];
 const ICONS = {
-  light: '🌞',
-  auto: '🌤️',
-  dark: '🌥️'
+  light: UI_EMOJIS.themeLight,
+  auto: UI_EMOJIS.themeAuto,
+  dark: UI_EMOJIS.themeDark
 };
 
 /**

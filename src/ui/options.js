@@ -1,7 +1,7 @@
 // Options panel UI: slide-in from right with controls to update DEFAULTS
 import { searchStations } from '../entur.js';
 import { t, setLanguage, getLanguage, getLanguages } from '../i18n.js';
-import { ALL_TRANSPORT_MODES } from '../config.js';
+import { ALL_TRANSPORT_MODES, TRANSPORT_MODE_EMOJIS } from '../config.js';
 
 export function createOptionsPanel(defaults, onApply, onLanguageChange, onSave){
   const panel = document.createElement('aside'); panel.className = 'options-panel';
@@ -71,15 +71,15 @@ export function createOptionsPanel(defaults, onApply, onLanguageChange, onSave){
   
   // helper to map mode -> emoji used in the UI
   const emojiForMode = (mode) => {
-    if(!mode) return '🚆';
+    if(!mode) return TRANSPORT_MODE_EMOJIS.default;
     const m = String(mode).toLowerCase();
-    if(m.includes('bus')) return '🚌';
-    if(m.includes('tram') || m.includes('trikk')) return '🚋';
-    if(m.includes('metro') || m.includes('t-bane') || m.includes('tbane')) return '🚇';
-    if(m.includes('rail') || m.includes('train') || m.includes('tog')) return '🚅';
-    if(m.includes('water') || m.includes('ferry') || m.includes('ferje') || m.includes('boat')) return '🛳️';
-    if(m.includes('coach')) return '🚍';
-    return '🚆';
+    if(m.includes('bus')) return TRANSPORT_MODE_EMOJIS.bus;
+    if(m.includes('tram') || m.includes('trikk')) return TRANSPORT_MODE_EMOJIS.tram;
+    if(m.includes('metro') || m.includes('t-bane') || m.includes('tbane')) return TRANSPORT_MODE_EMOJIS.metro;
+    if(m.includes('rail') || m.includes('train') || m.includes('tog')) return TRANSPORT_MODE_EMOJIS.rail;
+    if(m.includes('water') || m.includes('ferry') || m.includes('ferje') || m.includes('boat')) return TRANSPORT_MODE_EMOJIS.water;
+    if(m.includes('coach')) return TRANSPORT_MODE_EMOJIS.coach;
+    return TRANSPORT_MODE_EMOJIS.default;
   };
 
   POSSIBLE.forEach(row => {
