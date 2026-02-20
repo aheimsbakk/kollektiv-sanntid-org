@@ -18,6 +18,16 @@ initTheme();
 
 const ROOT = document.getElementById('app');
 
+// Update tooltips on global buttons when language changes
+function updateGlobalButtonTooltips() {
+  if (window.__GLOBAL_BUTTONS__) {
+    window.__GLOBAL_BUTTONS__.share.title = t('shareBoard');
+    window.__GLOBAL_BUTTONS__.share.setAttribute('aria-label', t('shareBoard'));
+    window.__GLOBAL_BUTTONS__.theme.title = t('themeTooltip');
+    window.__GLOBAL_BUTTONS__.settings.title = t('settingsTooltip');
+  }
+}
+
 function renderDepartures(listEl, items){
   clearList(listEl);
   if (!items || items.length === 0){
@@ -301,12 +311,7 @@ async function init(){
         opts._onApply = arguments[0];
         
         // Update tooltips on global buttons
-        if (window.__GLOBAL_BUTTONS__) {
-          window.__GLOBAL_BUTTONS__.share.title = t('shareBoard');
-          window.__GLOBAL_BUTTONS__.share.setAttribute('aria-label', t('shareBoard'));
-          window.__GLOBAL_BUTTONS__.theme.title = t('themeTooltip');
-          window.__GLOBAL_BUTTONS__.settings.title = t('settingsTooltip');
-        }
+        updateGlobalButtonTooltips();
         
         // Reopen the panel
         setTimeout(() => opts.open(), 50);
@@ -337,7 +342,10 @@ async function init(){
     try{ document.documentElement.classList.remove('text-size-tiny','text-size-small','text-size-medium','text-size-large','text-size-xlarge');
       document.documentElement.classList.add('text-size-'+(newOpts.TEXT_SIZE || 'large'));
     }catch(e){}
-  }, () => updateFooterTranslations(board.footer), ()=>{
+  }, () => {
+    updateFooterTranslations(board.footer);
+    updateGlobalButtonTooltips();
+  }, ()=>{
     // onSave callback - only adds to favorites, doesn't apply changes
     if (DEFAULTS.STATION_NAME && DEFAULTS.STOP_ID) {
       addRecentStation(DEFAULTS.STATION_NAME, DEFAULTS.STOP_ID, DEFAULTS.TRANSPORT_MODES, {
