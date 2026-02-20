@@ -405,7 +405,7 @@ button:active {
   opacity: 0.85;
   /* Center vertically on the text line */
   vertical-align: baseline;
-  transform: translateY(-30%);
+  transform: translateY(-50%);
 }
 
 .departure-time {
