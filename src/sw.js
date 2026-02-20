@@ -1,4 +1,4 @@
-const VERSION = '1.16.2';
+const VERSION = '1.16.3';
 const CACHE_NAME = `departures-v${VERSION}`;
 const ASSETS = [
   './',
@@ -65,7 +65,11 @@ self.addEventListener('fetch', (ev) => {
   // For other requests (CSS, JS, etc), use cache-first from the current versioned cache only
   ev.respondWith((async () => {
     const cache = await caches.open(CACHE_NAME);
-    const cached = await cache.match(req);
+    // Try exact match first, then try ignoring query params
+    let cached = await cache.match(req);
+    if (!cached) {
+      cached = await cache.match(req, { ignoreSearch: true });
+    }
     if (cached) return cached;
     
     try {

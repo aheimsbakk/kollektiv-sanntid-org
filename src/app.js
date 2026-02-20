@@ -216,7 +216,8 @@ async function init(){
         navigator.serviceWorker.addEventListener('controllerchange', () => {
           if (refreshing) return;
           refreshing = true;
-          window.location.reload();
+          // Force a hard reload by adding a timestamp to bypass any caches
+          window.location.href = window.location.href.split('?')[0] + '?t=' + Date.now();
         });
       }).catch(()=>{});
     } catch (e) { /* ignore */ }
