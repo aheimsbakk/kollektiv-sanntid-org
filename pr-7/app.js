@@ -139,11 +139,8 @@ async function init(){
   if ('serviceWorker' in navigator) {
     try {
       navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' }).then(reg => {
-        // Check for updates immediately and then every 60 seconds
+        // Check for updates immediately on load (user controls update via reload)
         reg.update();
-        setInterval(() => {
-          reg.update();
-        }, 60000);
         
         // helper to show a brief update notification and auto-reload
         const showUpdateNotification = async (worker) => {
