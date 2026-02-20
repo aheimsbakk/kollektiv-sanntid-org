@@ -10,7 +10,7 @@ const translations = {
     textSize: 'Text size',
     transportModes: 'Transport modes (filter)',
     switchLanguage: 'Switch language',
-    save: 'Save',
+    save: 'Save to Favorites',
     close: 'Close',
     
     // Text sizes
@@ -60,7 +60,7 @@ const translations = {
     transportModes: 'Transportmidler (filter)',
     switchLanguage: 'Bytt språk',
     apply: 'Bruk',
-    save: 'Lagre',
+    save: 'Lagre i favoritter',
     close: 'Lukk',
     
     // Text sizes
@@ -110,7 +110,7 @@ const translations = {
     transportModes: 'Verkehrsmittel (Filter)',
     switchLanguage: 'Sprache wechseln',
     apply: 'Anwenden',
-    save: 'Speichern',
+    save: 'In Favoriten speichern',
     close: 'Schließen',
     
     // Text sizes
@@ -160,7 +160,7 @@ const translations = {
     transportModes: 'Modos de transporte (filtro)',
     switchLanguage: 'Cambiar idioma',
     apply: 'Aplicar',
-    save: 'Guardar',
+    save: 'Guardar en favoritos',
     close: 'Cerrar',
     
     // Text sizes
@@ -210,7 +210,7 @@ const translations = {
     transportModes: 'Mezzi di trasporto (filtro)',
     switchLanguage: 'Cambia lingua',
     apply: 'Applica',
-    save: 'Salva',
+    save: 'Salva nei preferiti',
     close: 'Chiudi',
     
     // Text sizes
@@ -260,7 +260,7 @@ const translations = {
     transportModes: 'Μέσα μεταφοράς (φίλτρο)',
     switchLanguage: 'Αλλαγή γλώσσας',
     apply: 'Εφαρμογή',
-    save: 'Αποθήκευση',
+    save: 'Αποθήκευση στα αγαπημένα',
     close: 'Κλείσιμο',
     
     // Text sizes
@@ -310,7 +310,7 @@ const translations = {
     transportModes: 'وسایل نقلیه (فیلتر)',
     switchLanguage: 'تغییر زبان',
     apply: 'اعمال',
-    save: 'ذخیره',
+    save: 'ذخیره در علاقه‌مندی‌ها',
     close: 'بستن',
     
     // Text sizes
@@ -360,7 +360,7 @@ const translations = {
     transportModes: 'परिवहन साधन (फ़िल्टर)',
     switchLanguage: 'भाषा बदलें',
     apply: 'लागू करें',
-    save: 'सहेजें',
+    save: 'पसंदीदा में सहेजें',
     close: 'बंद करें',
     
     // Text sizes
@@ -410,7 +410,7 @@ const translations = {
     transportModes: 'Samgöngumátar (sía)',
     switchLanguage: 'Skipta um tungumál',
     apply: 'Nota',
-    save: 'Vista',
+    save: 'Vista í eftirlæti',
     close: 'Loka',
     
     // Text sizes
@@ -460,7 +460,7 @@ const translations = {
     transportModes: 'Транспортні засоби (фільтр)',
     switchLanguage: 'Змінити мову',
     apply: 'Застосувати',
-    save: 'Зберегти',
+    save: 'Зберегти в обране',
     close: 'Закрити',
     
     // Text sizes
@@ -510,7 +510,7 @@ const translations = {
     transportModes: 'Modes de transport (filtre)',
     switchLanguage: 'Changer de langue',
     apply: 'Appliquer',
-    save: 'Enregistrer',
+    save: 'Enregistrer dans les favoris',
     close: 'Fermer',
     
     // Text sizes
@@ -560,7 +560,7 @@ const translations = {
     transportModes: 'Środki transportu (filtr)',
     switchLanguage: 'Zmień język',
     apply: 'Zastosuj',
-    save: 'Zapisz',
+    save: 'Zapisz w ulubionych',
     close: 'Zamknij',
     
     // Text sizes
