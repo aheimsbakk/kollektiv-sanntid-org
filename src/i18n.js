@@ -13,6 +13,11 @@ const translations = {
     save: 'Save to Favorites',
     close: 'Close',
     
+    // Tooltips
+    stationNameTooltip: 'Click to show your saved favorites',
+    settingsTooltip: 'Open settings panel',
+    themeTooltip: 'Change theme',
+    
     // Text sizes
     tiny: 'Tiny',
     small: 'Small',
@@ -62,6 +67,11 @@ const translations = {
     apply: 'Bruk',
     save: 'Lagre i favoritter',
     close: 'Lukk',
+    
+    // Tooltips
+    stationNameTooltip: 'Klikk for å vise dine lagrede favoritter',
+    settingsTooltip: 'Åpne innstillinger',
+    themeTooltip: 'Bytt tema',
     
     // Text sizes
     tiny: 'Veldig liten',
@@ -113,6 +123,11 @@ const translations = {
     save: 'In Favoriten speichern',
     close: 'Schließen',
     
+    // Tooltips
+    stationNameTooltip: 'Klicken, um Ihre gespeicherten Favoriten anzuzeigen',
+    settingsTooltip: 'Einstellungen öffnen',
+    themeTooltip: 'Thema ändern',
+    
     // Text sizes
     tiny: 'Sehr klein',
     small: 'Klein',
@@ -162,6 +177,11 @@ const translations = {
     apply: 'Aplicar',
     save: 'Guardar en favoritos',
     close: 'Cerrar',
+    
+    // Tooltips
+    stationNameTooltip: 'Haz clic para ver tus favoritos guardados',
+    settingsTooltip: 'Abrir panel de configuración',
+    themeTooltip: 'Cambiar tema',
     
     // Text sizes
     tiny: 'Muy pequeño',
@@ -213,6 +233,11 @@ const translations = {
     save: 'Salva nei preferiti',
     close: 'Chiudi',
     
+    // Tooltips
+    stationNameTooltip: 'Clicca per mostrare i tuoi preferiti salvati',
+    settingsTooltip: 'Apri pannello impostazioni',
+    themeTooltip: 'Cambia tema',
+    
     // Text sizes
     tiny: 'Piccolissimo',
     small: 'Piccolo',
@@ -262,6 +287,11 @@ const translations = {
     apply: 'Εφαρμογή',
     save: 'Αποθήκευση στα αγαπημένα',
     close: 'Κλείσιμο',
+    
+    // Tooltips
+    stationNameTooltip: 'Κάντε κλικ για να δείτε τα αποθηκευμένα αγαπημένα σας',
+    settingsTooltip: 'Άνοιγμα πίνακα ρυθμίσεων',
+    themeTooltip: 'Αλλαγή θέματος',
     
     // Text sizes
     tiny: 'Πολύ μικρό',
@@ -313,6 +343,11 @@ const translations = {
     save: 'ذخیره در علاقه‌مندی‌ها',
     close: 'بستن',
     
+    // Tooltips
+    stationNameTooltip: 'برای نمایش علاقه‌مندی‌های ذخیره شده کلیک کنید',
+    settingsTooltip: 'باز کردن پنل تنظیمات',
+    themeTooltip: 'تغییر تم',
+    
     // Text sizes
     tiny: 'خیلی کوچک',
     small: 'کوچک',
@@ -362,6 +397,11 @@ const translations = {
     apply: 'लागू करें',
     save: 'पसंदीदा में सहेजें',
     close: 'बंद करें',
+    
+    // Tooltips
+    stationNameTooltip: 'अपने सहेजे गए पसंदीदा दिखाने के लिए क्लिक करें',
+    settingsTooltip: 'सेटिंग पैनल खोलें',
+    themeTooltip: 'थीम बदलें',
     
     // Text sizes
     tiny: 'बहुत छोटा',
@@ -413,6 +453,11 @@ const translations = {
     save: 'Vista í eftirlæti',
     close: 'Loka',
     
+    // Tooltips
+    stationNameTooltip: 'Smelltu til að sýna vistaða eftirlæti',
+    settingsTooltip: 'Opna stillingar',
+    themeTooltip: 'Breyta þema',
+    
     // Text sizes
     tiny: 'Örsmátt',
     small: 'Lítið',
@@ -462,6 +507,11 @@ const translations = {
     apply: 'Застосувати',
     save: 'Зберегти в обране',
     close: 'Закрити',
+    
+    // Tooltips
+    stationNameTooltip: 'Натисніть, щоб показати збережене обране',
+    settingsTooltip: 'Відкрити панель налаштувань',
+    themeTooltip: 'Змінити тему',
     
     // Text sizes
     tiny: 'Дуже малий',
@@ -513,6 +563,11 @@ const translations = {
     save: 'Enregistrer dans les favoris',
     close: 'Fermer',
     
+    // Tooltips
+    stationNameTooltip: 'Cliquez pour afficher vos favoris enregistrés',
+    settingsTooltip: 'Ouvrir le panneau des paramètres',
+    themeTooltip: 'Changer de thème',
+    
     // Text sizes
     tiny: 'Très petit',
     small: 'Petit',
@@ -562,6 +617,11 @@ const translations = {
     apply: 'Zastosuj',
     save: 'Zapisz w ulubionych',
     close: 'Zamknij',
+    
+    // Tooltips
+    stationNameTooltip: 'Kliknij, aby wyświetlić zapisane ulubione',
+    settingsTooltip: 'Otwórz panel ustawień',
+    themeTooltip: 'Zmień motyw',
     
     // Text sizes
     tiny: 'Bardzo mały',

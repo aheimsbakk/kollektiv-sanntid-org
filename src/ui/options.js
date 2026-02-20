@@ -12,7 +12,7 @@ export function createOptionsPanel(defaults, onApply, onLanguageChange, onSave){
   // station name
   const rowStation = document.createElement('div'); rowStation.className='options-row';
   const lblStation = document.createElement('label'); lblStation.textContent = t('stationName');
-  const inpStation = document.createElement('input'); inpStation.type='text'; inpStation.autocomplete='off'; inpStation.setAttribute('aria-autocomplete','list'); inpStation.value = defaults.STATION_NAME || '';
+  const inpStation = document.createElement('input'); inpStation.type='text'; inpStation.autocomplete='off'; inpStation.setAttribute('aria-autocomplete','list'); inpStation.value = defaults.STATION_NAME || ''; inpStation.title = t('stationNameTooltip');
   rowStation.append(lblStation, inpStation);
 
   // Autocomplete wrapper & list (visual rules moved to CSS)

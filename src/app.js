@@ -138,10 +138,7 @@ async function init(){
   // automatically reloads when a new service worker is installed.
   if ('serviceWorker' in navigator) {
     try {
-      navigator.serviceWorker.register('./sw.js', {
-        // Always fetch sw.js from network to detect updates immediately
-        updateViaCache: 'none'
-      }).then(reg => {
+      navigator.serviceWorker.register('./sw.js').then(reg => {
         // helper to show a brief update notification and auto-reload
         const showUpdateNotification = async (worker) => {
           // avoid creating multiple prompts
@@ -221,11 +218,6 @@ async function init(){
           refreshing = true;
           window.location.reload();
         });
-        
-        // Periodically check for updates (every 60 seconds)
-        setInterval(() => {
-          reg.update().catch(()=>{});
-        }, 60000);
       }).catch(()=>{});
     } catch (e) { /* ignore */ }
   }
@@ -351,7 +343,7 @@ async function init(){
   gWrap.appendChild(themeBtn);
   
   // settings gear button
-  const gBtn = document.createElement('button'); gBtn.className='gear-btn'; gBtn.type='button'; gBtn.textContent='⚙️'; gBtn.title='Settings';
+  const gBtn = document.createElement('button'); gBtn.className='gear-btn'; gBtn.type='button'; gBtn.textContent='⚙️'; gBtn.title=t('settingsTooltip');
   gBtn.addEventListener('click', ()=> {
     if (opts && typeof opts.open === 'function' && typeof opts.close === 'function'){
       // toggle based on presence of body class
