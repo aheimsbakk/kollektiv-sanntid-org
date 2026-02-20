@@ -3,6 +3,8 @@
  * Manages light/auto/dark theme switching
  */
 
+import { t } from '../i18n.js';
+
 const THEME_KEY = 'kollektiv-theme';
 const THEMES = ['light', 'auto', 'dark'];
 const ICONS = {
@@ -64,14 +66,14 @@ export function createThemeToggle() {
   const button = document.createElement('button');
   button.className = 'theme-toggle-btn';
   button.type = 'button';
-  button.title = 'Toggle theme';
+  button.title = t('themeTooltip');
   
   let currentTheme = getTheme();
   
   // Update button icon based on current theme
   function updateButton() {
     button.textContent = ICONS[currentTheme];
-    button.title = `Theme: ${currentTheme} (click to change)`;
+    button.title = t('themeTooltip');
   }
   
   // Initialize

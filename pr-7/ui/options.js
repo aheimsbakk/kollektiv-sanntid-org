@@ -4,6 +4,8 @@ import { t, setLanguage, getLanguage, getLanguages } from '../i18n.js';
 
 export function createOptionsPanel(defaults, onApply, onLanguageChange, onSave){
   const panel = document.createElement('aside'); panel.className = 'options-panel';
+  // Start with inert to remove from tab order when closed
+  panel.setAttribute('inert', '');
   const title = document.createElement('h3'); title.textContent = 'Kollektiv.Sanntid.org';
   panel.appendChild(title);
 
@@ -534,6 +536,8 @@ export function createOptionsPanel(defaults, onApply, onLanguageChange, onSave){
   const origOpen = open;
   open = function(){
     document.body.classList.add('options-open');
+    // Remove inert to make panel focusable
+    panel.removeAttribute('inert');
     // focus management: save previously focused element and then focus first focusable in panel
     open._prevFocus = document.activeElement;
     
@@ -552,6 +556,8 @@ export function createOptionsPanel(defaults, onApply, onLanguageChange, onSave){
   const origClose = close;
   close = function(){
     document.body.classList.remove('options-open');
+    // Make panel inert when closed to remove from tab order
+    panel.setAttribute('inert', '');
     origClose();
     // restore focus
     try{ if(open._prevFocus && typeof open._prevFocus.focus === 'function') open._prevFocus.focus(); }catch(e){}

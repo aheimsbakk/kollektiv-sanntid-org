@@ -123,6 +123,7 @@ export function createStationDropdown(currentStationName, onStationSelect) {
   titleBtn.className = 'station-title';
   titleBtn.setAttribute('aria-haspopup', 'true');
   titleBtn.setAttribute('aria-expanded', 'false');
+  titleBtn.title = t('stationNameTooltip');
   titleBtn.textContent = currentStationName || t('noStationSelected');
   
   // Dropdown arrow indicator

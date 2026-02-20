@@ -216,7 +216,8 @@ async function init(){
         navigator.serviceWorker.addEventListener('controllerchange', () => {
           if (refreshing) return;
           refreshing = true;
-          window.location.reload();
+          // Force a hard reload by adding a timestamp to bypass any caches
+          window.location.href = window.location.href.split('?')[0] + '?t=' + Date.now();
         });
       }).catch(()=>{});
     } catch (e) { /* ignore */ }
@@ -343,7 +344,7 @@ async function init(){
   gWrap.appendChild(themeBtn);
   
   // settings gear button
-  const gBtn = document.createElement('button'); gBtn.className='gear-btn'; gBtn.type='button'; gBtn.textContent='⚙️'; gBtn.title='Settings';
+  const gBtn = document.createElement('button'); gBtn.className='gear-btn'; gBtn.type='button'; gBtn.textContent='⚙️'; gBtn.title=t('settingsTooltip');
   gBtn.addEventListener('click', ()=> {
     if (opts && typeof opts.open === 'function' && typeof opts.close === 'function'){
       // toggle based on presence of body class
