@@ -95,8 +95,8 @@ async function init(){
           localStorage.setItem('departure:settings', JSON.stringify(DEFAULTS));
         } catch(e) {/*ignore*/}
         
-        // Don't clean the URL - keep the share parameter visible
-        // This allows users to see the full shareable link in their browser
+        // Clear the URL parameter to prevent accidental re-imports
+        window.history.replaceState({}, '', window.location.pathname);
       }
     }
   } catch(e) {
