@@ -242,7 +242,7 @@ async function init(){
           // Show countdown timer with version upgrade info
           let countdown = 5;
           const updateCountdown = () => {
-            toast.innerHTML = `<div>${t('newVersionAvailable')}</div><div>${t('upgradingFrom')} ${VERSION} to ${newVersion}</div><div>${t('updatingIn')} ${countdown}${t('seconds')}</div>`;
+            toast.innerHTML = `<div>${t('newVersionAvailable')}</div><div>${t('upgradingFrom')} ${VERSION} ${t('to')} ${newVersion}</div><div>${t('updatingIn')} ${countdown}${t('seconds')}</div>`;
           };
           updateCountdown();
           
