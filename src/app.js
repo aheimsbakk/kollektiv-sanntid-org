@@ -332,6 +332,7 @@ async function init(){
       DEFAULTS.NUM_DEPARTURES = newOpts.NUM_DEPARTURES;
       DEFAULTS.FETCH_INTERVAL = newOpts.FETCH_INTERVAL;
       DEFAULTS.TRANSPORT_MODES = newOpts.TRANSPORT_MODES;
+      DEFAULTS.TEXT_SIZE = newOpts.TEXT_SIZE;
       // update station dropdown title
       if (board.stationDropdown) {
         board.stationDropdown.updateTitle(DEFAULTS.STATION_NAME, DEFAULTS.TRANSPORT_MODES);
@@ -375,6 +376,7 @@ async function init(){
     DEFAULTS.NUM_DEPARTURES = newOpts.NUM_DEPARTURES;
     DEFAULTS.FETCH_INTERVAL = newOpts.FETCH_INTERVAL;
     DEFAULTS.TRANSPORT_MODES = newOpts.TRANSPORT_MODES;
+    DEFAULTS.TEXT_SIZE = newOpts.TEXT_SIZE;
     // update station dropdown title
     if (board.stationDropdown) {
       board.stationDropdown.updateTitle(DEFAULTS.STATION_NAME, DEFAULTS.TRANSPORT_MODES);

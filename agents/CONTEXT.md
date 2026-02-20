@@ -1,12 +1,12 @@
-Overall Context: Kollektiv.Sanntid.org - Share links now auto-add to favorites. Complete test coverage for share+favorites. Version 1.25.0.
+Overall Context: Kollektiv.Sanntid.org - Fixed all i18n, favorites, share, and options panel bugs. Version 1.25.1.
 
-Current Goal: Share link import adds stations to favorites automatically with full settings.
+Current Goal: Commit text size fix, run tests, verify all features work in browser.
 
 Last 3 Changes:
+- agents/worklogs/2026-02-20-16-56-fix-text-size-persistence.md
 - agents/worklogs/2026-02-20-16-50-add-shared-to-favorites.md
 - agents/worklogs/2026-02-20-16-41-preserve-favorite-settings.md
-- agents/worklogs/2026-02-20-16-28-fix-favorites-modes-matching.md
 
 Next Steps:
-- Test share link import and favorites in browser
-- Verify shared stations appear at top of favorites list
+- Commit v1.25.1 with worklog
+- Run full test suite to verify no regressions
