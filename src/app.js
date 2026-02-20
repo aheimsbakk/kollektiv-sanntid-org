@@ -80,8 +80,15 @@ async function init(){
           } catch(e) {/*ignore*/}
         }
         
-        // Don't automatically add shared boards to favorites
-        // User can manually save if they want to keep it
+        // Add shared board to top of favorites list
+        if (sharedSettings.stationName && sharedSettings.stopId) {
+          addRecentStation(sharedSettings.stationName, sharedSettings.stopId, sharedSettings.transportModes || [], {
+            numDepartures: sharedSettings.numDepartures,
+            fetchInterval: sharedSettings.fetchInterval,
+            textSize: sharedSettings.textSize,
+            language: sharedSettings.language
+          });
+        }
         
         // Save shared settings to localStorage so they persist after URL is cleaned
         try {

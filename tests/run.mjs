@@ -9,5 +9,6 @@ import './entur.lookup.test.mjs';
 import './entur.empty.test.mjs';
 import './ui.tick.test.mjs';
 import './station-dropdown.test.mjs';
+import './share-link.test.mjs';
 import './sw.test.mjs';
 console.log('All tests completed');
