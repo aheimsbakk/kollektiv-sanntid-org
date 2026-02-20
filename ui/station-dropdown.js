@@ -4,8 +4,57 @@ const STORAGE_KEY = 'recent-stations';
 const MAX_RECENT = 5;
 
 /**
+ * Mode order matches the options panel table (left to right, top to bottom):
+ * Row 1: bus, metro
+ * Row 2: tram, rail
+ * Row 3: water, coach
+ */
+const MODE_ORDER = ['bus', 'metro', 'tram', 'rail', 'water', 'coach'];
+
+/**
+ * Get emoji icon for a transport mode
+ * @param {string} mode 
+ * @returns {string}
+ */
+function getModeIcon(mode) {
+  if (!mode) return '🚆';
+  const m = String(mode).toLowerCase();
+  if (m === 'bus') return '🚌';
+  if (m === 'tram') return '🚋';
+  if (m === 'metro') return '🚇';
+  if (m === 'rail') return '🚅';
+  if (m === 'water') return '🛳️';
+  if (m === 'coach') return '🚍';
+  return '🚆';
+}
+
+/**
+ * Get mode icons in consistent order (as they appear in options panel)
+ * Returns empty string if all modes are selected (default state)
+ * @param {Array<string>} modes 
+ * @returns {string} Space-separated emoji string
+ */
+function getModesDisplay(modes) {
+  if (!modes || modes.length === 0) return '';
+  
+  // If all modes are selected, don't show any icons (default state)
+  if (modes.length === MODE_ORDER.length) {
+    const allSelected = MODE_ORDER.every(mode => modes.includes(mode));
+    if (allSelected) return '';
+  }
+  
+  // Sort by MODE_ORDER
+  const sorted = modes.slice().sort((a, b) => {
+    const idxA = MODE_ORDER.indexOf(a);
+    const idxB = MODE_ORDER.indexOf(b);
+    return (idxA === -1 ? 999 : idxA) - (idxB === -1 ? 999 : idxB);
+  });
+  return sorted.map(getModeIcon).join('');
+}
+
+/**
  * Get recent stations from localStorage
- * @returns {Array<{name: string, stopId: string}>}
+ * @returns {Array<{name: string, stopId: string, modes?: Array<string>}>}
  */
 export function getRecentStations() {
   try {
@@ -18,20 +67,34 @@ export function getRecentStations() {
 }
 
 /**
+ * Helper to compare mode arrays (order-independent)
+ * @param {Array<string>} modes1 
+ * @param {Array<string>} modes2 
+ * @returns {boolean}
+ */
+function modesEqual(modes1, modes2) {
+  const m1 = (modes1 || []).slice().sort();
+  const m2 = (modes2 || []).slice().sort();
+  return JSON.stringify(m1) === JSON.stringify(m2);
+}
+
+/**
  * Add or update a station in recent list (moves to top)
+ * Each unique combination of station + modes is a separate entry
  * @param {string} name - Station name
  * @param {string} stopId - Station stop ID
+ * @param {Array<string>} modes - Transport modes (e.g., ['bus', 'tram'])
  */
-export function addRecentStation(name, stopId) {
+export function addRecentStation(name, stopId, modes = []) {
   if (!name || !stopId) return;
   
   let recent = getRecentStations();
   
-  // Remove if already exists
-  recent = recent.filter(s => s.stopId !== stopId);
+  // Remove exact duplicate (same stopId AND same modes)
+  recent = recent.filter(s => !(s.stopId === stopId && modesEqual(s.modes, modes)));
   
   // Add to top
-  recent.unshift({ name, stopId });
+  recent.unshift({ name, stopId, modes: modes || [] });
   
   // Keep only MAX_RECENT
   if (recent.length > MAX_RECENT) {
@@ -60,6 +123,7 @@ export function createStationDropdown(currentStationName, onStationSelect) {
   titleBtn.className = 'station-title';
   titleBtn.setAttribute('aria-haspopup', 'true');
   titleBtn.setAttribute('aria-expanded', 'false');
+  titleBtn.title = t('stationNameTooltip');
   titleBtn.textContent = currentStationName || t('noStationSelected');
   
   // Dropdown arrow indicator
@@ -93,9 +157,23 @@ export function createStationDropdown(currentStationName, onStationSelect) {
       const item = document.createElement('button');
       item.className = 'station-dropdown-item';
       item.setAttribute('role', 'option');
-      item.textContent = station.name;
+      
+      // Station name
+      const nameSpan = document.createElement('span');
+      nameSpan.textContent = station.name;
+      item.appendChild(nameSpan);
+      
+      // Mode icons inline after name
+      if (station.modes && station.modes.length > 0) {
+        const modesSpan = document.createElement('span');
+        modesSpan.className = 'station-modes';
+        modesSpan.textContent = ' ' + getModesDisplay(station.modes);
+        item.appendChild(modesSpan);
+      }
+      
       item.dataset.stopId = station.stopId;
       item.dataset.name = station.name;
+      item.dataset.modes = JSON.stringify(station.modes || []);
       item.dataset.index = index;
       
       item.addEventListener('click', (e) => {
@@ -177,7 +255,8 @@ export function createStationDropdown(currentStationName, onStationSelect) {
         if (selectedIndex >= 0 && items[selectedIndex]) {
           const station = {
             name: items[selectedIndex].dataset.name,
-            stopId: items[selectedIndex].dataset.stopId
+            stopId: items[selectedIndex].dataset.stopId,
+            modes: JSON.parse(items[selectedIndex].dataset.modes || '[]')
           };
           selectStation(station);
         }
@@ -202,10 +281,17 @@ export function createStationDropdown(currentStationName, onStationSelect) {
     });
   }
   
-  // Update station title
-  function updateTitle(name) {
+  // Update station title with optional transport mode icons
+  function updateTitle(name, modes = []) {
     const arrowText = arrow.textContent;
     titleBtn.textContent = name || t('noStationSelected');
+    
+    // Add mode icons if there's a filter (not all modes selected)
+    const modesDisplay = getModesDisplay(modes);
+    if (modesDisplay) {
+      titleBtn.textContent += ' ' + modesDisplay;
+    }
+    
     arrow.textContent = arrowText;
     titleBtn.appendChild(arrow);
   }

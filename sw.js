@@ -1,4 +1,4 @@
-const VERSION = '1.11.0';
+const VERSION = '1.16.5';
 const CACHE_NAME = `departures-v${VERSION}`;
 const ASSETS = [
   './',
@@ -6,7 +6,6 @@ const ASSETS = [
   './style.css',
   './app.js',
   './config.js',
-  './data-loader.js',
   './entur.js',
   './i18n.js',
   './time.js',
@@ -15,8 +14,8 @@ const ASSETS = [
   './ui/header.js',
   './ui/options.js',
   './ui/station-dropdown.js',
-  './manifest.webmanifest',
-  './demo.json'
+  './ui/theme-toggle.js',
+  './manifest.webmanifest'
 ];
 
 // Install: cache core assets. Do NOT call skipWaiting here so we can
@@ -66,7 +65,11 @@ self.addEventListener('fetch', (ev) => {
   // For other requests (CSS, JS, etc), use cache-first from the current versioned cache only
   ev.respondWith((async () => {
     const cache = await caches.open(CACHE_NAME);
-    const cached = await cache.match(req);
+    // Try exact match first, then try ignoring query params
+    let cached = await cache.match(req);
+    if (!cached) {
+      cached = await cache.match(req, { ignoreSearch: true });
+    }
     if (cached) return cached;
     
     try {
