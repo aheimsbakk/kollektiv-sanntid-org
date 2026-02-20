@@ -78,6 +78,11 @@ async function init(){
           language: sharedSettings.language
         });
         
+        // Save shared settings to localStorage so they persist after URL is cleaned
+        try {
+          localStorage.setItem('departure:settings', JSON.stringify(DEFAULTS));
+        } catch(e) {/*ignore*/}
+        
         // Clean URL by removing the board parameter (optional - keeps URL clean)
         window.history.replaceState({}, document.title, window.location.pathname);
       }
