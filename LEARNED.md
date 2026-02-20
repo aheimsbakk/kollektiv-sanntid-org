@@ -1,56 +1,64 @@
+---
+generated_at: 2026-02-20T22:04:35Z
+total_worklogs: 211
+themes:
+  ui/css: 117
+  service-worker/pwa: 112
+  autocomplete: 102
+  options/favorites: 86
+  tests: 43
+  i18n: 31
+  accessibility: 24
+summary: "Consolidated lessons from agent worklogs: frequent autocomplete race conditions and SW caching mistakes were highest-impact; process improvements (worklog discipline, version bumps) reduced regressions."
+---
+
 What I learned
+- Autocomplete is fragile: race conditions, stale candidate lists, programmatic input events, and mobile-specific quirks repeatedly caused wrong selections or missing fetches. Representative worklogs: `agents/worklogs/2026-02-16-19-21-add-station-autocomplete.md`, `agents/worklogs/2026-02-16-20-10-rate-limit-autocomplete.md`, `agents/worklogs/2026-02-16-21-43-fix-autocomplete-stopid.md`.
+- Service Worker caching caused incorrect API responses when query strings were ignored or cache keys were reused; fixes included versioned caches and network-only for external APIs. Representative worklog: `agents/worklogs/2026-02-17-19-46-fix-sw-cache-version.md`.
+- i18n and character handling exposed backend filtering bugs (Norwegian characters); removing aggressive geocoder filters and adding client-side ranking fixed many cases. Representative worklogs: `agents/worklogs/2026-02-16-21-52-fix-norwegian-chars.md`, `agents/worklogs/2026-02-16-22-17-fix-storen-autocomplete.md`.
+- Tests and validation are effective at preventing regressions but were often added late; adding tests earlier would have saved time. Representative worklogs: `agents/worklogs/2026-02-20-20-36-add-missing-tests.md`, `agents/worklogs/2026-02-16-21-43-fix-autocomplete-stopid.md`.
+- UX/CSS churn is high: many small layout/styling fixes accumulate and cost time; centralizing tokens and CSS variables helped.
 
-- Service worker caching is a high-leverage place to look when responses are stale or inconsistent: using cache.match with options like `ignoreSearch` can silently return responses that don't match the current query (query string ignored). External APIs must be treated as network-first or explicitly excluded from aggressive cache matching.
-- Async UI bugs often come from race conditions and event ordering: debounced searches may return out-of-order results, programmatic updates can trigger handlers, and mobile behaviors (e.g. `select()`) differ from desktop.
-- Instrumentation (debug logs) helped find the issue fast, but leaving debug logs in production caused noise and required extra cleanup. Always gate or remove debug output when done.
-- Small UX choices interact with technical details: clearing input on focus vs selecting text had different effects on mobile and desktop. Handling mobile quirks required defensive checks (flags like `updatingFields`, stale-value detection).
-- Tests that exercise the service worker and edge cases prevented regressions. Adding targeted tests (e.g. `sw-api-caching.test.mjs`) made the fix reliable.
-- Versioned service-worker caches and a strict version-bump policy ensure clients pick up fixes. Bumping the SW `VERSION` on every meaningful change avoids stale assets being served.
+What I should have done differently
+- Add focused unit/integration tests for autocomplete and SW caching before making behavioral changes (e.g., tests that assert stale results are not rendered, and SW returns network-only for api hosts).
+- Treat external API requests as network-only by default in SW and explicitly opt-in to caching with a clear cache key that includes query params.
+- Guard against programmatic input events: set and clear a dedicated flag when updating input fields programmatically and have autocomplete ignore events while the flag is set.
+- Add debounce + request-cancellation (or response-sequencing) for autocomplete; always validate that a response matches the current query before rendering.
+- Require a worklog + test for any change touching networking, caching, or input handling (autocomplete/pre-fill) before code edits are merged.
+- Run a brief UX smoke test (mobile + desktop) after each autocomplete-related change to catch platform-specific input/select() quirks.
 
-What I should have done differently to achieve the goal earlier
+Suggested rules for agent (actionable, enforceable)
+1. If a change affects network fetching for external hostnames, then add a test and ensure SW treats that hostname as network-only (implementation hint: update `src/sw.js` route to `networkFirst` or bypass; enforce in CI by a lint that searches for hostnames in fetch handlers).
+   - Enforce: pre-commit lint + CI test preventing new external hostnames from being added without tests.
+2. Always validate autocomplete responses correspond to the current input before rendering (implementation hint: attach an increasing requestId or compare returned query with `input.value`).
+   - Enforce: unit tests in `tests/ui.autocomplete.*.mjs`.
+3. Debounce user input for autocomplete (250–500ms) and cancel or ignore earlier responses (implementation hint: store lastRequestId; ignore responses with stale id).
+   - Enforce: PR checklist item + unit test.
+4. When programmatically updating inputs (updateFields / pre-fill), set `suppressInputEvents=true` and ignore input/change events when set; clear the flag after the update completes.
+   - Enforce: code comment + small test that asserts no autocomplete triggers on programmatic set.
+5. Version the SW cache and require running `scripts/bump-version.sh` on any deploy-affecting commit (implementation hint: include version constant in `src/sw.js` and `src/config.js`).
+   - Enforce: pre-commit hook or CI check that `src/sw.js` and `src/config.js` versions were bumped when files under `src/` change.
+6. Prefer network-only for API endpoints that include query/search params; if caching is required, include normalized query in cache key (implementation hint: use Request.url as part of cache key or a hash of query string).
+   - Enforce: tests for SW caching behavior in `tests/sw.*.mjs`.
+7. Remove debug logging before merge and add a CI grep that fails if '[DEBUG]' or console.debug left in committed JS (implementation hint: add a small lint rule or grep step in CI).
+   - Enforce: CI lint step.
+8. Add acceptance tests for i18n edge cases (Norwegian characters) that exercise geocoder behavior and ranking (implementation hint: tests under `tests/entur.*.mjs` that assert expected stop appears in top results).
+   - Enforce: tests + CI.
+9. For any UI/UX change that affects layout, run a short visual/DOM smoke test on mobile viewport and desktop (implementation hint: a tiny Puppeteer script that loads the app, opens options, and runs a few key interactions).
+   - Enforce: local smoke script + optional CI job for major UI PRs.
+10. Maintain the worklog discipline: create a short worklog (1–3 sentences, correct front-matter order) before any code edits and run `scripts/validate_worklogs.sh`.
+   - Enforce: CI check that new commits include a worklog entry when files under `agents/` or `src/` change.
 
-- Prioritise the service worker when network responses look wrong — the SW is a common source of "mismatched" responses. A quick grep for `ignoreSearch` / `cache.match` would have surfaced the risky call earlier.
-- Write a small failing test first for the observed misbehavior (simulate a cached API response mismatch). TDD-style investigation can point you to the root cause faster.
-- When adding debug logging, keep it local or behind a `DEBUG` constant. Do not push global `console.log` statements to commits without a guard; instead create a temporary local branch or use conditional logging.
-- When changing UI input behavior, test on both desktop and mobile early. Mobile input selection semantics can be different; an early manual check would have shown the `select()` problem.
-- Add minimal SW-related unit tests when changing fetch/caching logic. The absence of such tests made it easier for the bug to slip in.
+Machine summary (JSON)
+{
+  "generated_at": "2026-02-20T22:04:35Z",
+  "total_worklogs": 211,
+  "themes": {"ui/css":117,"service-worker/pwa":112,"autocomplete":102,"options/favorites":86,"tests":43,"i18n":31,"accessibility":24}
+}
 
-Suggested rules for the agent (to make decisions more correct earlier)
-
-1. Service worker first rule
-- If a bug reports that network responses are incorrect or stale, always check the service worker fetch handler and cache.match usage before deeper code changes. Search for `ignoreSearch`, `cache.match`, and hostname checks.
-
-2. Guarded logging
-- Never add unguarded `console.log` debug statements directly to files that will be committed. Use a `DEBUG` flag, ephemeral local branches, or a logger that can be disabled. If logs are added, create a worklog entry stating why and mark them for removal before bumping a public version.
-
-3. Add regression tests early
-- When a production-visible bug is found, create a focused test that fails for that bug before implementing the fix (especially for SW and API caching issues). This prevents regressions and forces a targeted fix.
-
-4. Cross-platform verification for UI changes
-- For any change that touches input focus/selection or programmatic events, run a quick manual check on both desktop and mobile (or add a test that simulates mobile behavior). Assume `select()` and browser autofill behave differently across platforms.
-
-5. Guard programmatic updates
-- When code updates UI fields programmatically (e.g. `updateFields()`), always set an `updatingFields` flag and have input handlers return early when that flag is set. Document the flag usage in a nearby comment.
-
-6. Network-first for external APIs
-- Treat requests to external hostnames (not same-origin assets) as network-first by default in the SW. Explicitly exclude them from `ignoreSearch` or cache.match calls that ignore query strings.
-
-7. Versioning & worklogs
-- Bump SW `VERSION` for every commit that changes client-visible behavior, create a granular worklog BEFORE committing, and update `agents/CONTEXT.md` immediately. Validate worklogs with the repository script.
-
-8. Commit checklist
-- Before committing: run the full test suite (`npm test`), run `scripts/validate_worklogs.sh`, ensure no unguarded debug logs remain, and ensure the version bump script has been run.
-
-9. Async UI safety
-- For any UI flow that displays async results, only render results when the originating query still matches the input value (e.g., compare `inpStation.value` to `searchQuery`). This avoids out-of-order display.
-
-10. Keep short, actionable worklogs
-- Write concise worklogs that document the why/what and include a reference to the new version. Keep `agents/CONTEXT.md` under 20 lines and update it after each granular log.
-
-Next steps (practical)
-
-- Add a linter rule or pre-commit check to flag `console.log('\[DEBUG\]')` and stray `console.log` statements.
-- Add a small SW unit test harness (node-based) to exercise `fetch` handler branching for origin vs external hostnames.
-- Add a short mobile QA checklist to the repo README for input-related changes.
-
-File: `LEARNED.md`
+Representative references (one per major theme)
+- Autocomplete: `agents/worklogs/2026-02-16-19-21-add-station-autocomplete.md`
+- SW cache/version: `agents/worklogs/2026-02-17-19-46-fix-sw-cache-version.md`
+- Norwegian/i18n: `agents/worklogs/2026-02-16-21-52-fix-norwegian-chars.md`
+- Tests added: `agents/worklogs/2026-02-20-20-36-add-missing-tests.md`
+- Worklog discipline: `agents/WORKLOG_TEMPLATE.md`
