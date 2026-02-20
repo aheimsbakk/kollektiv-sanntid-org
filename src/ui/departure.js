@@ -122,7 +122,7 @@ export function createDepartureNode(item){
   // render emoji inline with destination text so it wraps naturally on small screens
   const emoji = emojiForMode(mode);
   const destinationText = (item && item.destination) ? String(item.destination) : '—';
-  const lineNumber = (item && item.publicCode) ? String(item.publicCode) + ' ' : '';
+  const lineNumber = (item && item.publicCode) ? String(item.publicCode) + ' · ' : '';
   
   // Build platform/quay display with stacked format: {emoji} <span>{symbol}<br>{code}</span>
   // Detect quay type from publicCode format:
