@@ -46,6 +46,7 @@ const translations = {
     // Update toast
     newVersionAvailable: 'New version available, reloading...',
     upgradingFrom: 'Upgrading from',
+    to: 'to',
     
     // Status
     updatingIn: 'Updating in',
@@ -108,6 +109,7 @@ const translations = {
     // Update toast
     newVersionAvailable: 'Ny versjon tilgjengelig, laster inn på nytt...',
     upgradingFrom: 'Oppgraderer fra',
+    to: 'til',
     
     // Status
     updatingIn: 'Oppdaterer om',
@@ -170,6 +172,7 @@ const translations = {
     // Update toast
     newVersionAvailable: 'Neue Version verfügbar, wird neu geladen...',
     upgradingFrom: 'Aktualisierung von',
+    to: 'auf',
     
     // Status
     updatingIn: 'Aktualisierung in',
@@ -232,6 +235,7 @@ const translations = {
     // Update toast
     newVersionAvailable: 'Nueva versión disponible, recargando...',
     upgradingFrom: 'Actualizando desde',
+    to: 'a',
     
     // Status
     updatingIn: 'Actualizando en',
@@ -294,6 +298,7 @@ const translations = {
     // Update toast
     newVersionAvailable: 'Nuova versione disponibile, ricaricamento...',
     upgradingFrom: 'Aggiornamento da',
+    to: 'a',
     
     // Status
     updatingIn: 'Aggiornamento tra',
@@ -356,6 +361,7 @@ const translations = {
     // Update toast
     newVersionAvailable: 'Διαθέσιμη νέα έκδοση, επαναφόρτωση...',
     upgradingFrom: 'Αναβάθμιση από',
+    to: 'σε',
     
     // Status
     updatingIn: 'Ενημέρωση σε',
@@ -415,6 +421,7 @@ const translations = {
     // Update toast
     newVersionAvailable: 'نسخه جدید موجود است، در حال بارگذاری مجدد...',
     upgradingFrom: 'ارتقا از',
+    to: 'به',
     
     // Status
     updatingIn: 'به‌روزرسانی در',
@@ -479,6 +486,7 @@ const translations = {
     // Update toast
     newVersionAvailable: 'नया संस्करण उपलब्ध है, फिर से लोड किया जा रहा है...',
     upgradingFrom: 'से अपग्रेड किया जा रहा है',
+    to: 'को',
     
     // Status
     updatingIn: 'अपडेट में',
@@ -543,6 +551,7 @@ const translations = {
     // Update toast
     newVersionAvailable: 'Ný útgáfa tiltæk, endurnýja...',
     upgradingFrom: 'Uppfærsla frá',
+    to: 'í',
     
     // Status
     updatingIn: 'Uppfærir eftir',
@@ -607,6 +616,7 @@ const translations = {
     // Update toast
     newVersionAvailable: 'Доступна нова версія, перезавантаження...',
     upgradingFrom: 'Оновлення з',
+    to: 'до',
     
     // Status
     updatingIn: 'Оновлення через',
@@ -671,6 +681,7 @@ const translations = {
     // Update toast
     newVersionAvailable: 'Nouvelle version disponible, rechargement...',
     upgradingFrom: 'Mise à niveau depuis',
+    to: 'vers',
     
     // Status
     updatingIn: 'Mise à jour dans',
@@ -735,6 +746,7 @@ const translations = {
     // Update toast
     newVersionAvailable: 'Nowa wersja dostępna, przeładowanie...',
     upgradingFrom: 'Aktualizacja z',
+    to: 'do',
     
     // Status
     updatingIn: 'Aktualizacja za',
