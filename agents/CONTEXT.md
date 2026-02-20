@@ -1,12 +1,12 @@
-Overall Context: Kollektiv.Sanntid.org - live-only app with reactive options panel and theme toggle. Version 1.20.0.
+Overall Context: Kollektiv.Sanntid.org - live-only app with reactive options panel and theme toggle. Version 1.21.0.
 
-Current Goal: Realtime indicator feature complete. Departures now show ● for live data, ○ for scheduled.
+Current Goal: Cancellation styling complete. Cancelled departures show strikethrough with reduced opacity.
 
 Last 3 Changes:
+- agents/worklogs/2026-02-20-13-52-cancellation-styling.md
 - agents/worklogs/2026-02-20-13-43-realtime-indicator.md
 - agents/worklogs/2026-02-20-13-24-template-system.md
-- agents/worklogs/2026-02-20-13-20-configurable-separator.md
 
 Next Steps:
-- Test realtime indicators with live departure data
-- Verify scheduled vs realtime display works correctly
+- Test cancellation styling with live cancelled departures
+- Verify all departure states display correctly (realtime, scheduled, cancelled)

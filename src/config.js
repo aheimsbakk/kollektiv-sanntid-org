@@ -1,6 +1,6 @@
 // Version is defined here and in src/sw.js (service worker)
 // Both must be kept in sync - use scripts/bump-version.sh to update both
-export const VERSION = '1.20.0';
+export const VERSION = '1.21.0';
 
 export const DEFAULTS = {
   STATION_NAME: 'Jernbanetorget, Oslo',
@@ -17,6 +17,15 @@ export const DEFAULTS = {
 export const REALTIME_INDICATORS = {
   realtime: '●',    // Solid dot for live realtime data
   scheduled: '○'    // Hollow dot for scheduled/static data
+};
+
+// Cancellation display wrapper
+// When a departure is cancelled (item.cancellation === true), the entire
+// departure line will be wrapped with these HTML tags to apply strikethrough styling.
+// The styling is defined in CSS via .departure-cancelled class.
+export const CANCELLATION_WRAPPER = {
+  open: '<span class="departure-cancelled">',
+  close: '</span>'
 };
 
 // Platform/Quay display symbols - based on the type of stop location

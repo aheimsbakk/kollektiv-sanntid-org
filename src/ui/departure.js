@@ -1,4 +1,4 @@
-import { PLATFORM_SYMBOLS, DEPARTURE_LINE_TEMPLATE, REALTIME_INDICATORS } from '../config.js';
+import { PLATFORM_SYMBOLS, DEPARTURE_LINE_TEMPLATE, REALTIME_INDICATORS, CANCELLATION_WRAPPER } from '../config.js';
 
 export function createDepartureNode(item){
   const container = document.createElement('div'); container.className='departure';
@@ -173,6 +173,9 @@ export function createDepartureNode(item){
     .replace('{platform}', platformElement ? PLATFORM_PLACEHOLDER : '');
   
   // Build the DOM: set text content, then replace placeholder with platform element
+  // If departure is cancelled, wrap everything with cancellation styling
+  const isCancelled = (item && item.cancellation === true);
+  
   try{ 
     dest.textContent = displayText;
     if (platformElement && displayText.includes(PLATFORM_PLACEHOLDER)) {
@@ -183,6 +186,17 @@ export function createDepartureNode(item){
       if (parts[0]) dest.appendChild(document.createTextNode(parts[0]));
       dest.appendChild(platformElement);
       if (parts[1]) dest.appendChild(document.createTextNode(parts[1]));
+    }
+    
+    // Wrap with cancellation styling if needed
+    if (isCancelled) {
+      const wrapper = document.createElement('span');
+      wrapper.className = 'departure-cancelled';
+      // Move all children into the wrapper
+      while (dest.firstChild) {
+        wrapper.appendChild(dest.firstChild);
+      }
+      dest.appendChild(wrapper);
     }
   } catch(e) { 
     dest.textContent = destinationText; 
@@ -204,7 +218,8 @@ export function createDepartureNode(item){
     const platformText = (item && item.quay && item.quay.publicCode) ? (' Platform ' + item.quay.publicCode) : '';
     const linePrefix = lineNumberText ? ('Line ' + lineNumberText + ' ') : '';
     const modeText = readableMode(mode) ? (' ' + readableMode(mode)) : '';
-    dest.setAttribute('aria-label', linePrefix + destinationText + modeText + platformText); 
+    const cancelledPrefix = isCancelled ? 'Cancelled: ' : '';
+    dest.setAttribute('aria-label', cancelledPrefix + linePrefix + destinationText + modeText + platformText); 
   }catch(e){}
 
   timeWrap.append(time);
