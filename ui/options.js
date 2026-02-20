@@ -374,6 +374,10 @@ export function createOptionsPanel(defaults, onApply, onLanguageChange, onSave){
       cb.checked = (defaults.TRANSPORT_MODES || []).includes(cb.value);
     });
     
+    // Reset lastQuery to ensure autocomplete works on first keystroke
+    // This fixes the bug where autocomplete doesn't work after opening with default station
+    lastQuery = '';
+    
     // Update initial values to match current state
     const chosen = Array.from(modesWrap.querySelectorAll('input[type=checkbox]:checked')).map(i=>i.value);
     initialValues = {
