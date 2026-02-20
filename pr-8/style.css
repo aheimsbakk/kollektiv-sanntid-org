@@ -393,6 +393,27 @@ button:active {
   text-shadow: var(--text-shadow-light);
 }
 
+/* Stacked platform/quay display (symbol on top, code below) */
+.platform-stacked {
+  display: inline-flex;
+  flex-direction: column;
+  font-size: 0.5em;
+  line-height: 0.9;
+  align-items: center;
+  justify-content: center;
+  margin-left: 2px;
+  opacity: 0.85;
+  /* Center vertically on the text line */
+  vertical-align: baseline;
+  transform: translateY(-50%);
+}
+
+/* Cancelled departure styling */
+.departure-cancelled {
+  text-decoration: line-through;
+  opacity: 0.6;
+}
+
 .departure-time {
   font-family: var(--mono);
   font-weight: 800;

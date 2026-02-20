@@ -1,3 +1,5 @@
+import { PLATFORM_SYMBOLS, DEPARTURE_LINE_TEMPLATE, REALTIME_INDICATORS, CANCELLATION_WRAPPER } from '../config.js';
+
 export function createDepartureNode(item){
   const container = document.createElement('div'); container.className='departure';
   const dest = document.createElement('div'); dest.className='departure-destination';
@@ -120,9 +122,85 @@ export function createDepartureNode(item){
   // render emoji inline with destination text so it wraps naturally on small screens
   const emoji = emojiForMode(mode);
   const destinationText = (item && item.destination) ? String(item.destination) : '—';
-  const lineNumber = (item && item.publicCode) ? String(item.publicCode) + ' ' : '';
-  const fullText = lineNumber + destinationText + ' ' + emoji;
-  try{ dest.textContent = fullText; }catch(e){ dest.textContent = destinationText; }
+  const lineNumberText = (item && item.publicCode) ? String(item.publicCode) : '';
+  
+  // Determine realtime indicator based on item.realtime field
+  const indicator = (item && item.realtime === true) 
+    ? REALTIME_INDICATORS.realtime 
+    : REALTIME_INDICATORS.scheduled;
+  
+  // Build platform/quay display with stacked format: {emoji} <span>{symbol}<br>{code}</span>
+  // Detect quay type from publicCode format:
+  // - Numeric (1-20) = platform (trains, metro)
+  // - Letters (A-Z) = gate/stop (buses, trams)
+  let platformElement = null;
+  if (item && item.quay && item.quay.publicCode) {
+    const quayCode = String(item.quay.publicCode);
+    let quayType = 'default';
+    
+    // Detect type based on publicCode format
+    if (/^\d+$/.test(quayCode)) {
+      // Pure numeric = platform (trains, metro)
+      quayType = 'platform';
+    } else if (/^[A-Z]$/i.test(quayCode)) {
+      // Single letter = gate or stop
+      // We could differentiate based on mode, but for simplicity use 'gate'
+      quayType = mode === 'tram' ? 'stop' : 'gate';
+    } else if (mode === 'water' || mode === 'ferry') {
+      quayType = 'berth';
+    }
+    
+    const platformSymbol = PLATFORM_SYMBOLS[quayType] || PLATFORM_SYMBOLS.default;
+    
+    // Create stacked display element
+    const stackedSpan = document.createElement('span');
+    stackedSpan.className = 'platform-stacked';
+    stackedSpan.innerHTML = `<span>${platformSymbol}</span><span>${quayCode}</span>`;
+    
+    // Store the element for later insertion
+    platformElement = stackedSpan;
+  }
+  
+  // Apply template to build the display line
+  // Available placeholders: {lineNumber}, {destination}, {emoji}, {platform}, {indicator}
+  // The {platform} placeholder will be replaced with a placeholder string that we'll swap with the element
+  const PLATFORM_PLACEHOLDER = '<<<PLATFORM>>>';
+  let displayText = DEPARTURE_LINE_TEMPLATE
+    .replace('{lineNumber}', lineNumberText)
+    .replace('{destination}', destinationText)
+    .replace('{emoji}', emoji)
+    .replace('{indicator}', indicator)
+    .replace('{platform}', platformElement ? PLATFORM_PLACEHOLDER : '');
+  
+  // Build the DOM: set text content, then replace placeholder with platform element
+  // If departure is cancelled, wrap everything with cancellation styling
+  const isCancelled = (item && item.cancellation === true);
+  
+  try{ 
+    dest.textContent = displayText;
+    if (platformElement && displayText.includes(PLATFORM_PLACEHOLDER)) {
+      // Replace the placeholder text with the actual platform element
+      const textContent = dest.textContent;
+      const parts = textContent.split(PLATFORM_PLACEHOLDER);
+      dest.textContent = '';
+      if (parts[0]) dest.appendChild(document.createTextNode(parts[0]));
+      dest.appendChild(platformElement);
+      if (parts[1]) dest.appendChild(document.createTextNode(parts[1]));
+    }
+    
+    // Wrap with cancellation styling if needed
+    if (isCancelled) {
+      const wrapper = document.createElement('span');
+      wrapper.className = 'departure-cancelled';
+      // Move all children into the wrapper
+      while (dest.firstChild) {
+        wrapper.appendChild(dest.firstChild);
+      }
+      dest.appendChild(wrapper);
+    }
+  } catch(e) { 
+    dest.textContent = destinationText; 
+  }
   // provide an accessible textual label matching the visual order (destination + mode)
   const readableMode = (m) => {
     if(!m) return '';
@@ -135,7 +213,14 @@ export function createDepartureNode(item){
     if(mm.includes('coach')) return 'Coach';
     return '';
   };
-  try{ dest.setAttribute('aria-label', (lineNumber ? 'Line ' + item.publicCode + ' to ' : '') + destinationText + (readableMode(mode) ? (' ' + readableMode(mode)) : '')); }catch(e){}
+  try{ 
+    // Build accessible aria-label matching the visual order from template
+    const platformText = (item && item.quay && item.quay.publicCode) ? (' Platform ' + item.quay.publicCode) : '';
+    const linePrefix = lineNumberText ? ('Line ' + lineNumberText + ' ') : '';
+    const modeText = readableMode(mode) ? (' ' + readableMode(mode)) : '';
+    const cancelledPrefix = isCancelled ? 'Cancelled: ' : '';
+    dest.setAttribute('aria-label', cancelledPrefix + linePrefix + destinationText + modeText + platformText); 
+  }catch(e){}
 
   timeWrap.append(time);
   // place situation between destination and countdown so alerts are read in context
