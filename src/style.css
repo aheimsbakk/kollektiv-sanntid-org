@@ -393,6 +393,17 @@ button:active {
   text-shadow: var(--text-shadow-light);
 }
 
+/* Stacked platform/quay display (symbol on top, code below) */
+.platform-stacked {
+  display: inline-flex;
+  flex-direction: column;
+  font-size: 0.5em;
+  line-height: 0.9;
+  vertical-align: middle;
+  margin-left: 2px;
+  opacity: 0.85;
+}
+
 .departure-time {
   font-family: var(--mono);
   font-weight: 800;
