@@ -4,14 +4,19 @@
 const translations = {
   en: {
     // Options panel
-    stationName: 'Station name',
+    stationName: 'Station or stop name',
     numberOfDepartures: 'Number of departures',
     fetchInterval: 'Fetch interval (seconds)',
     textSize: 'Text size',
     transportModes: 'Transport modes (filter)',
     switchLanguage: 'Switch language',
-    apply: 'Apply',
+    save: 'Save to Favorites',
     close: 'Close',
+    
+    // Tooltips
+    stationNameTooltip: 'Click to show your saved favorites',
+    settingsTooltip: 'Open settings panel',
+    themeTooltip: 'Change theme',
     
     // Text sizes
     tiny: 'Tiny',
@@ -32,6 +37,7 @@ const translations = {
     settingsApplied: 'Settings applied',
     filtersUpdated: 'Filters updated',
     textSizeUpdated: 'Text size updated',
+    savedToFavorites: 'Saved to favorites',
     languageChanged: 'Language changed',
     
     // Update toast
@@ -52,14 +58,20 @@ const translations = {
   
   no: {
     // Options panel
-    stationName: 'Stasjonsnavn',
+    stationName: 'Stasjons- eller holdeplassnavn',
     numberOfDepartures: 'Antall avganger',
     fetchInterval: 'Oppdateringsintervall (sekunder)',
     textSize: 'Tekststørrelse',
     transportModes: 'Transportmidler (filter)',
     switchLanguage: 'Bytt språk',
     apply: 'Bruk',
+    save: 'Lagre i favoritter',
     close: 'Lukk',
+    
+    // Tooltips
+    stationNameTooltip: 'Klikk for å vise dine lagrede favoritter',
+    settingsTooltip: 'Åpne innstillinger',
+    themeTooltip: 'Bytt tema',
     
     // Text sizes
     tiny: 'Veldig liten',
@@ -80,6 +92,7 @@ const translations = {
     settingsApplied: 'Innstillinger lagret',
     filtersUpdated: 'Filter oppdatert',
     textSizeUpdated: 'Tekststørrelse oppdatert',
+    savedToFavorites: 'Lagret i favoritter',
     languageChanged: 'Språk endret',
     
     // Update toast
@@ -100,14 +113,20 @@ const translations = {
   
   de: {
     // Options panel
-    stationName: 'Stationsname',
+    stationName: 'Bahnhofs- oder Haltestellenname',
     numberOfDepartures: 'Anzahl Abfahrten',
     fetchInterval: 'Aktualisierungsintervall (Sekunden)',
     textSize: 'Textgröße',
     transportModes: 'Verkehrsmittel (Filter)',
     switchLanguage: 'Sprache wechseln',
     apply: 'Anwenden',
+    save: 'In Favoriten speichern',
     close: 'Schließen',
+    
+    // Tooltips
+    stationNameTooltip: 'Klicken, um Ihre gespeicherten Favoriten anzuzeigen',
+    settingsTooltip: 'Einstellungen öffnen',
+    themeTooltip: 'Thema ändern',
     
     // Text sizes
     tiny: 'Sehr klein',
@@ -128,6 +147,7 @@ const translations = {
     settingsApplied: 'Einstellungen gespeichert',
     filtersUpdated: 'Filter aktualisiert',
     textSizeUpdated: 'Textgröße aktualisiert',
+    savedToFavorites: 'In Favoriten gespeichert',
     languageChanged: 'Sprache geändert',
     
     // Update toast
@@ -148,14 +168,20 @@ const translations = {
   
   es: {
     // Options panel
-    stationName: 'Nombre de estación',
+    stationName: 'Nombre de estación o parada',
     numberOfDepartures: 'Número de salidas',
     fetchInterval: 'Intervalo de actualización (segundos)',
     textSize: 'Tamaño del texto',
     transportModes: 'Modos de transporte (filtro)',
     switchLanguage: 'Cambiar idioma',
     apply: 'Aplicar',
+    save: 'Guardar en favoritos',
     close: 'Cerrar',
+    
+    // Tooltips
+    stationNameTooltip: 'Haz clic para ver tus favoritos guardados',
+    settingsTooltip: 'Abrir panel de configuración',
+    themeTooltip: 'Cambiar tema',
     
     // Text sizes
     tiny: 'Muy pequeño',
@@ -176,6 +202,7 @@ const translations = {
     settingsApplied: 'Configuración aplicada',
     filtersUpdated: 'Filtros actualizados',
     textSizeUpdated: 'Tamaño de texto actualizado',
+    savedToFavorites: 'Guardado en favoritos',
     languageChanged: 'Idioma cambiado',
     
     // Update toast
@@ -196,14 +223,20 @@ const translations = {
   
   it: {
     // Options panel
-    stationName: 'Nome stazione',
+    stationName: 'Nome stazione o fermata',
     numberOfDepartures: 'Numero di partenze',
     fetchInterval: 'Intervallo di aggiornamento (secondi)',
     textSize: 'Dimensione testo',
     transportModes: 'Mezzi di trasporto (filtro)',
     switchLanguage: 'Cambia lingua',
     apply: 'Applica',
+    save: 'Salva nei preferiti',
     close: 'Chiudi',
+    
+    // Tooltips
+    stationNameTooltip: 'Clicca per mostrare i tuoi preferiti salvati',
+    settingsTooltip: 'Apri pannello impostazioni',
+    themeTooltip: 'Cambia tema',
     
     // Text sizes
     tiny: 'Piccolissimo',
@@ -224,6 +257,7 @@ const translations = {
     settingsApplied: 'Impostazioni applicate',
     filtersUpdated: 'Filtri aggiornati',
     textSizeUpdated: 'Dimensione testo aggiornata',
+    savedToFavorites: 'Salvato nei preferiti',
     languageChanged: 'Lingua cambiata',
     
     // Update toast
@@ -244,14 +278,20 @@ const translations = {
   
   el: {
     // Options panel
-    stationName: 'Όνομα σταθμού',
+    stationName: 'Όνομα σταθμού ή στάσης',
     numberOfDepartures: 'Αριθμός αναχωρήσεων',
     fetchInterval: 'Διάστημα ενημέρωσης (δευτερόλεπτα)',
     textSize: 'Μέγεθος κειμένου',
     transportModes: 'Μέσα μεταφοράς (φίλτρο)',
     switchLanguage: 'Αλλαγή γλώσσας',
     apply: 'Εφαρμογή',
+    save: 'Αποθήκευση στα αγαπημένα',
     close: 'Κλείσιμο',
+    
+    // Tooltips
+    stationNameTooltip: 'Κάντε κλικ για να δείτε τα αποθηκευμένα αγαπημένα σας',
+    settingsTooltip: 'Άνοιγμα πίνακα ρυθμίσεων',
+    themeTooltip: 'Αλλαγή θέματος',
     
     // Text sizes
     tiny: 'Πολύ μικρό',
@@ -272,6 +312,7 @@ const translations = {
     settingsApplied: 'Οι ρυθμίσεις εφαρμόστηκαν',
     filtersUpdated: 'Τα φίλτρα ενημερώθηκαν',
     textSizeUpdated: 'Το μέγεθος κειμένου ενημερώθηκε',
+    savedToFavorites: 'Αποθηκεύτηκε στα αγαπημένα',
     languageChanged: 'Η γλώσσα άλλαξε',
     
     // Update toast
@@ -292,14 +333,20 @@ const translations = {
   
   fa: {
     // Options panel
-    stationName: 'نام ایستگاه',
+    stationName: 'نام ایستگاه یا توقفگاه',
     numberOfDepartures: 'تعداد حرکت‌ها',
     fetchInterval: 'فاصله به‌روزرسانی (ثانیه)',
     textSize: 'اندازه متن',
     transportModes: 'وسایل نقلیه (فیلتر)',
     switchLanguage: 'تغییر زبان',
     apply: 'اعمال',
+    save: 'ذخیره در علاقه‌مندی‌ها',
     close: 'بستن',
+    
+    // Tooltips
+    stationNameTooltip: 'برای نمایش علاقه‌مندی‌های ذخیره شده کلیک کنید',
+    settingsTooltip: 'باز کردن پنل تنظیمات',
+    themeTooltip: 'تغییر تم',
     
     // Text sizes
     tiny: 'خیلی کوچک',
@@ -320,6 +367,7 @@ const translations = {
     settingsApplied: 'تنظیمات اعمال شد',
     filtersUpdated: 'فیلترها به‌روزرسانی شد',
     textSizeUpdated: 'اندازه متن به‌روزرسانی شد',
+    savedToFavorites: 'در علاقه‌مندی‌ها ذخیره شد',
     languageChanged: 'زبان تغییر کرد',
     
     // Update toast
@@ -340,14 +388,20 @@ const translations = {
   
   hi: {
     // Options panel
-    stationName: 'स्टेशन का नाम',
+    stationName: 'स्टेशन या पड़ाव का नाम',
     numberOfDepartures: 'प्रस्थान की संख्या',
     fetchInterval: 'अपडेट अंतराल (सेकंड)',
     textSize: 'पाठ का आकार',
     transportModes: 'परिवहन साधन (फ़िल्टर)',
     switchLanguage: 'भाषा बदलें',
     apply: 'लागू करें',
+    save: 'पसंदीदा में सहेजें',
     close: 'बंद करें',
+    
+    // Tooltips
+    stationNameTooltip: 'अपने सहेजे गए पसंदीदा दिखाने के लिए क्लिक करें',
+    settingsTooltip: 'सेटिंग पैनल खोलें',
+    themeTooltip: 'थीम बदलें',
     
     // Text sizes
     tiny: 'बहुत छोटा',
@@ -368,7 +422,8 @@ const translations = {
     settingsApplied: 'सेटिंग्स लागू की गईं',
     filtersUpdated: 'फ़िल्टर अपडेट किए गए',
     textSizeUpdated: 'पाठ का आकार अपडेट किया गया',
-    languageChanged: 'भाषा बदल गई',
+    savedToFavorites: 'पसंदीदा में सहेजा गया',
+    languageChanged: 'भाषा बदली गई',
     
     // Update toast
     newVersionAvailable: 'नया संस्करण उपलब्ध है, फिर से लोड किया जा रहा है...',
@@ -388,14 +443,20 @@ const translations = {
   
   is: {
     // Options panel
-    stationName: 'Nafn stöðvar',
+    stationName: 'Nafn stöðvar eða biðstöðvar',
     numberOfDepartures: 'Fjöldi brottfara',
     fetchInterval: 'Uppfærslubil (sekúndur)',
     textSize: 'Textastærð',
     transportModes: 'Samgöngumátar (sía)',
     switchLanguage: 'Skipta um tungumál',
     apply: 'Nota',
+    save: 'Vista í eftirlæti',
     close: 'Loka',
+    
+    // Tooltips
+    stationNameTooltip: 'Smelltu til að sýna vistaða eftirlæti',
+    settingsTooltip: 'Opna stillingar',
+    themeTooltip: 'Breyta þema',
     
     // Text sizes
     tiny: 'Örsmátt',
@@ -416,6 +477,7 @@ const translations = {
     settingsApplied: 'Stillingar vistaðar',
     filtersUpdated: 'Síur uppfærðar',
     textSizeUpdated: 'Textastærð uppfærð',
+    savedToFavorites: 'Vistað í eftirlæti',
     languageChanged: 'Tungumáli breytt',
     
     // Update toast
@@ -436,14 +498,20 @@ const translations = {
   
   uk: {
     // Options panel
-    stationName: 'Назва станції',
+    stationName: 'Назва станції або зупинки',
     numberOfDepartures: 'Кількість відправлень',
     fetchInterval: 'Інтервал оновлення (секунди)',
     textSize: 'Розмір тексту',
     transportModes: 'Транспортні засоби (фільтр)',
     switchLanguage: 'Змінити мову',
     apply: 'Застосувати',
+    save: 'Зберегти в обране',
     close: 'Закрити',
+    
+    // Tooltips
+    stationNameTooltip: 'Натисніть, щоб показати збережене обране',
+    settingsTooltip: 'Відкрити панель налаштувань',
+    themeTooltip: 'Змінити тему',
     
     // Text sizes
     tiny: 'Дуже малий',
@@ -464,6 +532,7 @@ const translations = {
     settingsApplied: 'Налаштування застосовано',
     filtersUpdated: 'Фільтри оновлено',
     textSizeUpdated: 'Розмір тексту оновлено',
+    savedToFavorites: 'Збережено в обране',
     languageChanged: 'Мову змінено',
     
     // Update toast
@@ -484,14 +553,20 @@ const translations = {
   
   fr: {
     // Options panel
-    stationName: 'Nom de la station',
+    stationName: 'Nom de la station ou de l\'arrêt',
     numberOfDepartures: 'Nombre de départs',
     fetchInterval: 'Intervalle de mise à jour (secondes)',
     textSize: 'Taille du texte',
     transportModes: 'Modes de transport (filtre)',
     switchLanguage: 'Changer de langue',
     apply: 'Appliquer',
+    save: 'Enregistrer dans les favoris',
     close: 'Fermer',
+    
+    // Tooltips
+    stationNameTooltip: 'Cliquez pour afficher vos favoris enregistrés',
+    settingsTooltip: 'Ouvrir le panneau des paramètres',
+    themeTooltip: 'Changer de thème',
     
     // Text sizes
     tiny: 'Très petit',
@@ -512,6 +587,7 @@ const translations = {
     settingsApplied: 'Paramètres appliqués',
     filtersUpdated: 'Filtres mis à jour',
     textSizeUpdated: 'Taille du texte mise à jour',
+    savedToFavorites: 'Enregistré dans les favoris',
     languageChanged: 'Langue modifiée',
     
     // Update toast
@@ -532,14 +608,20 @@ const translations = {
   
   pl: {
     // Options panel
-    stationName: 'Nazwa stacji',
+    stationName: 'Nazwa stacji lub przystanku',
     numberOfDepartures: 'Liczba odjazdów',
     fetchInterval: 'Interwał odświeżania (sekundy)',
     textSize: 'Rozmiar tekstu',
     transportModes: 'Środki transportu (filtr)',
     switchLanguage: 'Zmień język',
     apply: 'Zastosuj',
+    save: 'Zapisz w ulubionych',
     close: 'Zamknij',
+    
+    // Tooltips
+    stationNameTooltip: 'Kliknij, aby wyświetlić zapisane ulubione',
+    settingsTooltip: 'Otwórz panel ustawień',
+    themeTooltip: 'Zmień motyw',
     
     // Text sizes
     tiny: 'Bardzo mały',
@@ -560,6 +642,7 @@ const translations = {
     settingsApplied: 'Ustawienia zastosowane',
     filtersUpdated: 'Filtry zaktualizowane',
     textSizeUpdated: 'Rozmiar tekstu zaktualizowany',
+    savedToFavorites: 'Zapisano w ulubionych',
     languageChanged: 'Język zmieniony',
     
     // Update toast

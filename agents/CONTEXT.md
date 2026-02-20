@@ -1,12 +1,13 @@
-Overall Context: Kollektiv.Sanntid.org - dependency-free real-time departure board with Entur APIs, Norwegian kollektivtrafikk focus. Versioned service worker, multilingual (12 languages), auto-select inputs, transport mode filters. PR preview deployments via gh-pages branch with sub-folder structure.
+Overall Context: Kollektiv.Sanntid.org - live-only app with reactive options panel and theme toggle. Version 1.16.5.
 
-Current Goal: Test PR preview workflow with workflow fixes on branch a-19512.
+Current Goal: Production ready - user-controlled updates with reliable cache bypass on reload.
 
 Last 3 Changes:
-- agents/worklogs/2026-02-19-17-03-app-rename.md
-- agents/worklogs/2026-02-19-16-48-pr-preview-subfolder-fix.md
-- agents/worklogs/2026-02-19-16-31-pr-preview-deployment.md
+- agents/worklogs/2026-02-20-11-12-remove-periodic-updates.md
+- agents/worklogs/2026-02-20-11-08-force-sw-updates.md
+- agents/worklogs/2026-02-20-11-03-fix-sw-cache-updates.md
 
 Next Steps:
-- Push branch a-19512 with workflow fixes
-- Verify PR preview deployment works correctly
+- Test PR preview updates when user reloads
+- Verify tooltips and version updates work correctly
+- Deploy to production
