@@ -194,12 +194,19 @@ export function createShareButton(getSettings) {
         await navigator.clipboard.writeText(url);
       }
     } catch (e) {
-      // Ignore clipboard errors - we'll navigate anyway
+      // Ignore clipboard errors - we'll update URL anyway
     }
     
-    // Navigate to the URL with the share parameter
-    // This allows user to see the full link and share it easily
-    window.location.href = url;
+    // Update the address bar without reloading the page
+    // This allows user to see the full shareable link
+    window.history.pushState({}, '', url);
+    
+    // Show brief success indicator
+    const originalText = button.textContent;
+    button.textContent = '✓';
+    setTimeout(() => {
+      button.textContent = originalText;
+    }, 2000);
   });
   
   return { button, urlBox, showUrlBox };
