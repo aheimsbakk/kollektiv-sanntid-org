@@ -344,37 +344,22 @@ export function createOptionsPanel(defaults, onApply, onLanguageChange, onSave){
     }
   });
 
-  // Clear input on focus if a station was previously selected
-  // Otherwise select text for editing (fresh search scenario)
+  // Pre-fill and select station name on focus for easy editing
   inpStation.addEventListener('focus', () => {
-    console.log('[DEBUG] FOCUS - Before:', { 
-      value: inpStation.value, 
-      stopId: inpStation.dataset.stopId, 
-      lastQuery,
-      updatingFields 
-    });
-    
     // Clear lastQuery so typing triggers new search
     lastQuery = '';
     // Clear any stale autocomplete
     clearAutocomplete();
     
-    // If there's a stopId, user selected a station before - clear for fresh search
-    if (inpStation.dataset.stopId) {
-      inpStation.value = '';
-      inpStation.dataset.stopId = '';
-    } else {
-      // No previous selection - just select text for easy editing
-      inpStation.select();
+    // Always pre-fill with current station name if available
+    // This provides visual context of what station is currently selected
+    if (defaults.STATION_NAME && !inpStation.value) {
+      inpStation.value = defaults.STATION_NAME;
+      inpStation.dataset.stopId = defaults.STOP_ID || '';
     }
     
-    console.log('[DEBUG] FOCUS - After:', { 
-      value: inpStation.value, 
-      stopId: inpStation.dataset.stopId, 
-      lastQuery,
-      selectionStart: inpStation.selectionStart,
-      selectionEnd: inpStation.selectionEnd
-    });
+    // Select text so user can immediately start typing to replace
+    inpStation.select();
   });
 
   inpNum.addEventListener('focus', () => {
@@ -388,13 +373,6 @@ export function createOptionsPanel(defaults, onApply, onLanguageChange, onSave){
   // Function to update panel fields with current defaults (useful when station changes while panel is open)
   let updatingFields = false;
   function updateFields() {
-    console.log('[DEBUG] updateFields - Before:', { 
-      updatingFields,
-      'defaults.STATION_NAME': defaults.STATION_NAME,
-      'defaults.STOP_ID': defaults.STOP_ID,
-      lastQuery 
-    });
-    
     updatingFields = true;
     // Update input fields with current defaults
     inpStation.value = defaults.STATION_NAME || '';
@@ -428,13 +406,6 @@ export function createOptionsPanel(defaults, onApply, onLanguageChange, onSave){
       TEXT_SIZE: selSize.value || (defaults.TEXT_SIZE || 'large')
     };
     updatingFields = false;
-    
-    console.log('[DEBUG] updateFields - After:', { 
-      'inpStation.value': inpStation.value,
-      'inpStation.dataset.stopId': inpStation.dataset.stopId,
-      lastQuery,
-      updatingFields 
-    });
   }
 
   // Station autocomplete behaviour: query after 3 characters and show up to 5 matches
@@ -495,19 +466,8 @@ export function createOptionsPanel(defaults, onApply, onLanguageChange, onSave){
   }
 
   inpStation.addEventListener('input', (e) => {
-    console.log('[DEBUG] INPUT - Entry:', { 
-      value: inpStation.value, 
-      stopId: inpStation.dataset.stopId, 
-      lastQuery,
-      updatingFields,
-      'value.length': (inpStation.value || '').length
-    });
-    
     // Ignore input events triggered by programmatic updates
-    if (updatingFields) {
-      console.log('[DEBUG] INPUT - Ignored (updatingFields=true)');
-      return;
-    }
+    if (updatingFields) return;
     
     const v = String(inpStation.value || '');
     
@@ -516,34 +476,23 @@ export function createOptionsPanel(defaults, onApply, onLanguageChange, onSave){
     // This happens when select() doesn't work properly on mobile.
     // Clear the input to start fresh.
     if (lastQuery === '' && v.trim().length >= 3 && !inpStation.dataset.stopId) {
-      console.log('[DEBUG] INPUT - Stale value detected, clearing input');
       inpStation.value = '';
       lastQuery = '';
       clearAutocomplete();
       return;
     }
     
-    if (v === lastQuery) {
-      console.log('[DEBUG] INPUT - Ignored (same as lastQuery)');
-      return;
-    }
-    
-    console.log('[DEBUG] INPUT - Processing new query:', v);
+    if (v === lastQuery) return;
     lastQuery = v;
     // Clear stored stopId when user manually types (not selecting from autocomplete)
     inpStation.dataset.stopId = '';
     clearTimeout(acTimer);
-    if (v.trim().length < 3){ 
-      console.log('[DEBUG] INPUT - Too short, clearing autocomplete');
-      clearAutocomplete(); 
-      return; 
-    }
+    if (v.trim().length < 3){ clearAutocomplete(); return; }
     
     // Clear old candidates immediately when starting a new search
     // This prevents auto-selecting stale results if user blurs before new results arrive
     lastCandidates = [];
     
-    console.log('[DEBUG] INPUT - Starting search for:', v);
     // debounce queries to avoid overloading backend; reset on every keypress
     acTimer = setTimeout(async () => {
       const searchQuery = v; // Capture query for this specific search
@@ -551,17 +500,12 @@ export function createOptionsPanel(defaults, onApply, onLanguageChange, onSave){
         // Don't filter by modes in autocomplete - Entur geocoder has bugs with 
         // categories filtering + Norwegian characters (e.g., "Støren" returns wrong results)
         const cands = await searchStations({ text: searchQuery, limit: 5, fetchFn: window.fetch });
-        console.log('[DEBUG] INPUT - Search results for "' + searchQuery + '":', cands.length, 'candidates', cands.map(c => c.title));
         
         // Only show results if the input hasn't changed since this search started
         if (inpStation.value === searchQuery) {
-          console.log('[DEBUG] INPUT - Showing results (query still matches)');
           showCandidates(cands);
-        } else {
-          console.log('[DEBUG] INPUT - Discarding stale results. Current value:', inpStation.value, 'Search was for:', searchQuery);
         }
       }catch(err){ 
-        console.log('[DEBUG] INPUT - Search error:', err);
         clearAutocomplete(); 
       }
     }, 250);
