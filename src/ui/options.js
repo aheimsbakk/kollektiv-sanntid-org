@@ -546,12 +546,20 @@ export function createOptionsPanel(defaults, onApply, onLanguageChange, onSave){
     console.log('[DEBUG] INPUT - Starting search for:', v);
     // debounce queries to avoid overloading backend; reset on every keypress
     acTimer = setTimeout(async () => {
+      const searchQuery = v; // Capture query for this specific search
       try{
         // Don't filter by modes in autocomplete - Entur geocoder has bugs with 
         // categories filtering + Norwegian characters (e.g., "Støren" returns wrong results)
-        const cands = await searchStations({ text: v, limit: 5, fetchFn: window.fetch });
-        console.log('[DEBUG] INPUT - Search results:', cands.length, 'candidates');
-        showCandidates(cands);
+        const cands = await searchStations({ text: searchQuery, limit: 5, fetchFn: window.fetch });
+        console.log('[DEBUG] INPUT - Search results for "' + searchQuery + '":', cands.length, 'candidates', cands.map(c => c.title));
+        
+        // Only show results if the input hasn't changed since this search started
+        if (inpStation.value === searchQuery) {
+          console.log('[DEBUG] INPUT - Showing results (query still matches)');
+          showCandidates(cands);
+        } else {
+          console.log('[DEBUG] INPUT - Discarding stale results. Current value:', inpStation.value, 'Search was for:', searchQuery);
+        }
       }catch(err){ 
         console.log('[DEBUG] INPUT - Search error:', err);
         clearAutocomplete(); 
