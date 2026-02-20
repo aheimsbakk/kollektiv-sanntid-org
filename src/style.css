@@ -87,7 +87,7 @@
 /* Mobile breakpoint - increase base font scale on small screens */
 @media (max-width: 600px) {
   :root {
-    --large-scale: 10vw;
+    /* --large-scale: 10vw; */
   }
 }
 
