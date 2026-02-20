@@ -129,28 +129,15 @@ export function createDepartureNode(item){
     ? REALTIME_INDICATORS.realtime 
     : REALTIME_INDICATORS.scheduled;
   
-  // Build platform/quay display with stacked format: {emoji} <span>{symbol}<br>{code}</span>
-  // Detect quay type from publicCode format:
-  // - Numeric (1-20) = platform (trains, metro)
-  // - Letters (A-Z) = gate/stop (buses, trams)
+  // Build platform/quay display with stacked format: {symbol}<br>{code}
+  // Symbol is selected from PLATFORM_SYMBOLS based on the transport mode from the API
+  // (not the format of publicCode, which varies by location)
   let platformElement = null;
   if (item && item.quay && item.quay.publicCode) {
     const quayCode = String(item.quay.publicCode);
-    let quayType = 'default';
     
-    // Detect type based on publicCode format
-    if (/^\d+$/.test(quayCode)) {
-      // Pure numeric = platform (trains, metro)
-      quayType = 'platform';
-    } else if (/^[A-Z]$/i.test(quayCode)) {
-      // Single letter = gate or stop
-      // We could differentiate based on mode, but for simplicity use 'gate'
-      quayType = mode === 'tram' ? 'stop' : 'gate';
-    } else if (mode === 'water' || mode === 'ferry') {
-      quayType = 'berth';
-    }
-    
-    const platformSymbol = PLATFORM_SYMBOLS[quayType] || PLATFORM_SYMBOLS.default;
+    // Select symbol based on transport mode from API
+    const platformSymbol = PLATFORM_SYMBOLS[mode] || PLATFORM_SYMBOLS.default;
     
     // Create stacked display element
     const stackedSpan = document.createElement('span');

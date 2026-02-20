@@ -1,6 +1,6 @@
 // Version is defined here and in src/sw.js (service worker)
 // Both must be kept in sync - use scripts/bump-version.sh to update both
-export const VERSION = '1.29.2';
+export const VERSION = '1.29.3';
 
 export const DEFAULTS = {
   STATION_NAME: 'Jernbanetorget, Oslo',
@@ -53,16 +53,17 @@ export const CANCELLATION_WRAPPER = {
   close: '</span>'
 };
 
-// Platform/Quay display symbols - based on the type of stop location
-// We detect the type from the quay publicCode format:
-// - Numeric (1-20) = Platform (trains, metro)
-// - Letters (A-Z) = Gate/Stop (buses, trams)
+// Platform/Quay display symbols - mapped by transport mode from the API
+// The symbol is selected based on serviceJourney.journeyPattern.line.transportMode
+// not on the format of quay.publicCode (which varies by stop location)
 export const PLATFORM_SYMBOLS = {
-  platform: '⚏',  // Railroad track symbol for numbered platforms (trains, metro)
-  gate: '◆',      // Diamond for lettered gates (buses at stations)
-  stop: '▪',      // Small square for lettered stops (trams, local buses)
-  berth: '⚓',     // Anchor for ferry berths
-  default: '•'    // Bullet for unknown/ambiguous cases
+  bus: '◆',       // Diamond for bus stops/gates/platforms
+  coach: '◆',     // Diamond for coach stops/platforms
+  tram: '▪',      // Small square for tram stops
+  metro: '⚏',     // Railroad track symbol for metro platforms
+  rail: '⚏',      // Railroad track symbol for train platforms
+  water: '⚓',     // Anchor for ferry/boat berths
+  default: '•'    // Bullet for unknown transport modes
 };
 
 // Departure line display template
