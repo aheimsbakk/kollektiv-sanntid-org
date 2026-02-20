@@ -1,12 +1,12 @@
-Overall Context: Kollektiv.Sanntid.org - live-only app with reactive options panel and theme toggle. Version 1.18.4.
+Overall Context: Kollektiv.Sanntid.org - live-only app with reactive options panel and theme toggle. Version 1.19.0.
 
-Current Goal: Line number and platform display features complete with configurable formatting options.
+Current Goal: Template system for departure line format complete. Ready for testing and deployment.
 
 Last 3 Changes:
+- agents/worklogs/2026-02-20-13-24-template-system.md
 - agents/worklogs/2026-02-20-13-20-configurable-separator.md
 - agents/worklogs/2026-02-20-13-18-add-middot-separator.md
-- agents/worklogs/2026-02-20-12-55-adjust-centering.md
 
 Next Steps:
-- Test complete display with live data
-- Consider deployment to production
+- Test template system with live data
+- Verify all display formats work correctly

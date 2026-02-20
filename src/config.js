@@ -1,6 +1,6 @@
 // Version is defined here and in src/sw.js (service worker)
 // Both must be kept in sync - use scripts/bump-version.sh to update both
-export const VERSION = '1.18.4';
+export const VERSION = '1.19.0';
 
 export const DEFAULTS = {
   STATION_NAME: 'Jernbanetorget, Oslo',
@@ -24,6 +24,18 @@ export const PLATFORM_SYMBOLS = {
   default: '•'    // Bullet for unknown/ambiguous cases
 };
 
-// Line number separator - displayed between line number and destination
-// Examples: ' · ' (middot), ' - ' (dash), ' | ' (pipe), ' ' (space only)
-export const LINE_NUMBER_SEPARATOR = ' · ';
+// Departure line display template
+// Available placeholders:
+//   {lineNumber}   - Line/route number (e.g., "L2", "81")
+//   {destination}  - Destination name (e.g., "Ski", "Myrvoll stasjon")
+//   {emoji}        - Transport mode emoji (e.g., 🚅, 🚌, 🚇)
+//   {platform}     - Platform/gate display (stacked symbol+code)
+//
+// Template examples:
+//   '{lineNumber} · {destination} {emoji}{platform}'  - Line first (old format)
+//   '{destination} · {lineNumber} {emoji}{platform}'  - Destination first
+//   '{destination} {emoji}{platform} ({lineNumber})'  - Line in parentheses
+//   '{emoji} {lineNumber} - {destination}{platform}'  - Emoji first
+//
+// Note: {platform} is automatically empty if no platform info is available
+export const DEPARTURE_LINE_TEMPLATE = '{destination} · {lineNumber} {emoji}{platform}';

@@ -1,4 +1,4 @@
-import { PLATFORM_SYMBOLS, LINE_NUMBER_SEPARATOR } from '../config.js';
+import { PLATFORM_SYMBOLS, DEPARTURE_LINE_TEMPLATE } from '../config.js';
 
 export function createDepartureNode(item){
   const container = document.createElement('div'); container.className='departure';
@@ -122,13 +122,13 @@ export function createDepartureNode(item){
   // render emoji inline with destination text so it wraps naturally on small screens
   const emoji = emojiForMode(mode);
   const destinationText = (item && item.destination) ? String(item.destination) : '—';
-  const lineNumber = (item && item.publicCode) ? String(item.publicCode) + LINE_NUMBER_SEPARATOR : '';
+  const lineNumberText = (item && item.publicCode) ? String(item.publicCode) : '';
   
   // Build platform/quay display with stacked format: {emoji} <span>{symbol}<br>{code}</span>
   // Detect quay type from publicCode format:
   // - Numeric (1-20) = platform (trains, metro)
   // - Letters (A-Z) = gate/stop (buses, trams)
-  let platformDisplay = '';
+  let platformElement = null;
   if (item && item.quay && item.quay.publicCode) {
     const quayCode = String(item.quay.publicCode);
     let quayType = 'default';
@@ -153,15 +153,30 @@ export function createDepartureNode(item){
     stackedSpan.innerHTML = `<span>${platformSymbol}</span><span>${quayCode}</span>`;
     
     // Store the element for later insertion
-    platformDisplay = stackedSpan;
+    platformElement = stackedSpan;
   }
   
-  // Build text content and append platform element if present
-  const fullText = lineNumber + destinationText + ' ' + emoji;
+  // Apply template to build the display line
+  // Available placeholders: {lineNumber}, {destination}, {emoji}, {platform}
+  // The {platform} placeholder will be replaced with a placeholder string that we'll swap with the element
+  const PLATFORM_PLACEHOLDER = '<<<PLATFORM>>>';
+  let displayText = DEPARTURE_LINE_TEMPLATE
+    .replace('{lineNumber}', lineNumberText)
+    .replace('{destination}', destinationText)
+    .replace('{emoji}', emoji)
+    .replace('{platform}', platformElement ? PLATFORM_PLACEHOLDER : '');
+  
+  // Build the DOM: set text content, then replace placeholder with platform element
   try{ 
-    dest.textContent = fullText;
-    if (platformDisplay) {
-      dest.appendChild(platformDisplay);
+    dest.textContent = displayText;
+    if (platformElement && displayText.includes(PLATFORM_PLACEHOLDER)) {
+      // Replace the placeholder text with the actual platform element
+      const textContent = dest.textContent;
+      const parts = textContent.split(PLATFORM_PLACEHOLDER);
+      dest.textContent = '';
+      if (parts[0]) dest.appendChild(document.createTextNode(parts[0]));
+      dest.appendChild(platformElement);
+      if (parts[1]) dest.appendChild(document.createTextNode(parts[1]));
     }
   } catch(e) { 
     dest.textContent = destinationText; 
@@ -179,8 +194,11 @@ export function createDepartureNode(item){
     return '';
   };
   try{ 
+    // Build accessible aria-label matching the visual order from template
     const platformText = (item && item.quay && item.quay.publicCode) ? (' Platform ' + item.quay.publicCode) : '';
-    dest.setAttribute('aria-label', (lineNumber ? 'Line ' + item.publicCode + ' to ' : '') + destinationText + (readableMode(mode) ? (' ' + readableMode(mode)) : '') + platformText); 
+    const linePrefix = lineNumberText ? ('Line ' + lineNumberText + ' ') : '';
+    const modeText = readableMode(mode) ? (' ' + readableMode(mode)) : '';
+    dest.setAttribute('aria-label', linePrefix + destinationText + modeText + platformText); 
   }catch(e){}
 
   timeWrap.append(time);
