@@ -1,12 +1,12 @@
-Overall Context: Kollektiv.Sanntid.org - Fixed autocomplete race condition. Version 1.27.10.
+Overall Context: Kollektiv.Sanntid.org - Debug why API returns Jernbanetorget for all queries. Version 1.27.11.
 
-Current Goal: Validate race condition fix resolves autocomplete bug.
+Current Goal: Identify if Entur API bug or our search function bug.
 
 Last 3 Changes:
+- agents/worklogs/2026-02-20-20-00-debug-api-responses.md
 - agents/worklogs/2026-02-20-19-57-fix-autocomplete-race-condition.md
 - agents/worklogs/2026-02-20-19-47-add-debug-logging.md
-- agents/worklogs/2026-02-20-19-44-ignore-programmatic-input.md
 
 Next Steps:
-- Commit race condition fix v1.27.10
-- User tests to confirm autocomplete shows correct results
+- Commit API debug logging v1.27.11
+- User tests to see what API actually returns for "bergkrys"

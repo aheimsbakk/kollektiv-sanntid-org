@@ -451,6 +451,7 @@ function mapModesToGeocoderCategories(modes){
   // We'll filter client-side to show only transport stops and return the requested limit
   const fetchSize = Math.max(50, limit * 10);
   const url = `${geocodeUrl}?text=${encodeURIComponent(text)}&lang=no&size=${fetchSize}`;
+  console.log('[DEBUG] searchStations - URL:', url);
   try{
     const r = await fetchFn(url, { headers: { 'ET-Client-Name': clientName } });
     if (!r) return [];
@@ -458,6 +459,7 @@ function mapModesToGeocoderCategories(modes){
     const contentType = (r.headers && (typeof r.headers.get === 'function')) ? r.headers.get('content-type') : (r.headers && (r.headers['content-type'] || r.headers['Content-Type'])) || '';
     if (contentType && !/application\/json/i.test(contentType)) return [];
     const j = await r.json();
+    console.log('[DEBUG] searchStations - API returned', j.features?.length, 'features');
     if (!j || !Array.isArray(j.features)) return [];
     // Filter to only transport stops (venue layer only)
     // This prevents address/place results from appearing, even if they have NSR: IDs
@@ -497,8 +499,12 @@ function mapModesToGeocoderCategories(modes){
     // Sort by score descending, then keep original order for ties
     scoredStops.sort((a, b) => b.score - a.score);
     
+    console.log('[DEBUG] searchStations - After filtering/scoring:', scoredStops.length, 'transport stops');
+    
     // Map features into a lightweight candidate shape consumed by the UI
-    return scoredStops.slice(0, limit).map(({ feature: f }) => ({ id: f && f.properties && f.properties.id ? f.properties.id : null, title: f && f.properties && (f.properties.label || f.properties.name || f.properties.title) ? (f.properties.label || f.properties.name || f.properties.title) : (f && f.text ? f.text : ''), raw: f }));
+    const results = scoredStops.slice(0, limit).map(({ feature: f }) => ({ id: f && f.properties && f.properties.id ? f.properties.id : null, title: f && f.properties && (f.properties.label || f.properties.name || f.properties.title) ? (f.properties.label || f.properties.name || f.properties.title) : (f && f.text ? f.text : ''), raw: f }));
+    console.log('[DEBUG] searchStations - Returning', results.length, 'results:', results.map(r => r.title));
+    return results;
   }catch(e){
     return [];
   }
