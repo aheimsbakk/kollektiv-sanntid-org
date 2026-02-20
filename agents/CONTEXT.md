@@ -1,12 +1,13 @@
-Overall Context: Kollektiv.Sanntid.org - live-only app with reactive options panel and theme toggle. Version 1.16.6.
+Overall Context: Kollektiv.Sanntid.org - live-only app with reactive options panel and theme toggle. Version 1.16.7.
 
-Current Goal: Production ready with user manual documentation.
+Current Goal: Production ready with accurate documentation.
 
 Last 3 Changes:
+- agents/worklogs/2026-02-20-11-44-fix-readme-line-numbers.md
 - agents/worklogs/2026-02-20-11-35-user-manual-readme.md
 - agents/worklogs/2026-02-20-11-12-remove-periodic-updates.md
-- agents/worklogs/2026-02-20-11-08-force-sw-updates.md
 
 Next Steps:
-- Test app with new documentation
+- Investigate line number format from Oslo S API response
+- Consider implementing line number display
 - Deploy to production

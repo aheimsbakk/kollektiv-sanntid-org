@@ -27,7 +27,7 @@ Click the **station name** at the top of the screen to open your favorites list.
 ### Live Departures
 
 The app displays upcoming departures with:
-- **Line number and destination** for each service
+- **Destination** for each service
 - **Countdown timer** showing minutes until departure
 - **Transport icons** (🚌 🚋 🚇 🚅 🛳️ 🚍) to identify the vehicle type
 - **Automatic updates** every 60 seconds (configurable)
