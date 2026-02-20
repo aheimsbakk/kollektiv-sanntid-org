@@ -378,6 +378,10 @@ export function createOptionsPanel(defaults, onApply, onLanguageChange, onSave){
     // This fixes the bug where autocomplete doesn't work after opening with default station
     lastQuery = '';
     
+    // Clear any stale autocomplete state from previous sessions
+    // This prevents auto-selecting from old candidate lists when user types new queries
+    clearAutocomplete();
+    
     // Update initial values to match current state
     const chosen = Array.from(modesWrap.querySelectorAll('input[type=checkbox]:checked')).map(i=>i.value);
     initialValues = {
@@ -455,6 +459,11 @@ export function createOptionsPanel(defaults, onApply, onLanguageChange, onSave){
     inpStation.dataset.stopId = '';
     clearTimeout(acTimer);
     if (v.trim().length < 3){ clearAutocomplete(); return; }
+    
+    // Clear old candidates immediately when starting a new search
+    // This prevents auto-selecting stale results if user blurs before new results arrive
+    lastCandidates = [];
+    
     // debounce queries to avoid overloading backend; reset on every keypress
     acTimer = setTimeout(async () => {
       try{
