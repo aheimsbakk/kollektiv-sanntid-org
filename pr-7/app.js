@@ -138,7 +138,13 @@ async function init(){
   // automatically reloads when a new service worker is installed.
   if ('serviceWorker' in navigator) {
     try {
-      navigator.serviceWorker.register('./sw.js').then(reg => {
+      navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' }).then(reg => {
+        // Check for updates immediately and then every 60 seconds
+        reg.update();
+        setInterval(() => {
+          reg.update();
+        }, 60000);
+        
         // helper to show a brief update notification and auto-reload
         const showUpdateNotification = async (worker) => {
           // avoid creating multiple prompts
