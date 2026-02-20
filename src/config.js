@@ -37,7 +37,7 @@ export const TRANSPORT_MODE_EMOJIS = {
 // UI Button emojis
 export const UI_EMOJIS = {
   settings: '⚙️',
-  share: '🔗',
+  share: '📋',
   shareSuccess: '✓',
   themeLight: '🌞',
   themeAuto: '🌤️',
