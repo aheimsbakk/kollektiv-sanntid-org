@@ -120,9 +120,9 @@ export function createDepartureNode(item){
   // render emoji inline with destination text so it wraps naturally on small screens
   const emoji = emojiForMode(mode);
   const destinationText = (item && item.destination) ? String(item.destination) : '—';
-  try{ dest.textContent = emoji + ' ' + destinationText; }catch(e){ dest.textContent = destinationText; }
-  // now place the emoji at the end of the destination text (visual change requested)
-  try{ dest.textContent = destinationText + ' ' + emoji; }catch(e){ dest.textContent = destinationText; }
+  const lineNumber = (item && item.publicCode) ? String(item.publicCode) + ' ' : '';
+  const fullText = lineNumber + destinationText + ' ' + emoji;
+  try{ dest.textContent = fullText; }catch(e){ dest.textContent = destinationText; }
   // provide an accessible textual label matching the visual order (destination + mode)
   const readableMode = (m) => {
     if(!m) return '';
@@ -135,7 +135,7 @@ export function createDepartureNode(item){
     if(mm.includes('coach')) return 'Coach';
     return '';
   };
-  try{ dest.setAttribute('aria-label', destinationText + (readableMode(mode) ? (' ' + readableMode(mode)) : '')); }catch(e){}
+  try{ dest.setAttribute('aria-label', (lineNumber ? 'Line ' + item.publicCode + ' to ' : '') + destinationText + (readableMode(mode) ? (' ' + readableMode(mode)) : '')); }catch(e){}
 
   timeWrap.append(time);
   // place situation between destination and countdown so alerts are read in context

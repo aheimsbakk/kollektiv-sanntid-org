@@ -27,7 +27,7 @@ Click the **station name** at the top of the screen to open your favorites list.
 ### Live Departures
 
 The app displays upcoming departures with:
-- **Destination** for each service
+- **Line number and destination** for each service (e.g., "L2 Ski", "81 Myrvoll stasjon")
 - **Countdown timer** showing minutes until departure
 - **Transport icons** (🚌 🚋 🚇 🚅 🛳️ 🚍) to identify the vehicle type
 - **Automatic updates** every 60 seconds (configurable)
