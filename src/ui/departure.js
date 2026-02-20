@@ -1,4 +1,4 @@
-import { PLATFORM_SYMBOLS, DEPARTURE_LINE_TEMPLATE, REALTIME_INDICATORS, CANCELLATION_WRAPPER, TRANSPORT_MODE_EMOJIS } from '../config.js';
+import { PLATFORM_SYMBOLS, PLATFORM_SYMBOL_RULES, DEPARTURE_LINE_TEMPLATE, REALTIME_INDICATORS, CANCELLATION_WRAPPER, TRANSPORT_MODE_EMOJIS } from '../config.js';
 
 export function createDepartureNode(item){
   const container = document.createElement('div'); container.className='departure';
@@ -130,14 +130,30 @@ export function createDepartureNode(item){
     : REALTIME_INDICATORS.scheduled;
   
   // Build platform/quay display with stacked format: {symbol}<br>{code}
-  // Symbol is selected from PLATFORM_SYMBOLS based on the transport mode from the API
-  // (not the format of publicCode, which varies by location)
+  // Symbol is selected using PLATFORM_SYMBOL_RULES from config.js
+  // Rules combine transport mode (authoritative from API) with publicCode pattern
+  // to distinguish physical quay types (e.g., bus bay vs bus gate)
   let platformElement = null;
   if (item && item.quay && item.quay.publicCode) {
     const quayCode = String(item.quay.publicCode);
     
-    // Select symbol based on transport mode from API
-    const platformSymbol = PLATFORM_SYMBOLS[mode] || PLATFORM_SYMBOLS.default;
+    // Evaluate rules in order to select the symbol
+    let symbolKey = 'default';
+    for (const rule of PLATFORM_SYMBOL_RULES) {
+      // Check transport mode match (if rule specifies modes)
+      const modeMatches = !rule.transportMode || (rule.transportMode.includes(mode));
+      
+      // Check publicCode pattern match (if rule specifies a pattern)
+      const patternMatches = !rule.publicCodePattern || rule.publicCodePattern.test(quayCode);
+      
+      // If both conditions pass, use this rule's symbol
+      if (modeMatches && patternMatches) {
+        symbolKey = rule.symbol;
+        break;
+      }
+    }
+    
+    const platformSymbol = PLATFORM_SYMBOLS[symbolKey] || PLATFORM_SYMBOLS.default;
     
     // Create stacked display element
     const stackedSpan = document.createElement('span');
