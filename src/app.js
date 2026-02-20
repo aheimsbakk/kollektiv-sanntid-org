@@ -299,6 +299,15 @@ async function init(){
         Object.assign(opts, newOpts);
         // Store the handlers for future language changes
         opts._onApply = arguments[0];
+        
+        // Update tooltips on global buttons
+        if (window.__GLOBAL_BUTTONS__) {
+          window.__GLOBAL_BUTTONS__.share.title = t('shareBoard');
+          window.__GLOBAL_BUTTONS__.share.setAttribute('aria-label', t('shareBoard'));
+          window.__GLOBAL_BUTTONS__.theme.title = t('themeTooltip');
+          window.__GLOBAL_BUTTONS__.settings.title = t('settingsTooltip');
+        }
+        
         // Reopen the panel
         setTimeout(() => opts.open(), 50);
         return;
@@ -434,6 +443,13 @@ async function init(){
     } else if (opts && typeof opts.open === 'function') opts.open();
   });
   gWrap.appendChild(gBtn);
+  
+  // Store references to buttons for tooltip updates on language change
+  window.__GLOBAL_BUTTONS__ = {
+    share: shareComponents.button,
+    theme: themeBtn,
+    settings: gBtn
+  };
   
   document.body.appendChild(gWrap);
   
