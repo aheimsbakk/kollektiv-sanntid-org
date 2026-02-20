@@ -1,6 +1,6 @@
 // Version is defined here and in src/sw.js (service worker)
 // Both must be kept in sync - use scripts/bump-version.sh to update both
-export const VERSION = '1.19.0';
+export const VERSION = '1.20.0';
 
 export const DEFAULTS = {
   STATION_NAME: 'Jernbanetorget, Oslo',
@@ -10,6 +10,13 @@ export const DEFAULTS = {
   TRANSPORT_MODES: ['bus','tram','metro','rail','water','coach'],
   CLIENT_NAME: 'kollektiv-sanntid-org',
   API_URL: 'https://api.entur.io/journey-planner/v3/graphql'
+};
+
+// Realtime data indicators
+// Used in the departure line template via {indicator} placeholder
+export const REALTIME_INDICATORS = {
+  realtime: '●',    // Solid dot for live realtime data
+  scheduled: '○'    // Hollow dot for scheduled/static data
 };
 
 // Platform/Quay display symbols - based on the type of stop location
@@ -30,12 +37,13 @@ export const PLATFORM_SYMBOLS = {
 //   {destination}  - Destination name (e.g., "Ski", "Myrvoll stasjon")
 //   {emoji}        - Transport mode emoji (e.g., 🚅, 🚌, 🚇)
 //   {platform}     - Platform/gate display (stacked symbol+code)
+//   {indicator}    - Realtime indicator (● for live data, ○ for scheduled)
 //
 // Template examples:
-//   '{lineNumber} · {destination} {emoji}{platform}'  - Line first (old format)
-//   '{destination} · {lineNumber} {emoji}{platform}'  - Destination first
-//   '{destination} {emoji}{platform} ({lineNumber})'  - Line in parentheses
-//   '{emoji} {lineNumber} - {destination}{platform}'  - Emoji first
+//   '{lineNumber} · {destination} {emoji}{platform}'       - Line first (old format)
+//   '{destination} {indicator} {lineNumber} {emoji}{platform}' - Destination first with realtime indicator
+//   '{destination} {emoji}{platform} ({lineNumber})'       - Line in parentheses
+//   '{emoji} {lineNumber} - {destination}{platform}'       - Emoji first
 //
 // Note: {platform} is automatically empty if no platform info is available
-export const DEPARTURE_LINE_TEMPLATE = '{destination} · {lineNumber} {emoji}{platform}';
+export const DEPARTURE_LINE_TEMPLATE = '{destination} {indicator} {lineNumber} {emoji} {platform}';

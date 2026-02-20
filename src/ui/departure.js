@@ -1,4 +1,4 @@
-import { PLATFORM_SYMBOLS, DEPARTURE_LINE_TEMPLATE } from '../config.js';
+import { PLATFORM_SYMBOLS, DEPARTURE_LINE_TEMPLATE, REALTIME_INDICATORS } from '../config.js';
 
 export function createDepartureNode(item){
   const container = document.createElement('div'); container.className='departure';
@@ -124,6 +124,11 @@ export function createDepartureNode(item){
   const destinationText = (item && item.destination) ? String(item.destination) : '—';
   const lineNumberText = (item && item.publicCode) ? String(item.publicCode) : '';
   
+  // Determine realtime indicator based on item.realtime field
+  const indicator = (item && item.realtime === true) 
+    ? REALTIME_INDICATORS.realtime 
+    : REALTIME_INDICATORS.scheduled;
+  
   // Build platform/quay display with stacked format: {emoji} <span>{symbol}<br>{code}</span>
   // Detect quay type from publicCode format:
   // - Numeric (1-20) = platform (trains, metro)
@@ -157,13 +162,14 @@ export function createDepartureNode(item){
   }
   
   // Apply template to build the display line
-  // Available placeholders: {lineNumber}, {destination}, {emoji}, {platform}
+  // Available placeholders: {lineNumber}, {destination}, {emoji}, {platform}, {indicator}
   // The {platform} placeholder will be replaced with a placeholder string that we'll swap with the element
   const PLATFORM_PLACEHOLDER = '<<<PLATFORM>>>';
   let displayText = DEPARTURE_LINE_TEMPLATE
     .replace('{lineNumber}', lineNumberText)
     .replace('{destination}', destinationText)
     .replace('{emoji}', emoji)
+    .replace('{indicator}', indicator)
     .replace('{platform}', platformElement ? PLATFORM_PLACEHOLDER : '');
   
   // Build the DOM: set text content, then replace placeholder with platform element
