@@ -451,9 +451,12 @@ function mapModesToGeocoderCategories(modes){
   // We'll filter client-side to show only transport stops and return the requested limit
   const fetchSize = Math.max(50, limit * 10);
   const url = `${geocodeUrl}?text=${encodeURIComponent(text)}&lang=no&size=${fetchSize}`;
+  console.log('[DEBUG] searchStations - text parameter:', text);
+  console.log('[DEBUG] searchStations - encodeURIComponent(text):', encodeURIComponent(text));
   console.log('[DEBUG] searchStations - URL:', url);
   try{
     const r = await fetchFn(url, { headers: { 'ET-Client-Name': clientName } });
+    console.log('[DEBUG] searchStations - Fetch completed, response.url:', r.url);
     if (!r) return [];
     if (typeof r.ok !== 'undefined' && r.ok === false) return [];
     const contentType = (r.headers && (typeof r.headers.get === 'function')) ? r.headers.get('content-type') : (r.headers && (r.headers['content-type'] || r.headers['Content-Type'])) || '';
