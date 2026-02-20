@@ -1,6 +1,7 @@
 // Options panel UI: slide-in from right with controls to update DEFAULTS
 import { searchStations } from '../entur.js';
 import { t, setLanguage, getLanguage, getLanguages } from '../i18n.js';
+import { ALL_TRANSPORT_MODES } from '../config.js';
 
 export function createOptionsPanel(defaults, onApply, onLanguageChange, onSave){
   const panel = document.createElement('aside'); panel.className = 'options-panel';
@@ -219,7 +220,7 @@ export function createOptionsPanel(defaults, onApply, onLanguageChange, onSave){
       STOP_ID: inpStation.dataset.stopId || null,
       NUM_DEPARTURES: numDepartures,
       FETCH_INTERVAL: fetchInterval,
-      TRANSPORT_MODES: chosen.length ? chosen : defaults.TRANSPORT_MODES,
+      TRANSPORT_MODES: chosen.length ? chosen : ALL_TRANSPORT_MODES,
       TEXT_SIZE: selSize.value || (defaults.TEXT_SIZE || 'large')
     };
     

@@ -53,6 +53,25 @@ function getModesDisplay(modes) {
 }
 
 /**
+ * Compare two mode arrays for equality (order doesn't matter)
+ * @param {Array<string>} modes1 
+ * @param {Array<string>} modes2 
+ * @returns {boolean}
+ */
+export function modesEqual(modes1, modes2) {
+  const m1 = modes1 || [];
+  const m2 = modes2 || [];
+  
+  if (m1.length !== m2.length) return false;
+  
+  // Sort both arrays and compare
+  const sorted1 = m1.slice().sort();
+  const sorted2 = m2.slice().sort();
+  
+  return sorted1.every((mode, i) => mode === sorted2[i]);
+}
+
+/**
  * Get recent stations from localStorage
  * @returns {Array<{name: string, stopId: string, modes?: Array<string>}>}
  */
@@ -67,25 +86,13 @@ export function getRecentStations() {
 }
 
 /**
- * Helper to compare mode arrays (order-independent)
- * @param {Array<string>} modes1 
- * @param {Array<string>} modes2 
- * @returns {boolean}
- */
-function modesEqual(modes1, modes2) {
-  const m1 = (modes1 || []).slice().sort();
-  const m2 = (modes2 || []).slice().sort();
-  return JSON.stringify(m1) === JSON.stringify(m2);
-}
-
-/**
- * Add or update a station in recent list (moves to top)
- * Each unique combination of station + modes is a separate entry
+ * Add or update a recent station with full settings
  * @param {string} name - Station name
  * @param {string} stopId - Station stop ID
  * @param {Array<string>} modes - Transport modes (e.g., ['bus', 'tram'])
+ * @param {Object} settings - Optional full settings object { numDepartures, fetchInterval, textSize, language }
  */
-export function addRecentStation(name, stopId, modes = []) {
+export function addRecentStation(name, stopId, modes = [], settings = {}) {
   if (!name || !stopId) return;
   
   let recent = getRecentStations();
@@ -93,8 +100,17 @@ export function addRecentStation(name, stopId, modes = []) {
   // Remove exact duplicate (same stopId AND same modes)
   recent = recent.filter(s => !(s.stopId === stopId && modesEqual(s.modes, modes)));
   
-  // Add to top
-  recent.unshift({ name, stopId, modes: modes || [] });
+  // Add to top with full settings
+  recent.unshift({ 
+    name, 
+    stopId, 
+    modes: modes || [],
+    // Store all settings for future use (but don't apply them on restore yet)
+    numDepartures: settings.numDepartures,
+    fetchInterval: settings.fetchInterval,
+    textSize: settings.textSize,
+    language: settings.language
+  });
   
   // Keep only MAX_RECENT
   if (recent.length > MAX_RECENT) {

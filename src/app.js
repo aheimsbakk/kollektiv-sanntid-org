@@ -5,9 +5,10 @@ import { createHeaderToggle } from './ui/header.js';
 import { createOptionsPanel } from './ui/options.js';
 import { createDepartureNode, updateDepartureCountdown } from './ui/departure.js';
 import { fetchDepartures, lookupStopId } from './entur.js';
-import { initLanguage, t } from './i18n.js';
+import { initLanguage, t, getLanguage } from './i18n.js';
 import { addRecentStation } from './ui/station-dropdown.js';
 import { initTheme, createThemeToggle } from './ui/theme-toggle.js';
+import { createShareButton, decodeSettings } from './ui/share-button.js';
 
 // Initialize language on startup
 initLanguage();
@@ -17,11 +18,21 @@ initTheme();
 
 const ROOT = document.getElementById('app');
 
+// Update tooltips on global buttons when language changes
+function updateGlobalButtonTooltips() {
+  if (window.__GLOBAL_BUTTONS__) {
+    window.__GLOBAL_BUTTONS__.share.title = t('shareBoard');
+    window.__GLOBAL_BUTTONS__.share.setAttribute('aria-label', t('shareBoard'));
+    window.__GLOBAL_BUTTONS__.theme.title = t('themeTooltip');
+    window.__GLOBAL_BUTTONS__.settings.title = t('settingsTooltip');
+  }
+}
+
 function renderDepartures(listEl, items){
   clearList(listEl);
   if (!items || items.length === 0){
     const empty = document.createElement('div'); empty.className = 'empty-state';
-    empty.textContent = 'No departures...';
+    empty.textContent = t('noDepartures');
     listEl.appendChild(empty);
     return;
   }
@@ -45,6 +56,60 @@ async function init(){
     }
   }catch(e){/*ignore*/}
 
+  // Check for URL parameters
+  try {
+    const urlParams = new URLSearchParams(window.location.search);
+    
+    // Clear cache-busting timestamp parameter if present (from SW update reload)
+    if (urlParams.has('t')) {
+      window.history.replaceState({}, '', window.location.pathname);
+    }
+    
+    // Check for shared board URL parameter (?b= or legacy ?board=)
+    const boardParam = urlParams.get('b') || urlParams.get('board');
+    if (boardParam) {
+      const sharedSettings = decodeSettings(boardParam);
+      if (sharedSettings) {
+        // Apply all decoded settings to DEFAULTS
+        DEFAULTS.STATION_NAME = sharedSettings.stationName;
+        DEFAULTS.STOP_ID = sharedSettings.stopId;
+        DEFAULTS.TRANSPORT_MODES = sharedSettings.transportModes;
+        DEFAULTS.NUM_DEPARTURES = sharedSettings.numDepartures;
+        DEFAULTS.FETCH_INTERVAL = sharedSettings.fetchInterval;
+        DEFAULTS.TEXT_SIZE = sharedSettings.textSize;
+        
+        // Apply language if valid
+        if (sharedSettings.language) {
+          try {
+            localStorage.setItem('departure:language', sharedSettings.language);
+            // Re-initialize language with new setting
+            initLanguage();
+          } catch(e) {/*ignore*/}
+        }
+        
+        // Add shared board to top of favorites list
+        if (sharedSettings.stationName && sharedSettings.stopId) {
+          addRecentStation(sharedSettings.stationName, sharedSettings.stopId, sharedSettings.transportModes || [], {
+            numDepartures: sharedSettings.numDepartures,
+            fetchInterval: sharedSettings.fetchInterval,
+            textSize: sharedSettings.textSize,
+            language: sharedSettings.language
+          });
+        }
+        
+        // Save shared settings to localStorage so they persist after URL is cleaned
+        try {
+          localStorage.setItem('departure:settings', JSON.stringify(DEFAULTS));
+        } catch(e) {/*ignore*/}
+        
+        // Clear the URL parameter to prevent accidental re-imports
+        window.history.replaceState({}, '', window.location.pathname);
+      }
+    }
+  } catch(e) {
+    console.warn('Failed to decode shared board URL', e);
+  }
+
   // Handler for when user selects a station from recent dropdown
   function handleStationSelect(station) {
     DEFAULTS.STATION_NAME = station.name;
@@ -63,8 +128,14 @@ async function init(){
       window.__APP_OPTIONS__.updateFields();
     }
     
-    // Move this station to top of recent list (with its modes)
-    addRecentStation(station.name, station.stopId, station.modes || []);
+    // Move this station to top of recent list (preserve its stored settings)
+    // Use the station's own settings if available, otherwise use current DEFAULTS
+    addRecentStation(station.name, station.stopId, station.modes || [], {
+      numDepartures: station.numDepartures !== undefined ? station.numDepartures : DEFAULTS.NUM_DEPARTURES,
+      fetchInterval: station.fetchInterval !== undefined ? station.fetchInterval : DEFAULTS.FETCH_INTERVAL,
+      textSize: station.textSize || DEFAULTS.TEXT_SIZE,
+      language: station.language || getLanguage()
+    });
     board.stationDropdown.refresh();
     
     // Update document title
@@ -171,7 +242,7 @@ async function init(){
           // Show countdown timer with version upgrade info
           let countdown = 5;
           const updateCountdown = () => {
-            toast.innerHTML = `<div>${t('newVersionAvailable')}</div><div>Upgrading from ${VERSION} to ${newVersion}</div><div>${t('updatingIn')} ${countdown}${t('seconds')}</div>`;
+            toast.innerHTML = `<div>${t('newVersionAvailable')}</div><div>${t('upgradingFrom')} ${VERSION} to ${newVersion}</div><div>${t('updatingIn')} ${countdown}${t('seconds')}</div>`;
           };
           updateCountdown();
           
@@ -241,13 +312,21 @@ async function init(){
         opts.close();
         // Remove old panel
         opts.panel.remove();
+        // Preserve handlers before recreation
+        const savedOnApply = opts._onApply;
+        const savedOnSave = opts._onSave;
         // Create new panel with updated translations
-        const newOpts = createOptionsPanel(DEFAULTS, opts._onApply, () => updateFooterTranslations(board.footer), opts._onSave);
+        const newOpts = createOptionsPanel(DEFAULTS, savedOnApply, () => updateFooterTranslations(board.footer), savedOnSave);
         document.body.appendChild(newOpts.panel);
         // Update reference
         Object.assign(opts, newOpts);
-        // Store the handlers for future language changes
-        opts._onApply = arguments[0];
+        // Restore the handlers for future language changes
+        opts._onApply = savedOnApply;
+        opts._onSave = savedOnSave;
+        
+        // Update tooltips on global buttons
+        updateGlobalButtonTooltips();
+        
         // Reopen the panel
         setTimeout(() => opts.open(), 50);
         return;
@@ -260,6 +339,7 @@ async function init(){
       DEFAULTS.NUM_DEPARTURES = newOpts.NUM_DEPARTURES;
       DEFAULTS.FETCH_INTERVAL = newOpts.FETCH_INTERVAL;
       DEFAULTS.TRANSPORT_MODES = newOpts.TRANSPORT_MODES;
+      DEFAULTS.TEXT_SIZE = newOpts.TEXT_SIZE;
       // update station dropdown title
       if (board.stationDropdown) {
         board.stationDropdown.updateTitle(DEFAULTS.STATION_NAME, DEFAULTS.TRANSPORT_MODES);
@@ -277,10 +357,18 @@ async function init(){
     try{ document.documentElement.classList.remove('text-size-tiny','text-size-small','text-size-medium','text-size-large','text-size-xlarge');
       document.documentElement.classList.add('text-size-'+(newOpts.TEXT_SIZE || 'large'));
     }catch(e){}
-  }, () => updateFooterTranslations(board.footer), ()=>{
+  }, () => {
+    updateFooterTranslations(board.footer);
+    updateGlobalButtonTooltips();
+  }, ()=>{
     // onSave callback - only adds to favorites, doesn't apply changes
     if (DEFAULTS.STATION_NAME && DEFAULTS.STOP_ID) {
-      addRecentStation(DEFAULTS.STATION_NAME, DEFAULTS.STOP_ID, DEFAULTS.TRANSPORT_MODES);
+      addRecentStation(DEFAULTS.STATION_NAME, DEFAULTS.STOP_ID, DEFAULTS.TRANSPORT_MODES, {
+        numDepartures: DEFAULTS.NUM_DEPARTURES,
+        fetchInterval: DEFAULTS.FETCH_INTERVAL,
+        textSize: DEFAULTS.TEXT_SIZE,
+        language: getLanguage()
+      });
       if (board.stationDropdown) {
         board.stationDropdown.refresh();
       }
@@ -295,6 +383,7 @@ async function init(){
     DEFAULTS.NUM_DEPARTURES = newOpts.NUM_DEPARTURES;
     DEFAULTS.FETCH_INTERVAL = newOpts.FETCH_INTERVAL;
     DEFAULTS.TRANSPORT_MODES = newOpts.TRANSPORT_MODES;
+    DEFAULTS.TEXT_SIZE = newOpts.TEXT_SIZE;
     // update station dropdown title
     if (board.stationDropdown) {
       board.stationDropdown.updateTitle(DEFAULTS.STATION_NAME, DEFAULTS.TRANSPORT_MODES);
@@ -316,7 +405,12 @@ async function init(){
   opts._onSave = ()=>{
     // onSave callback - only adds to favorites
     if (DEFAULTS.STATION_NAME && DEFAULTS.STOP_ID) {
-      addRecentStation(DEFAULTS.STATION_NAME, DEFAULTS.STOP_ID, DEFAULTS.TRANSPORT_MODES);
+      addRecentStation(DEFAULTS.STATION_NAME, DEFAULTS.STOP_ID, DEFAULTS.TRANSPORT_MODES, {
+        numDepartures: DEFAULTS.NUM_DEPARTURES,
+        fetchInterval: DEFAULTS.FETCH_INTERVAL,
+        textSize: DEFAULTS.TEXT_SIZE,
+        language: getLanguage()
+      });
       if (board.stationDropdown) {
         board.stationDropdown.refresh();
       }
@@ -342,6 +436,24 @@ async function init(){
   // add a global fixed header controls in top-right for easy access
   const gWrap = document.createElement('div'); gWrap.className='global-gear';
   
+  // share button (left of theme toggle)
+  const shareComponents = createShareButton(() => {
+    // Return current settings for sharing
+    if (!DEFAULTS.STATION_NAME || !DEFAULTS.STOP_ID) {
+      return null; // No station to share
+    }
+    return {
+      STATION_NAME: DEFAULTS.STATION_NAME,
+      STOP_ID: DEFAULTS.STOP_ID,
+      TRANSPORT_MODES: DEFAULTS.TRANSPORT_MODES,
+      NUM_DEPARTURES: DEFAULTS.NUM_DEPARTURES,
+      FETCH_INTERVAL: DEFAULTS.FETCH_INTERVAL,
+      TEXT_SIZE: DEFAULTS.TEXT_SIZE,
+      language: getLanguage()
+    };
+  });
+  gWrap.appendChild(shareComponents.button);
+  
   // theme toggle button
   const themeBtn = createThemeToggle();
   gWrap.appendChild(themeBtn);
@@ -356,7 +468,18 @@ async function init(){
   });
   gWrap.appendChild(gBtn);
   
+  // Store references to buttons for tooltip updates on language change
+  window.__GLOBAL_BUTTONS__ = {
+    share: shareComponents.button,
+    theme: themeBtn,
+    settings: gBtn
+  };
+  
   document.body.appendChild(gWrap);
+  
+  // Add share URL box to body (for fallback display)
+  document.body.appendChild(shareComponents.urlBox);
+  
   ROOT.appendChild(board.el);
   
   // Try live data on initial load
@@ -375,12 +498,12 @@ async function init(){
       if (board.status) {
         board.status.classList.add('visible');
         // give an initial label while the ticker updates on the next tick
-        board.status.textContent = 'Live';
+        board.status.textContent = t('live');
       }
     }
   }catch(e){
     console.warn('Live fetch failed', e && e.message ? e.message : e);
-    if(board.status){ board.status.classList.add('visible'); board.status.textContent = 'Error'; }
+    if(board.status){ board.status.classList.add('visible'); board.status.textContent = t('error'); }
   }
   if(!data || !data.length){
     // Show empty state if no data

@@ -1,12 +1,12 @@
-Overall Context: Kollektiv.Sanntid.org - live-only app with reactive options panel and theme toggle. Version 1.21.2.
+Overall Context: Kollektiv.Sanntid.org - Fixed all i18n, favorites, share, and options panel bugs. Version 1.25.3.
 
-Current Goal: Documentation updated. All major features complete and documented.
+Current Goal: Clean URL parameters after their intended use is complete.
 
 Last 3 Changes:
-- agents/worklogs/2026-02-20-14-03-update-readme.md
-- agents/worklogs/2026-02-20-14-00-update-app-icons.md
-- agents/worklogs/2026-02-20-13-52-cancellation-styling.md
+- agents/worklogs/2026-02-20-17-07-clear-timestamp-param.md
+- agents/worklogs/2026-02-20-17-05-clear-url-after-import.md
+- agents/worklogs/2026-02-20-16-56-fix-text-size-persistence.md
 
 Next Steps:
-- Test all features with live data
-- Consider deployment to production
+- Commit v1.25.3 with worklog
+- Ready for browser testing and deployment
