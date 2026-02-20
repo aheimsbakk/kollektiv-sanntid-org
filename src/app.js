@@ -32,7 +32,7 @@ function renderDepartures(listEl, items){
   clearList(listEl);
   if (!items || items.length === 0){
     const empty = document.createElement('div'); empty.className = 'empty-state';
-    empty.textContent = 'No departures...';
+    empty.textContent = t('noDepartures');
     listEl.appendChild(empty);
     return;
   }
@@ -227,7 +227,7 @@ async function init(){
           // Show countdown timer with version upgrade info
           let countdown = 5;
           const updateCountdown = () => {
-            toast.innerHTML = `<div>${t('newVersionAvailable')}</div><div>Upgrading from ${VERSION} to ${newVersion}</div><div>${t('updatingIn')} ${countdown}${t('seconds')}</div>`;
+            toast.innerHTML = `<div>${t('newVersionAvailable')}</div><div>${t('upgradingFrom')} ${VERSION} to ${newVersion}</div><div>${t('updatingIn')} ${countdown}${t('seconds')}</div>`;
           };
           updateCountdown();
           
@@ -477,12 +477,12 @@ async function init(){
       if (board.status) {
         board.status.classList.add('visible');
         // give an initial label while the ticker updates on the next tick
-        board.status.textContent = 'Live';
+        board.status.textContent = t('live');
       }
     }
   }catch(e){
     console.warn('Live fetch failed', e && e.message ? e.message : e);
-    if(board.status){ board.status.classList.add('visible'); board.status.textContent = 'Error'; }
+    if(board.status){ board.status.classList.add('visible'); board.status.textContent = t('error'); }
   }
   if(!data || !data.length){
     // Show empty state if no data

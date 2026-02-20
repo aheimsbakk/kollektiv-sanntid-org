@@ -45,10 +45,14 @@ const translations = {
     
     // Update toast
     newVersionAvailable: 'New version available, reloading...',
+    upgradingFrom: 'Upgrading from',
     
     // Status
     updatingIn: 'Updating in',
     seconds: 's',
+    live: 'Live',
+    error: 'Error',
+    noDepartures: 'No departures...',
     
     // Footer
     version: 'Version',
@@ -103,10 +107,14 @@ const translations = {
     
     // Update toast
     newVersionAvailable: 'Ny versjon tilgjengelig, laster inn på nytt...',
+    upgradingFrom: 'Oppgraderer fra',
     
     // Status
     updatingIn: 'Oppdaterer om',
     seconds: 's',
+    live: 'Direkte',
+    error: 'Feil',
+    noDepartures: 'Ingen avganger...',
     
     // Footer
     version: 'Versjon',
@@ -161,10 +169,14 @@ const translations = {
     
     // Update toast
     newVersionAvailable: 'Neue Version verfügbar, wird neu geladen...',
+    upgradingFrom: 'Aktualisierung von',
     
     // Status
     updatingIn: 'Aktualisierung in',
     seconds: 's',
+    live: 'Live',
+    error: 'Fehler',
+    noDepartures: 'Keine Abfahrten...',
     
     // Footer
     version: 'Version',
@@ -219,10 +231,14 @@ const translations = {
     
     // Update toast
     newVersionAvailable: 'Nueva versión disponible, recargando...',
+    upgradingFrom: 'Actualizando desde',
     
     // Status
     updatingIn: 'Actualizando en',
     seconds: 's',
+    live: 'En vivo',
+    error: 'Error',
+    noDepartures: 'Sin salidas...',
     
     // Footer
     version: 'Versión',
@@ -277,10 +293,14 @@ const translations = {
     
     // Update toast
     newVersionAvailable: 'Nuova versione disponibile, ricaricamento...',
+    upgradingFrom: 'Aggiornamento da',
     
     // Status
     updatingIn: 'Aggiornamento tra',
     seconds: 's',
+    live: 'Dal vivo',
+    error: 'Errore',
+    noDepartures: 'Nessuna partenza...',
     
     // Footer
     version: 'Versione',
@@ -335,10 +355,14 @@ const translations = {
     
     // Update toast
     newVersionAvailable: 'Διαθέσιμη νέα έκδοση, επαναφόρτωση...',
+    upgradingFrom: 'Αναβάθμιση από',
     
     // Status
     updatingIn: 'Ενημέρωση σε',
     seconds: 'δ',
+    live: 'Ζωντανά',
+    error: 'Σφάλμα',
+    noDepartures: 'Δεν υπάρχουν αναχωρήσεις...',
     
     // Footer
     version: 'Έκδοση',
@@ -390,10 +414,14 @@ const translations = {
     
     // Update toast
     newVersionAvailable: 'نسخه جدید موجود است، در حال بارگذاری مجدد...',
+    upgradingFrom: 'ارتقا از',
     
     // Status
     updatingIn: 'به‌روزرسانی در',
     seconds: 'ث',
+    live: 'زنده',
+    error: 'خطا',
+    noDepartures: 'حرکتی وجود ندارد...',
     
     // Footer
     version: 'نسخه',
@@ -450,10 +478,14 @@ const translations = {
     
     // Update toast
     newVersionAvailable: 'नया संस्करण उपलब्ध है, फिर से लोड किया जा रहा है...',
+    upgradingFrom: 'से अपग्रेड किया जा रहा है',
     
     // Status
     updatingIn: 'अपडेट में',
     seconds: 'से',
+    live: 'लाइव',
+    error: 'त्रुटि',
+    noDepartures: 'कोई प्रस्थान नहीं...',
     
     // Footer
     version: 'संस्करण',
@@ -510,10 +542,14 @@ const translations = {
     
     // Update toast
     newVersionAvailable: 'Ný útgáfa tiltæk, endurnýja...',
+    upgradingFrom: 'Uppfærsla frá',
     
     // Status
     updatingIn: 'Uppfærir eftir',
     seconds: 's',
+    live: 'Beint',
+    error: 'Villa',
+    noDepartures: 'Engar brottfarir...',
     
     // Footer
     version: 'Útgáfa',
@@ -570,10 +606,14 @@ const translations = {
     
     // Update toast
     newVersionAvailable: 'Доступна нова версія, перезавантаження...',
+    upgradingFrom: 'Оновлення з',
     
     // Status
     updatingIn: 'Оновлення через',
     seconds: 'с',
+    live: 'Пряма трансляція',
+    error: 'Помилка',
+    noDepartures: 'Немає відправлень...',
     
     // Footer
     version: 'Версія',
@@ -630,10 +670,14 @@ const translations = {
     
     // Update toast
     newVersionAvailable: 'Nouvelle version disponible, rechargement...',
+    upgradingFrom: 'Mise à niveau depuis',
     
     // Status
     updatingIn: 'Mise à jour dans',
     seconds: 's',
+    live: 'En direct',
+    error: 'Erreur',
+    noDepartures: 'Aucun départ...',
     
     // Footer
     version: 'Version',
@@ -690,10 +734,14 @@ const translations = {
     
     // Update toast
     newVersionAvailable: 'Nowa wersja dostępna, przeładowanie...',
+    upgradingFrom: 'Aktualizacja z',
     
     // Status
     updatingIn: 'Aktualizacja za',
     seconds: 's',
+    live: 'Na żywo',
+    error: 'Błąd',
+    noDepartures: 'Brak odjazdów...',
     
     // Footer
     version: 'Wersja',
