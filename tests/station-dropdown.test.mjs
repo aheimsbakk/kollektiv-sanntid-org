@@ -124,7 +124,16 @@ const { getRecentStations, addRecentStation, modesEqual } = await import('../src
 {
   localStorage.clear();
   localStorage.setItem('recent-stations', 'invalid-json');
+  
+  // Temporarily suppress console.error for this test (we expect an error)
+  const originalError = console.error;
+  console.error = () => {};
+  
   const recent = getRecentStations();
+  
+  // Restore console.error
+  console.error = originalError;
+  
   assert.deepEqual(recent, []);
 }
 
