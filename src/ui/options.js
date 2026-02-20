@@ -464,6 +464,18 @@ export function createOptionsPanel(defaults, onApply, onLanguageChange, onSave){
 
   inpStation.addEventListener('input', (e) => {
     const v = String(inpStation.value || '');
+    
+    // Special case: if lastQuery is empty and input value is long (>= 3 chars),
+    // user probably just focused (lastQuery cleared) but input still has old value.
+    // This happens when select() doesn't work properly on mobile.
+    // Clear the input to start fresh.
+    if (lastQuery === '' && v.trim().length >= 3 && !inpStation.dataset.stopId) {
+      inpStation.value = '';
+      lastQuery = '';
+      clearAutocomplete();
+      return;
+    }
+    
     if (v === lastQuery) return;
     lastQuery = v;
     // Clear stored stopId when user manually types (not selecting from autocomplete)
