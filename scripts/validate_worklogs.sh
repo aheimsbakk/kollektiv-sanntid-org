@@ -21,14 +21,14 @@ Usage:
 If one or more paths are provided, those files are validated from the
 workspace. If no paths are provided the script inspects staged files in the
 git index (added/modified/renamed) and validates any matching
-`agent/worklogs/*.md` files.
+`agents/worklogs/*.md` files.
 
 Options:
   -h, --help       Show this help message and exit
   -v, --version    Show version and exit
 
 Examples:
-  ./scripts/validate_worklogs.sh agent/worklogs/2026-02-15-add-emoji-mapping.md
+  ./scripts/validate_worklogs.sh agents/worklogs/2026-02-15-add-emoji-mapping.md
   ./scripts/validate_worklogs.sh   # validate staged files
 EOF
 }
@@ -160,9 +160,9 @@ EOF
 
 validate_path() {
   local path="$1"
-  # only consider agent/worklogs/*.md
+  # only consider agents/worklogs/*.md
   case "$path" in
-    agent/worklogs/*.md)
+    agents/worklogs/*.md)
       total=$((total+1))
       echo "Validating worklog: $path"
       if echo "$path" | grep -q "/archived/"; then
