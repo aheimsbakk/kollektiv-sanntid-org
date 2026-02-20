@@ -460,6 +460,12 @@ function mapModesToGeocoderCategories(modes){
     if (contentType && !/application\/json/i.test(contentType)) return [];
     const j = await r.json();
     console.log('[DEBUG] searchStations - API returned', j.features?.length, 'features');
+    console.log('[DEBUG] searchStations - Raw features:', j.features?.map(f => ({
+      name: f.properties?.name,
+      label: f.properties?.label, 
+      layer: f.properties?.layer,
+      id: f.properties?.id
+    })));
     if (!j || !Array.isArray(j.features)) return [];
     // Filter to only transport stops (venue layer only)
     // This prevents address/place results from appearing, even if they have NSR: IDs
@@ -471,6 +477,11 @@ function mapModesToGeocoderCategories(modes){
       // Only include venue layer results (actual transport stops/stations)
       return layer === 'venue';
     });
+    console.log('[DEBUG] searchStations - After venue filter:', transportStops.map(f => ({
+      name: f.properties?.name,
+      label: f.properties?.label,
+      layer: f.properties?.layer
+    })));
     
     // Re-rank results to prioritize closer matches to the search query
     // This helps "Støren stasjon" rank higher than "Storeng" when searching "Støren"

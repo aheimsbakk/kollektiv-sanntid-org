@@ -1,12 +1,12 @@
-Overall Context: Kollektiv.Sanntid.org - Debug why API returns Jernbanetorget for all queries. Version 1.27.11.
+Overall Context: Kollektiv.Sanntid.org - Debug venue layer filtering removing valid stations. Version 1.27.12.
 
-Current Goal: Identify if Entur API bug or our search function bug.
+Current Goal: Identify why only Jernbanetorget passes venue filter for "berg" query.
 
 Last 3 Changes:
+- agents/worklogs/2026-02-20-20-04-debug-venue-filter.md
 - agents/worklogs/2026-02-20-20-00-debug-api-responses.md
 - agents/worklogs/2026-02-20-19-57-fix-autocomplete-race-condition.md
-- agents/worklogs/2026-02-20-19-47-add-debug-logging.md
 
 Next Steps:
-- Commit API debug logging v1.27.11
-- User tests to see what API actually returns for "bergkrys"
+- Commit venue filter debug v1.27.12
+- User tests to see what layer other 2 features have
