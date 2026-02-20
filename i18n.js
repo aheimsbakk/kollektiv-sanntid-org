@@ -17,6 +17,9 @@ const translations = {
     stationNameTooltip: 'Click to show your saved favorites',
     settingsTooltip: 'Open settings panel',
     themeTooltip: 'Change theme',
+    shareBoard: 'Copy link to clipboard',
+    noStationToShare: 'No station selected to share',
+    shareFailed: 'Failed to create share link',
     
     // Text sizes
     tiny: 'Tiny',
@@ -42,10 +45,14 @@ const translations = {
     
     // Update toast
     newVersionAvailable: 'New version available, reloading...',
+    upgradingFrom: 'Upgrading from',
     
     // Status
     updatingIn: 'Updating in',
     seconds: 's',
+    live: 'Live',
+    error: 'Error',
+    noDepartures: 'No departures...',
     
     // Footer
     version: 'Version',
@@ -72,6 +79,9 @@ const translations = {
     stationNameTooltip: 'Klikk for å vise dine lagrede favoritter',
     settingsTooltip: 'Åpne innstillinger',
     themeTooltip: 'Bytt tema',
+    shareBoard: 'Kopier lenke til utklippstavle',
+    noStationToShare: 'Ingen stasjon valgt å dele',
+    shareFailed: 'Kunne ikke lage delingslenke',
     
     // Text sizes
     tiny: 'Veldig liten',
@@ -97,10 +107,14 @@ const translations = {
     
     // Update toast
     newVersionAvailable: 'Ny versjon tilgjengelig, laster inn på nytt...',
+    upgradingFrom: 'Oppgraderer fra',
     
     // Status
     updatingIn: 'Oppdaterer om',
     seconds: 's',
+    live: 'Direkte',
+    error: 'Feil',
+    noDepartures: 'Ingen avganger...',
     
     // Footer
     version: 'Versjon',
@@ -127,6 +141,9 @@ const translations = {
     stationNameTooltip: 'Klicken, um Ihre gespeicherten Favoriten anzuzeigen',
     settingsTooltip: 'Einstellungen öffnen',
     themeTooltip: 'Thema ändern',
+    shareBoard: 'Link in Zwischenablage kopieren',
+    noStationToShare: 'Keine Station zum Teilen ausgewählt',
+    shareFailed: 'Fehler beim Erstellen des Freigabelinks',
     
     // Text sizes
     tiny: 'Sehr klein',
@@ -152,10 +169,14 @@ const translations = {
     
     // Update toast
     newVersionAvailable: 'Neue Version verfügbar, wird neu geladen...',
+    upgradingFrom: 'Aktualisierung von',
     
     // Status
     updatingIn: 'Aktualisierung in',
     seconds: 's',
+    live: 'Live',
+    error: 'Fehler',
+    noDepartures: 'Keine Abfahrten...',
     
     // Footer
     version: 'Version',
@@ -182,6 +203,9 @@ const translations = {
     stationNameTooltip: 'Haz clic para ver tus favoritos guardados',
     settingsTooltip: 'Abrir panel de configuración',
     themeTooltip: 'Cambiar tema',
+    shareBoard: 'Copiar enlace al portapapeles',
+    noStationToShare: 'No hay estación seleccionada para compartir',
+    shareFailed: 'Error al crear el enlace',
     
     // Text sizes
     tiny: 'Muy pequeño',
@@ -207,10 +231,14 @@ const translations = {
     
     // Update toast
     newVersionAvailable: 'Nueva versión disponible, recargando...',
+    upgradingFrom: 'Actualizando desde',
     
     // Status
     updatingIn: 'Actualizando en',
     seconds: 's',
+    live: 'En vivo',
+    error: 'Error',
+    noDepartures: 'Sin salidas...',
     
     // Footer
     version: 'Versión',
@@ -237,6 +265,9 @@ const translations = {
     stationNameTooltip: 'Clicca per mostrare i tuoi preferiti salvati',
     settingsTooltip: 'Apri pannello impostazioni',
     themeTooltip: 'Cambia tema',
+    shareBoard: 'Condividi questa bacheca',
+    noStationToShare: 'Nessuna stazione selezionata da condividere',
+    shareFailed: 'Impossibile creare il link',
     
     // Text sizes
     tiny: 'Piccolissimo',
@@ -262,10 +293,14 @@ const translations = {
     
     // Update toast
     newVersionAvailable: 'Nuova versione disponibile, ricaricamento...',
+    upgradingFrom: 'Aggiornamento da',
     
     // Status
     updatingIn: 'Aggiornamento tra',
     seconds: 's',
+    live: 'Dal vivo',
+    error: 'Errore',
+    noDepartures: 'Nessuna partenza...',
     
     // Footer
     version: 'Versione',
@@ -292,6 +327,9 @@ const translations = {
     stationNameTooltip: 'Κάντε κλικ για να δείτε τα αποθηκευμένα αγαπημένα σας',
     settingsTooltip: 'Άνοιγμα πίνακα ρυθμίσεων',
     themeTooltip: 'Αλλαγή θέματος',
+    shareBoard: 'Κοινοποίηση αυτού του πίνακα',
+    noStationToShare: 'Δεν επιλέχθηκε σταθμός για κοινοποίηση',
+    shareFailed: 'Αποτυχία δημιουργίας συνδέσμου',
     
     // Text sizes
     tiny: 'Πολύ μικρό',
@@ -317,10 +355,14 @@ const translations = {
     
     // Update toast
     newVersionAvailable: 'Διαθέσιμη νέα έκδοση, επαναφόρτωση...',
+    upgradingFrom: 'Αναβάθμιση από',
     
     // Status
     updatingIn: 'Ενημέρωση σε',
     seconds: 'δ',
+    live: 'Ζωντανά',
+    error: 'Σφάλμα',
+    noDepartures: 'Δεν υπάρχουν αναχωρήσεις...',
     
     // Footer
     version: 'Έκδοση',
@@ -372,10 +414,14 @@ const translations = {
     
     // Update toast
     newVersionAvailable: 'نسخه جدید موجود است، در حال بارگذاری مجدد...',
+    upgradingFrom: 'ارتقا از',
     
     // Status
     updatingIn: 'به‌روزرسانی در',
     seconds: 'ث',
+    live: 'زنده',
+    error: 'خطا',
+    noDepartures: 'حرکتی وجود ندارد...',
     
     // Footer
     version: 'نسخه',
@@ -383,7 +429,12 @@ const translations = {
     
     // Station dropdown
     noStationSelected: 'هیچ ایستگاهی انتخاب نشده',
-    noRecentStations: 'ایستگاه اخیر وجود ندارد'
+    noRecentStations: 'ایستگاه اخیر وجود ندارد',
+    
+    // Share button
+    shareBoard: 'اشتراک‌گذاری این تابلو',
+    noStationToShare: 'هیچ ایستگاهی برای اشتراک‌گذاری انتخاب نشده',
+    shareFailed: 'ایجاد لینک اشتراک‌گذاری ناموفق بود'
   },
   
   hi: {
@@ -427,10 +478,14 @@ const translations = {
     
     // Update toast
     newVersionAvailable: 'नया संस्करण उपलब्ध है, फिर से लोड किया जा रहा है...',
+    upgradingFrom: 'से अपग्रेड किया जा रहा है',
     
     // Status
     updatingIn: 'अपडेट में',
     seconds: 'से',
+    live: 'लाइव',
+    error: 'त्रुटि',
+    noDepartures: 'कोई प्रस्थान नहीं...',
     
     // Footer
     version: 'संस्करण',
@@ -438,7 +493,12 @@ const translations = {
     
     // Station dropdown
     noStationSelected: 'कोई स्टेशन चयनित नहीं',
-    noRecentStations: 'कोई हालिया स्टेशन नहीं'
+    noRecentStations: 'कोई हालिया स्टेशन नहीं',
+    
+    // Share button
+    shareBoard: 'इस बोर्ड को साझा करें',
+    noStationToShare: 'साझा करने के लिए कोई स्टेशन नहीं चुना गया',
+    shareFailed: 'शेयर लिंक बनाने में विफल'
   },
   
   is: {
@@ -482,10 +542,14 @@ const translations = {
     
     // Update toast
     newVersionAvailable: 'Ný útgáfa tiltæk, endurnýja...',
+    upgradingFrom: 'Uppfærsla frá',
     
     // Status
     updatingIn: 'Uppfærir eftir',
     seconds: 's',
+    live: 'Beint',
+    error: 'Villa',
+    noDepartures: 'Engar brottfarir...',
     
     // Footer
     version: 'Útgáfa',
@@ -493,7 +557,12 @@ const translations = {
     
     // Station dropdown
     noStationSelected: 'Engin stöð valin',
-    noRecentStations: 'Engar nýlegar stöðvar'
+    noRecentStations: 'Engar nýlegar stöðvar',
+    
+    // Share button
+    shareBoard: 'Deila þessari töflu',
+    noStationToShare: 'Engin stöð valin til að deila',
+    shareFailed: 'Mistókst að búa til deilingartengil'
   },
   
   uk: {
@@ -537,10 +606,14 @@ const translations = {
     
     // Update toast
     newVersionAvailable: 'Доступна нова версія, перезавантаження...',
+    upgradingFrom: 'Оновлення з',
     
     // Status
     updatingIn: 'Оновлення через',
     seconds: 'с',
+    live: 'Пряма трансляція',
+    error: 'Помилка',
+    noDepartures: 'Немає відправлень...',
     
     // Footer
     version: 'Версія',
@@ -548,7 +621,12 @@ const translations = {
     
     // Station dropdown
     noStationSelected: 'Станцію не вибрано',
-    noRecentStations: 'Немає недавніх станцій'
+    noRecentStations: 'Немає недавніх станцій',
+    
+    // Share button
+    shareBoard: 'Поділитися цією дошкою',
+    noStationToShare: 'Не вибрано станцію для спільного доступу',
+    shareFailed: 'Не вдалося створити посилання'
   },
   
   fr: {
@@ -592,10 +670,14 @@ const translations = {
     
     // Update toast
     newVersionAvailable: 'Nouvelle version disponible, rechargement...',
+    upgradingFrom: 'Mise à niveau depuis',
     
     // Status
     updatingIn: 'Mise à jour dans',
     seconds: 's',
+    live: 'En direct',
+    error: 'Erreur',
+    noDepartures: 'Aucun départ...',
     
     // Footer
     version: 'Version',
@@ -603,7 +685,12 @@ const translations = {
     
     // Station dropdown
     noStationSelected: 'Aucune station sélectionnée',
-    noRecentStations: 'Aucune station récente'
+    noRecentStations: 'Aucune station récente',
+    
+    // Share button
+    shareBoard: 'Partager ce tableau',
+    noStationToShare: 'Aucune station sélectionnée à partager',
+    shareFailed: 'Échec de création du lien'
   },
   
   pl: {
@@ -647,10 +734,14 @@ const translations = {
     
     // Update toast
     newVersionAvailable: 'Nowa wersja dostępna, przeładowanie...',
+    upgradingFrom: 'Aktualizacja z',
     
     // Status
     updatingIn: 'Aktualizacja za',
     seconds: 's',
+    live: 'Na żywo',
+    error: 'Błąd',
+    noDepartures: 'Brak odjazdów...',
     
     // Footer
     version: 'Wersja',
@@ -658,7 +749,12 @@ const translations = {
     
     // Station dropdown
     noStationSelected: 'Nie wybrano stacji',
-    noRecentStations: 'Brak ostatnich stacji'
+    noRecentStations: 'Brak ostatnich stacji',
+    
+    // Share button
+    shareBoard: 'Udostępnij tę tablicę',
+    noStationToShare: 'Nie wybrano stacji do udostępnienia',
+    shareFailed: 'Nie udało się utworzyć linku'
   }
 };
 
