@@ -4,7 +4,7 @@
 const translations = {
   en: {
     // Options panel
-    stationName: 'Station name',
+    stationName: 'Station or stop name',
     numberOfDepartures: 'Number of departures',
     fetchInterval: 'Fetch interval (seconds)',
     textSize: 'Text size',
@@ -53,7 +53,7 @@ const translations = {
   
   no: {
     // Options panel
-    stationName: 'Stasjonsnavn',
+    stationName: 'Stasjons- eller stoppnavn',
     numberOfDepartures: 'Antall avganger',
     fetchInterval: 'Oppdateringsintervall (sekunder)',
     textSize: 'Tekststørrelse',
@@ -103,7 +103,7 @@ const translations = {
   
   de: {
     // Options panel
-    stationName: 'Stationsname',
+    stationName: 'Bahnhofs- oder Haltestellenname',
     numberOfDepartures: 'Anzahl Abfahrten',
     fetchInterval: 'Aktualisierungsintervall (Sekunden)',
     textSize: 'Textgröße',
@@ -153,7 +153,7 @@ const translations = {
   
   es: {
     // Options panel
-    stationName: 'Nombre de estación',
+    stationName: 'Nombre de estación o parada',
     numberOfDepartures: 'Número de salidas',
     fetchInterval: 'Intervalo de actualización (segundos)',
     textSize: 'Tamaño del texto',
@@ -203,7 +203,7 @@ const translations = {
   
   it: {
     // Options panel
-    stationName: 'Nome stazione',
+    stationName: 'Nome stazione o fermata',
     numberOfDepartures: 'Numero di partenze',
     fetchInterval: 'Intervallo di aggiornamento (secondi)',
     textSize: 'Dimensione testo',
@@ -253,7 +253,7 @@ const translations = {
   
   el: {
     // Options panel
-    stationName: 'Όνομα σταθμού',
+    stationName: 'Όνομα σταθμού ή στάσης',
     numberOfDepartures: 'Αριθμός αναχωρήσεων',
     fetchInterval: 'Διάστημα ενημέρωσης (δευτερόλεπτα)',
     textSize: 'Μέγεθος κειμένου',
@@ -303,7 +303,7 @@ const translations = {
   
   fa: {
     // Options panel
-    stationName: 'نام ایستگاه',
+    stationName: 'نام ایستگاه یا توقفگاه',
     numberOfDepartures: 'تعداد حرکت‌ها',
     fetchInterval: 'فاصله به‌روزرسانی (ثانیه)',
     textSize: 'اندازه متن',
@@ -353,7 +353,7 @@ const translations = {
   
   hi: {
     // Options panel
-    stationName: 'स्टेशन का नाम',
+    stationName: 'स्टेशन या पड़ाव का नाम',
     numberOfDepartures: 'प्रस्थान की संख्या',
     fetchInterval: 'अपडेट अंतराल (सेकंड)',
     textSize: 'पाठ का आकार',
@@ -403,7 +403,7 @@ const translations = {
   
   is: {
     // Options panel
-    stationName: 'Nafn stöðvar',
+    stationName: 'Nafn stöðvar eða stoppistöðvar',
     numberOfDepartures: 'Fjöldi brottfara',
     fetchInterval: 'Uppfærslubil (sekúndur)',
     textSize: 'Textastærð',
@@ -453,7 +453,7 @@ const translations = {
   
   uk: {
     // Options panel
-    stationName: 'Назва станції',
+    stationName: 'Назва станції або зупинки',
     numberOfDepartures: 'Кількість відправлень',
     fetchInterval: 'Інтервал оновлення (секунди)',
     textSize: 'Розмір тексту',
@@ -503,7 +503,7 @@ const translations = {
   
   fr: {
     // Options panel
-    stationName: 'Nom de la station',
+    stationName: 'Nom de la station ou de l\'arrêt',
     numberOfDepartures: 'Nombre de départs',
     fetchInterval: 'Intervalle de mise à jour (secondes)',
     textSize: 'Taille du texte',
@@ -553,7 +553,7 @@ const translations = {
   
   pl: {
     // Options panel
-    stationName: 'Nazwa stacji',
+    stationName: 'Nazwa stacji lub przystanku',
     numberOfDepartures: 'Liczba odjazdów',
     fetchInterval: 'Interwał odświeżania (sekundy)',
     textSize: 'Rozmiar tekstu',
