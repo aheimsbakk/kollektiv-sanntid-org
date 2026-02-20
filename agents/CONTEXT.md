@@ -1,13 +1,12 @@
-Overall Context: Kollektiv.Sanntid.org - Fixed service worker missing cache assets. Version 1.27.5.
+Overall Context: Kollektiv.Sanntid.org - Fixed autocomplete first-load regression. Version 1.27.6.
 
-Current Goal: Deploy complete fix with all assets properly cached.
+Current Goal: Test autocomplete works in all scenarios (first load, subsequent searches).
 
 Last 3 Changes:
+- agents/worklogs/2026-02-20-19-28-fix-autocomplete-first-load.md
 - agents/worklogs/2026-02-20-19-11-fix-sw-missing-assets.md
 - agents/worklogs/2026-02-20-19-01-fix-autocomplete-input-stuck.md
-- agents/worklogs/2026-02-20-18-35-fix-autocomplete-stale-results.md
 
 Next Steps:
-- Commit version 1.27.5
-- Deploy to gh-pages
-- User to test - should work properly now with all files cached
+- Commit version 1.27.6
+- User to test both scenarios: first load + subsequent searches
