@@ -1,178 +1,93 @@
-# Departure Board — BLUEPRINT
+# Departure Board — BLUEPRINT (REVISED)
 
 Purpose
-- Browser single‑page application that replicates the terminal departure board in `departure.sh`.
-- No external dependencies, no build step. All source lives under `src/` and uses native ES modules + modern browser APIs.
+- Browser single‑page application that renders a terminal-style departure board using modern browser APIs and native ES modules.
+- Pure client-side UX: the app calls Entur endpoints directly from the browser and expects live data; there is no bundled demo fallback in mainline builds.
+- Keep UI accessible, responsive and dependency-free (no bundler/transpilation required).
 
 High-level constraints
-- No third‑party libraries or packages.
-- Files under `src/`.
-- Client-side only: no server component, no proxy, and no server instructions included in the repo.
-- The app must function fully in the browser. If Entur's API blocks cross-origin requests, the app will fall back
-  to a demo/offline mode and a manual JSON upload path so users can load their own fetched data.
-- Keep accessibility and responsive design in mind.
-- Follow agents protocol before committing: create `agents/worklogs/YYYY-MM-DD-HH-mm-{short-desc}.md` and update `agents/CONTEXT.md` (<=20 lines).
+- No third‑party runtime libraries. Use only native browser APIs and small, testable JS modules under `src/`.
+- Client-side only: do not add server proxies or server code in the repo. If Entur or CORS blocks requests the app must show a clear error/empty state and instructions.
+- Versioning: `src/config.js` and `src/sw.js` both contain version constants and must be kept in sync; use `scripts/bump-version.sh` when making releases.
+- Follow agents/worklog protocol: create `agents/worklogs/YYYY-MM-DD-HH-mm-{short-desc}.md` and update `agents/CONTEXT.md` before commits.
 
 User-facing features
-- Station header (toggleable).
-- Up to N upcoming departures (configurable).
-- Destination shown prominently (large, "figlet-like" styling via CSS).
-- Live countdown (HH:MM:SS or MM:SS), updates every second.
-- Situation/service alerts highlighted (red badge / banner).
-- Auto-centering both horizontally and vertically.
-- Settings persisted to `localStorage` (station name, N, modes, color mode, fetch interval).
-- No external fonts required — use system fonts + CSS for visual effect.
+- Station dropdown (recent favorites) with keyboard navigation and inline mode icons.
+- Configurable number of upcoming departures (N).
+- Prominent destination display with large monospace-like styling; live countdowns updated each second.
+- Situation/service alerts shown when present.
+- Settings persisted to `localStorage` (`departure:settings`) and recent stations stored under `recent-stations`.
+- Shareable boards via compact base64 array URL `?b=<base64>` using array-encoding (backwards compatible with legacy object format).
+- Toggleable options panel (keyboard-friendly, uses `inert` and focus trapping).
 
-Architecture overview
-- index.html — entry point, minimal markup, loads `src/app.js` as module.
-- src/
-  - index.html
-  - src/style.css
-  - src/app.js            — bootstraps app, wires DOM & intervals
-  - src/config.js         — default configurable constants (station, N, interval)
-  - src/entur.js          — small Entur GraphQL client (fetch wrapper)
-  - src/time.js           — pure utilities: iso → epoch, format countdown
-  - src/ui/
-    - ui.js               — DOM helpers and render loop (minimize DOM thrash)
-    - departure.js        — component to render a single departure
-    - header.js           — station header component
-  - src/icons.css         — small CSS-only icons/badges if needed
-  - src/demo.json         — small test data file for offline dev (optional)
-- No transpilation. Use `type="module"` for the scripts.
+Architecture overview (current)
+- `index.html` — minimal entry; loads `src/app.js` as module.
+- `src/`
+  - `src/index.html`
+  - `src/style.css`
+  - `src/app.js`            — bootstraps the app, wires UI, orchestrates refresh loop, SW registration
+  - `src/config.js`         — `VERSION`, `DEFAULTS`, `PLATFORM_SYMBOLS`, `PLATFORM_SYMBOL_RULES`, emojis, storage keys
+  - `src/entur.js`          — GraphQL client, `fetchDepartures`, `lookupStopId`, `searchStations`, `parseEnturResponse`
+  - `src/time.js`           — time utilities (ISO → epoch, countdown format)
+  - `src/sw.js`             — service worker, asset list, network/caching rules
+  - `src/ui/`               — UI primitives and components:
+    - `ui.js`, `departure.js`, `header.js`, `options.js`, `station-dropdown.js`, `share-button.js`, `theme-toggle.js`, `share-button.js`
+  - `src/icons.css`, `src/i18n.js` and other small modules
+- No build step; scripts are ESM modules loaded via `type="module"`.
 
-Data flow
-- app.js reads config, initializes UI, then:
-  1. On start and every FETCH_INTERVAL seconds: call `entur.fetchDepartures(station, n, modes)`.
-  2. `entur.fetchDepartures` uses `fetch()` to hit Entur GraphQL endpoint with the same query used in `departure.sh`.
-  3. Parse response to normalized JS objects:
-     - { destination: string, expectedDepartureISO: string, situations: [string], raw: {} }
-  4. UI layer keeps last successful dataset; on new data diff (by id/time) update DOM nodes for departures; always update countdown labels every second with a small timer that modifies textContent only.
-  5. On fetch failure show "Station Not Found" or "Loading..." states similar to terminal script.
-
-Entur API considerations
-- Query: use GraphQL `stopPlace(id: "...") { estimatedCalls(numberOfDepartures: X, whiteListedModes: [...]) { expectedDepartureTime destinationDisplay { frontText } situations { description { value language } } } }`
-- Use `fetch` with POST, JSON body: `{ "query": "..." }`, and header `ET-Client-Name: personal-js-app`.
-- CORS: Because this is a strict client-only application, the app will attempt to call Entur directly from the browser. If Entur blocks cross-origin requests, the app MUST NOT attempt to create or recommend any server-side proxies in the repo. Instead, the app will:
-  1. Detect CORS failure and show a clear explanatory message to the user.
-  2. Offer a demo/offline mode using bundled `src/demo.json` data.
-  3. Provide a manual "Upload JSON" control that accepts a saved Entur response so users can load live data they fetched separately.
-  4. Optionally, provide instructions in the UI explaining why requests might fail and how to obtain data (for advanced users) but without shipping server code.
-
-Time and timezone
-- Parse ISO times using `Date.parse()`; prefer working in UTC epoch seconds then compute diff with `Date.now()`.
-- Display "Now" for diff <= 0.
-- Formatting: if hours>0 use `HH:MM:SS`, else `MM:SS`.
-- Avoid heavy libraries: use small helper functions in `src/time.js`.
+Data flow and Entur client
+- Startup: `app.js` loads settings, resolves `STOP_ID` (use `DEFAULTS.STOP_ID` if present, else `lookupStopId`), then calls `fetchDepartures`.
+- `fetchDepartures` (in `src/entur.js`) attempts multiple GraphQL shapes/variants (variables vs inline literals, extended selection) to accommodate server AST sensitivity; it parses the response into normalized objects and returns an array of departures.
+- When server returns an unfiltered response and the caller requested modes, `fetchDepartures` may apply a permissive client-side filter to align UI with user-selected modes.
+- Lightweight in-memory cache: `globalThis._enturCache` keyed by request shape/stopId; `app.js` clears or uses it intentionally.
+- `searchStations` queries Entur geocoder and re-ranks results; the UI intentionally avoids restrictive geocoder category filters because of geocoder edge cases in production.
 
 UI/UX & styling
-- CSS variables (root): `--bg`, `--fg`, `--accent`, `--danger`, `--mono`, `--large-scale`.
-- Use a dark-ish gradient background with subtle texture (pure CSS).
-- Destination: large block using monospace font and heavy `font-size` + `text-shadow` to emulate figlet. Provide a CSS "stroke" via multiple `text-shadow` layers for punchy look.
-- Time: large bold block under destination.
-- Situations: red banner/badge centered above or below the destination when present; show only when non-empty.
-- Auto-centering: wrapper uses Flexbox column + `justify-content:center; align-items:center; min-height:100vh;`.
-- Responsive: small screens reduce font-size and stack elements; ensure vertical centering still works.
-- Accessibility: high contrast, ARIA labels for dynamic content, `role="status"` for countdowns.
+- CSS variables for theme colors and sizes; responsive scaling controlled by `TEXT_SIZE` with CSS classes like `text-size-medium`.
+- Destination and countdown use dedicated nodes; countdown updates only modify text content each second (`updateDepartureCountdown`).
+- Platform/quay display uses stacked symbol+code; symbol selection is driven from `PLATFORM_SYMBOL_RULES` and `PLATFORM_SYMBOLS` in `src/config.js` (regex + transport mode matching).
+- Accessibility: ARIA labels, `role="status"` for dynamic countdowns, keyboard traps, `inert` for hidden panels.
 
-Performance & DOM update pattern
-- Render template once per departure item; keep references to text nodes for countdown and situation.
-- Only update the countdown text every second rather than re-paint full DOM.
-- On new fetch, diff the departure array by stable key (destination + expectedDepartureISO) and only add/remove or reorder DOM nodes as needed.
-- Use `requestAnimationFrame` sparingly for animations; timer uses `setInterval(1000)` to update times.
+Service worker & caching
+- `src/sw.js` contains a version constant and a deterministic `ASSETS` list of local assets to cache.
+- Navigation requests are network-first with fallback to cache; local assets are cache-first; external API requests (Entur/geocoder) are network-only and are NOT cached by the SW.
+- Update flow: app detects waiting SW, shows a short upgrade notification/countdown, posts `SKIP_WAITING` to the worker and forces a reload with a cache-busting `?t=` param.
 
-Error handling & fallback UX
-- If station lookup fails: show "Station Not Found" screen and a retry button.
-- If network error: show toast with retry suggestion, and keep previous data if available.
-- Provide manual “Refresh” button and keyboard shortcut (e.g., `r`).
-- Provide toggle to hide header (parity with `-H`), and toggle for color mode (parity with `-C`).
+Error handling & offline UX
+- If a live fetch fails: show a clear "error" status chip and a retry control; keep the last successful dataset where possible.
+- The app no longer bundles a demo fallback; manual demo artifacts were removed from mainline to avoid shipping stale test data. For offline/dev needs, consider a separate dev-only demo loader that is not committed to mainline.
 
 Settings & persistence
-- Settings stored in `localStorage` as `departure.settings` JSON.
-- Settings UI either in a small overlay (click gear) or via URL params for quick testing: `?station=...&n=3`.
+- Settings saved to `localStorage` under `departure:settings`.
+- Recent stations/favorites saved under `recent-stations` with stored `stopId`, modes and optional per-station settings.
+- `STOP_ID` can be stored on station selection to skip brittle name lookups for certain edge-case locations.
 
-Testing & dev workflow (no deps)
-- Manual smoke tests:
-  - Load `index.html`, confirm station lookup, departures, countdowns decrement.
-  - Simulate network failure using devtools offline.
-  - Simulate situations by editing `src/demo.json` and toggling demo mode.
+Testing & dev workflow
+- Node-local unit tests (ESM) cover pure logic (time utilities, entur parsing, diff logic, share encode/decode); run via `node tests/run.mjs` or `npm test`.
+- Tests avoid DOM or fetch unless mocked; keep UI integration tested manually in a browser.
+- Keep `scripts/validate_worklogs.sh` in CI/pre-commit flows to enforce worklog front-matter.
 
-- Node-local unit tests (recommended):
-  - Purpose: provide fast, repeatable tests for pure JS logic that can run locally with Node.js (no browser required).
-  - Scope: test pure utilities and parsing logic (e.g. `src/time.js`, `src/entur.js` parsing functions, `src/data-loader.js` normalization).
-  - Implementation:
-    - Place tests under `tests/` as ESM modules (e.g. `tests/time.test.mjs`, `tests/entur.parse.test.mjs`). The repo already uses ESM (`package.json` includes `type: "module"`).
-    - Use Node's built-in `assert` API for assertions (no test framework dependency):
-      ```js
-      import assert from 'assert';
-      import { formatCountdown } from '../src/time.js';
+Versioning & commits
+- When committing user-visible changes bump the version in both `src/config.js` and `src/sw.js`. Prefer `scripts/bump-version.sh` to do this consistently.
+- Before any commit create a worklog `agents/worklogs/YYYY-MM-DD-HH-mm-create-blueprint.md` with the strict front-matter keys (`when`, `why`, `what`, `model`, `tags`) and a 1–3 sentence body; validate with `scripts/validate_worklogs.sh`.
+- Commit message style: conventional commits, e.g., `feat(ui): add blueprint and scaffolding plan`.
 
-      assert.equal(formatCountdown(65), '01:05');
-      ```
-    - Provide a tiny test runner `tests/run.mjs` that imports test modules, runs them, logs results, and exits with non-zero code on failure. Example run: `node tests/run.mjs`.
-    - Keep tests hermetic: avoid DOM APIs or `fetch`. For functions that interact with the DOM, export pure helpers that can be tested under Node; keep UI integration tested manually in the browser.
-  - Automation: recommend adding a convenience `npm` script (optional) — the blueprint avoids auto-generated files, but example command to add locally:
-    ```bash
-    # run tests locally
-    node tests/run.mjs
-    # or via npm (if you add a script):
-    npm test
-    ```
-
-- Browser integration tests (optional):
-  - Keep simple manual HTML pages under `tests/` that load modules in a real browser and print assertions to console; these are complementary to Node tests and useful for quick visual verification.
-
-- Logging: minimal console logs guarded by `DEBUG` flag.
-
-Security & privacy
-- Never log tokens or secrets. Avoid embedding keys in the code.
-- Explain CORS fallback without suggesting public proxies for production.
-
-Files to create (exact file tree)
-- `src/index.html`
-- `src/style.css`
-- `src/app.js`
-- `src/config.js`
-- `src/entur.js`
-- `src/time.js`
-- `src/ui/ui.js`
-- `src/ui/departure.js`
-- `src/ui/header.js`
-- `src/icons.css`
-- `src/data-loader.js`       # handles manual JSON upload and demo toggle
-- `src/demo.json` (bundled demo dataset for offline/dev)
+Files to add/remove (current canonical set)
+- Keep: `src/index.html`, `src/style.css`, `src/app.js`, `src/config.js`, `src/entur.js`, `src/time.js`, `src/sw.js`, `src/i18n.js`, `src/ui/*`, `src/icons.css`, `src/manifest.webmanifest`
+- Removed from mainline: `src/data-loader.js`, `src/demo.json` (dev/demo loaders may live in a separate branch or dev-only helper not merged to mainline)
 
 Implementation milestones (priority order)
-1. Scaffolding: `index.html`, `style.css`, `src/app.js`, `src/config.js`.
-2. Entur client: `src/entur.js` — implement GraphQL query & parse logic; include demo data mode.
-3. UI primitives: `src/ui/ui.js`, `src/ui/header.js`, `src/ui/departure.js`.
-4. Time utilities and countdown timer: `src/time.js`.
-5. Settings persistence and controls.
-6. Accessibility polish and responsive tweaks.
-7. Error handling, offline/demo mode, and manual testing pages.
- 8. Prepare release: `agents/worklogs/...` entry and `agents/CONTEXT.md` update before commit.
-
-Commit & agent protocol notes (required)
- - Before committing any code, create a granular worklog file: `agents/worklogs/YYYY-MM-DD-HH-mm-create-blueprint.md` containing ONLY the front-matter keys below followed by 1–3 sentence body describing changes and files touched.
-  - Example front matter:
-    ```yaml
-    ---
-    when: 2026-02-14T12:00:00Z
-    why: create blueprint for pure-js departure board
-    what: add BLUEPRINT.md content and implementation plan
-    model: github-copilot/gpt-5-mini
-    tags: [blueprint, planning, departure]
-    ---
-    ```
- - Immediately update `agents/CONTEXT.md` (under 20 lines) with Current Goal, Last 3 Changes, Next Steps.
-- If any file contains `VERSION="x.y.z"`, bump semver and mention it in worklog body.
-- Commit message style: Conventional — e.g., `feat(ui): add blueprint and scaffolding plan`.
-
-Estimate & deliverables
-- Blueprint approval (this file).
-- After approval: implement scaffolding (1–2 hours manual coding).
-- Full implementation and polish (4–8 hours depending on styling/edge cases).
+1. Keep scaffolding and tests green: ensure `npm test` passes locally.
+2. Update `BLUEPRINT.md` to match this document (this file).
+3. If you want dev/demo flow preserved, add a development-only loader behind a build/dev flag (do not ship demo data in production).
+4. Continue incremental UI polish: accessibility, platform symbol edge cases, and compact share UX.
 
 Open questions (pick one)
-- Should the app attempt a pure client-side approach first (try `fetch` to Entur and handle CORS errors), or do you prefer we plan for a small local proxy from the start? (Recommended: try client-only first; add proxy only if necessary.)
+1) Reintroduce an optional dev/demo loader (dev-only, not committed to mainline) to make browser development easier? (Recommended: yes for a separate dev helper; keep it out of the production tree.)
+2) Keep live-only policy as the canonical user experience (recommended) or plan an "offline demo" mode in the UI for non-technical users?
+3) Should we publish a small CHANGELOG entry listing removal of demo fallback and STOP_ID behavior for transparency?
 
-End of blueprint.
+Next steps (recommended)
+1) Apply this blueprint update to `BLUEPRINT.md` and run `npm test` locally; fix any test regressions.
+2) If updating the file in the repo, create the required worklog (`agents/worklogs/...`) and update `agents/CONTEXT.md` before committing; then run `scripts/bump-version.sh patch` if you make non-feature changes.
+3) Tell me if you want me to apply the revised `BLUEPRINT.md`, create the worklog, run tests, and open a commit — I will prepare the exact changes and a proposed commit message but will not modify the repo until you confirm.

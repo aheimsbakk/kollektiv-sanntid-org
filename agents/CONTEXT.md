@@ -1,12 +1,12 @@
-Overall Context: Kollektiv.Sanntid.org - Configurable platform symbols with mode+pattern rules. Version 1.30.2.
+Overall Context: Kollektiv.Sanntid.org — live-first client app; platform symbol rules and compact share links.
 
-Current Goal: UX refinements for share functionality.
+Current Goal: Update blueprint to reflect live-only fetches, STOP_ID usage, compact share encoding, and SW update flow.
 
 Last 3 Changes:
+- agents/worklogs/2026-02-21-09-14-update-blueprint.md
 - agents/worklogs/2026-02-21-08-38-clean-share-url.md
 - agents/worklogs/2026-02-21-08-11-configurable-github-url.md
-- agents/worklogs/2026-02-20-23-14-configurable-platform-symbol-rules.md
 
 Next Steps:
-- Await user feedback or new feature requests
-- Consider other UX improvements
+- Run tests locally and ensure green
+- Land any follow-up docs or CHANGELOG entries
