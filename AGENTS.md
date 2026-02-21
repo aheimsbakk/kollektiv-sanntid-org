@@ -1,5 +1,9 @@
 # Agent Protocol
 
+## 0. Master rules
+
+- **ALWAYS adhere to**: Master rules in `agents/rules/*.md`.
+
 ## 1. Worklogs
 
 ### 1.1. Granular Worklog (Long-term Memory)
