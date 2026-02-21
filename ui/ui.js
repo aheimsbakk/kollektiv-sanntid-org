@@ -1,6 +1,6 @@
 // Minimal UI helpers: create container and manage departure list
 import { t } from '../i18n.js';
-import { VERSION } from '../config.js';
+import { VERSION, DEFAULTS } from '../config.js';
 import { createStationDropdown } from './station-dropdown.js';
 
 export function createBoardElements(stationName, onStationSelect){
@@ -21,7 +21,7 @@ export function createBoardElements(stationName, onStationSelect){
   const versionText = document.createElement('span'); 
   versionText.textContent = `${t('version')} ${VERSION} `;
   const githubLink = document.createElement('a');
-  githubLink.href = 'https://github.com/aheimsbakk/departure';
+  githubLink.href = DEFAULTS.GITHUB_URL || 'https://github.com/aheimsbakk/departure';
   githubLink.target = '_blank';
   githubLink.rel = 'noopener noreferrer';
   githubLink.textContent = '🔗';
