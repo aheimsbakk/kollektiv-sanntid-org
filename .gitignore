@@ -1,0 +1,7 @@
+# Temporary folder for agent
+tmp/**
+!tmp/.placeholder
+
+# Other tempfiles
+*.tmp
+*~
