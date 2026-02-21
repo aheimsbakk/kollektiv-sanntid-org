@@ -10,7 +10,7 @@ export const DEFAULTS = {
   TRANSPORT_MODES: ['bus','tram','metro','rail','water','coach'],
   CLIENT_NAME: 'kollektiv-sanntid-org',
   API_URL: 'https://api.entur.io/journey-planner/v3/graphql',
-  GITHUB_URL: 'https://github.com/aheimsbakk/departure'
+  GITHUB_URL: 'https://github.com/aheimsbakk/kollektiv-sanntid-org'
 };
 
 // Immutable list of all transport modes for fallback when no modes are selected
