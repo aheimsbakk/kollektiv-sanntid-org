@@ -195,12 +195,8 @@ export function createShareButton(getSettings) {
         await navigator.clipboard.writeText(url);
       }
     } catch (e) {
-      // Ignore clipboard errors - we'll update URL anyway
+      // Ignore clipboard errors
     }
-    
-    // Update the address bar without reloading the page
-    // This allows user to see the full shareable link
-    window.history.pushState({}, '', url);
     
     // Show brief success indicator
     const originalText = button.textContent;
