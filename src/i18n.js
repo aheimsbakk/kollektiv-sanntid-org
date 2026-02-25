@@ -51,6 +51,7 @@ const translations = {
     // Status
     updatingIn: 'Updating in',
     seconds: 's',
+    now: 'Now',
     live: 'Live',
     error: 'Error',
     noDepartures: 'No departures...',
@@ -114,6 +115,7 @@ const translations = {
     // Status
     updatingIn: 'Oppdaterer om',
     seconds: 's',
+    now: 'Nå',
     live: 'Direkte',
     error: 'Feil',
     noDepartures: 'Ingen avganger...',
@@ -177,6 +179,7 @@ const translations = {
     // Status
     updatingIn: 'Aktualisierung in',
     seconds: 's',
+    now: 'Jetzt',
     live: 'Live',
     error: 'Fehler',
     noDepartures: 'Keine Abfahrten...',
@@ -240,6 +243,7 @@ const translations = {
     // Status
     updatingIn: 'Actualizando en',
     seconds: 's',
+    now: 'Ahora',
     live: 'En vivo',
     error: 'Error',
     noDepartures: 'Sin salidas...',
@@ -303,6 +307,7 @@ const translations = {
     // Status
     updatingIn: 'Aggiornamento tra',
     seconds: 's',
+    now: 'Adesso',
     live: 'Dal vivo',
     error: 'Errore',
     noDepartures: 'Nessuna partenza...',
@@ -366,6 +371,7 @@ const translations = {
     // Status
     updatingIn: 'Ενημέρωση σε',
     seconds: 'δ',
+    now: 'Τώρα',
     live: 'Ζωντανά',
     error: 'Σφάλμα',
     noDepartures: 'Δεν υπάρχουν αναχωρήσεις...',
@@ -426,6 +432,7 @@ const translations = {
     // Status
     updatingIn: 'به‌روزرسانی در',
     seconds: 'ث',
+    now: 'اکنون',
     live: 'زنده',
     error: 'خطا',
     noDepartures: 'حرکتی وجود ندارد...',
@@ -491,6 +498,7 @@ const translations = {
     // Status
     updatingIn: 'अपडेट में',
     seconds: 'से',
+    now: 'अभी',
     live: 'लाइव',
     error: 'त्रुटि',
     noDepartures: 'कोई प्रस्थान नहीं...',
@@ -556,6 +564,7 @@ const translations = {
     // Status
     updatingIn: 'Uppfærir eftir',
     seconds: 's',
+    now: 'Núna',
     live: 'Beint',
     error: 'Villa',
     noDepartures: 'Engar brottfarir...',
@@ -621,6 +630,7 @@ const translations = {
     // Status
     updatingIn: 'Оновлення через',
     seconds: 'с',
+    now: 'Зараз',
     live: 'Пряма трансляція',
     error: 'Помилка',
     noDepartures: 'Немає відправлень...',
@@ -686,6 +696,7 @@ const translations = {
     // Status
     updatingIn: 'Mise à jour dans',
     seconds: 's',
+    now: 'Maintenant',
     live: 'En direct',
     error: 'Erreur',
     noDepartures: 'Aucun départ...',
@@ -751,6 +762,7 @@ const translations = {
     // Status
     updatingIn: 'Aktualizacja za',
     seconds: 's',
+    now: 'Teraz',
     live: 'Na żywo',
     error: 'Błąd',
     noDepartures: 'Brak odjazdów...',
