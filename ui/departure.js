@@ -232,11 +232,11 @@ export function createDepartureNode(item){
   return {container, dest, time, situ, epochMs: Number.isFinite(epochMs) ? epochMs : null};
 }
 
-export function updateDepartureCountdown(node, nowMs = Date.now(), formatFn){
+export function updateDepartureCountdown(node, nowMs = Date.now(), formatFn, translator = null){
   if (!node || !node.time || !formatFn) return;
   const v = node.time.dataset.epochMs;
   const epoch = (v == null || v === '') ? (node.epochMs || null) : Number(v);
   if (!Number.isFinite(epoch)) { node.time.textContent = '—'; return; }
-  const text = formatFn(epoch, nowMs) || '—';
+  const text = formatFn(epoch, nowMs, translator) || '—';
   node.time.textContent = text;
 }

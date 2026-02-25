@@ -344,22 +344,6 @@ export function createOptionsPanel(defaults, onApply, onLanguageChange, onSave){
     }
   });
 
-<<<<<<< HEAD
-  // On focus: select text for easy editing, or clear if a station was previously selected
-  inpStation.addEventListener('focus', () => {
-    // If there's a stopId, it means user selected from autocomplete previously
-    // Clear it to force fresh search (fixes mobile select() issues)
-    if (inpStation.dataset.stopId) {
-      inpStation.value = '';
-      inpStation.dataset.stopId = '';
-      clearAutocomplete();
-    } else {
-      // No stopId means this is a default/typed value - just select it for editing
-      inpStation.select();
-    }
-    // Always clear lastQuery to allow re-searching
-    lastQuery = '';
-=======
   // Pre-fill and select station name on focus for easy editing
   inpStation.addEventListener('focus', () => {
     // Clear lastQuery so typing triggers new search
@@ -376,7 +360,6 @@ export function createOptionsPanel(defaults, onApply, onLanguageChange, onSave){
     
     // Select text so user can immediately start typing to replace
     inpStation.select();
->>>>>>> 9916be81b4f50c55d2c2a53025828de7efc80857
   });
 
   inpNum.addEventListener('focus', () => {

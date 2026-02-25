@@ -6,10 +6,10 @@ export function isoToEpochMs(iso) {
 
 function pad(n){return String(n).padStart(2,'0')}
 
-export function formatCountdown(targetEpochMs, nowMs = Date.now()){
+export function formatCountdown(targetEpochMs, nowMs = Date.now(), translator = null){
   if (typeof targetEpochMs !== 'number') return null;
   const diffMs = targetEpochMs - nowMs;
-  if (diffMs <= 0) return 'Now';
+  if (diffMs <= 0) return translator ? translator('now') : 'Now';
   let totalSec = Math.floor(diffMs / 1000);
   const hours = Math.floor(totalSec / 3600);
   totalSec = totalSec % 3600;

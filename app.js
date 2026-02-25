@@ -39,7 +39,7 @@ function renderDepartures(listEl, items){
   items.forEach(it => {
     const node = createDepartureNode(it);
     // initial countdown
-    updateDepartureCountdown(node, Date.now(), formatCountdown);
+    updateDepartureCountdown(node, Date.now(), formatCountdown, t);
     listEl.appendChild(node.container);
   });
 }
@@ -517,13 +517,13 @@ async function init(){
   function tickCountdowns(){
     const now = Date.now();
     const times = board.list.querySelectorAll('.departure-time');
-    times.forEach(t => {
-      const v = t.dataset.epochMs;
+    times.forEach(el => {
+      const v = el.dataset.epochMs;
       // treat empty string or missing dataset as invalid
       const epoch = (v == null || v === '' ) ? NaN : Number(v);
-      if (!Number.isFinite(epoch)) { t.textContent = '—'; return; }
-      const txt = formatCountdown(epoch, now);
-      t.textContent = (txt != null) ? txt : '—';
+      if (!Number.isFinite(epoch)) { el.textContent = '—'; return; }
+      const txt = formatCountdown(epoch, now, t);
+      el.textContent = (txt != null) ? txt : '—';
     });
     // update header status chip with seconds until next automatic refresh (compact)
     if (board.status) {
