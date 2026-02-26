@@ -36,7 +36,7 @@ jobs:
 
           # Create/update PR subfolder
           mkdir -p "${PR_FOLDER}"
-          rsync -av --delete src/ "${PR_FOLDER}/"
+          rsync -av --checksum --delete src/ "${PR_FOLDER}/"
 
           cd gh-pages-content
           git config user.name "github-actions[bot]"
