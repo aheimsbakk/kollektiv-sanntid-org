@@ -195,7 +195,8 @@ export function createShareButton(getSettings) {
         await navigator.clipboard.writeText(url);
       }
     } catch (e) {
-      // Ignore clipboard errors
+      // Clipboard write is a best-effort operation; failure is not fatal
+      console.warn('clipboard.writeText failed:', e);
     }
     
     // Show brief success indicator
