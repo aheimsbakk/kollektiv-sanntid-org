@@ -33,23 +33,22 @@ jobs:
         run: |
           # Copy src/ contents to root of gh-pages (preserving PR folders and CNAME)
           rsync -av --delete --exclude='pr-*/' --exclude='.git' --exclude='CNAME' src/ gh-pages-content/
-          
+
           cd gh-pages-content
-          
+
           # Configure git
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          
+
+          # Pull latest remote changes BEFORE staging to avoid rebase discarding staged files
+          git pull --rebase --autostash
+
           git add .
           if git diff --staged --quiet; then
             echo "No changes to deploy"
             exit 0
           fi
-          
-          # Pull latest changes (with autostash to handle any conflicts)
-          git pull --rebase --autostash || true
-          
-          # Commit and push
+
           git commit -m "Deploy main site from ${GITHUB_SHA::7}"
-          git push || (git pull --rebase --autostash && git push)
+          git push
 
