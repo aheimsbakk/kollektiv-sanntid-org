@@ -32,7 +32,9 @@ jobs:
       - name: Deploy to root of gh-pages
         run: |
           # Copy src/ contents to root of gh-pages (preserving PR folders and CNAME)
-          rsync -av --delete --exclude='pr-*/' --exclude='.git' --exclude='CNAME' src/ gh-pages-content/
+          # --checksum: compare file contents, not mtime+size (Git checkouts all have the same mtime,
+          # so size-only comparison misses same-length edits like version string bumps)
+          rsync -av --checksum --delete --exclude='pr-*/' --exclude='.git' --exclude='CNAME' src/ gh-pages-content/
 
           cd gh-pages-content
 
