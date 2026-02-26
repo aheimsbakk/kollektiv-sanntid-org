@@ -17,7 +17,10 @@ const ASSETS = [
   './ui/share-button.js',
   './ui/station-dropdown.js',
   './ui/theme-toggle.js',
-  './manifest.webmanifest'
+  './manifest.webmanifest',
+  './icons/favicon.svg',
+  './icons/icon-192.svg',
+  './icons/icon-512.svg'
 ];
 
 // Install: cache core assets. Do NOT call skipWaiting here so we can
