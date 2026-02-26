@@ -32,17 +32,7 @@ export function createBoardElements(stationName, onStationSelect){
   el.headerWrap = headerWrap;
   // expose station dropdown for updating
   el.stationDropdown = stationDropdown;
-  const debug = document.createElement('pre'); debug.className='debug-panel';
-  // expose helper to set debug content; keep it minimal so callers can append
-  debug.setDebug = (obj) => {
-    try{
-      // Use CSS class to control visibility so theming via CSS variables works
-      debug.classList.add('open');
-      debug.textContent = typeof obj === 'string' ? obj : JSON.stringify(obj, null, 2);
-    }catch(e){ debug.textContent = String(obj); }
-  };
-  el.append(debug);
-  return {el, list, status, debug, footer, stationDropdown};
+  return {el, list, status, footer, stationDropdown};
 }
 
 // Update footer translations when language changes

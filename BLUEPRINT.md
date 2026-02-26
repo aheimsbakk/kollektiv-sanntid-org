@@ -90,7 +90,7 @@ Internationalisation (i18n)
 - `t(key)` returns the string for the current language (falls back to `en`).
 - Language persisted in `localStorage` key `departure:language`.
 - Supported: `en`, `no`, `de`, `es`, `it`, `el`, `fa`, `hi`, `is`, `uk`, `fr`, `pl`.
-- Language switcher in options panel uses flag buttons; changing language re-renders the options panel immediately.
+- Language switcher in options panel uses flag buttons; changing language updates all translatable strings in the open panel in-place (footer and tooltips refreshed via `onLanguageChange` callback — the panel is **not** recreated).
 
 Share URL format
 - Encoding: compact JSON array `[stationName, stopId, modes[], numDepartures, fetchInterval, textSize, language]` → JSON.stringify → btoa (URL-safe: `+`→`-`, `/`→`_`, strip `=`).
@@ -133,7 +133,7 @@ Testing & dev workflow (no deps)
   - Use Node's built-in `assert` API — no test framework.
   - Keep tests hermetic: no DOM APIs or `fetch`.
 
-- Logging: minimal console logs (no `DEBUG` flag required; use `console.warn` for failures).
+- Logging: minimal console logs only. `console.debug` is banned. Use `console.warn` for recoverable failures and `console.error` for unexpected errors. No empty `catch` blocks.
 
 Security & privacy
 - Never log tokens or secrets. Avoid embedding keys in the code.

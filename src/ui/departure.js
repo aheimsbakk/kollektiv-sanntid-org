@@ -74,8 +74,11 @@ export function createDepartureNode(item){
           try{
             const val = cur[k];
             if (val){
-              const nm = normalize(val);
-              if (nm){ const mm = matchesToken(nm); if (mm) return mm; }
+              // convert value to string directly; normalize() was never defined
+              const nm = (typeof val === 'string') ? val : (typeof val === 'object' && val !== null)
+                ? (val.value || val.id || val.name || '')
+                : String(val);
+              if (nm){ const mm = matchesToken(String(nm)); if (mm) return mm; }
             }
           }catch(e){}
         }
@@ -103,22 +106,6 @@ export function createDepartureNode(item){
   }
 
   const mode = detectMode();
-  // Diagnostic: if mode not found, log a compact signature of raw once per unique shape
-  try{
-    if (!mode && item && item.raw){
-      try{
-        const sigKeys = Object.keys(item.raw).slice(0,8);
-        const sig = JSON.stringify(sigKeys);
-        if (!_seenRawSignatures.has(sig)){
-          _seenRawSignatures.add(sig);
-          // store a compact diagnostic snapshot on window for later inspection
-              // debug snapshots removed — no-op
-          // still log a compact console message for immediacy
-          try{ console.warn('emoji-detect: no mode found; raw keys sample:', sigKeys); }catch(e){}
-        }
-      }catch(e){}
-    }
-  }catch(e){}
   // render emoji inline with destination text so it wraps naturally on small screens
   const emoji = emojiForMode(mode);
   const destinationText = (item && item.destination) ? String(item.destination) : '—';
