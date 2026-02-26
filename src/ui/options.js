@@ -194,9 +194,6 @@ export function createOptionsPanel(defaults, onApply, onLanguageChange, onSave){
     TEXT_SIZE: ''
   };
 
-  function open(){ panel.classList.add('open'); }
-  function close(){ panel.classList.remove('open'); }
-
   // apply changes immediately to DEFAULTS and trigger refresh
   function applyChanges(){
     const chosen = Array.from(modesWrap.querySelectorAll('input[type=checkbox]:checked')).map(i=>i.value);
@@ -264,10 +261,10 @@ export function createOptionsPanel(defaults, onApply, onLanguageChange, onSave){
       }
     }
     
-    close();
+    closePanel();
   }
 
-  btnClose.addEventListener('click', ()=> close());
+  btnClose.addEventListener('click', ()=> closePanel());
   btnSave.addEventListener('click', ()=> saveToFavorites());
 
   // Enter key navigation: station -> departures -> interval -> text size -> Save
@@ -585,40 +582,7 @@ export function createOptionsPanel(defaults, onApply, onLanguageChange, onSave){
   // Apply immediately when text size selection changes
   selSize.addEventListener('change', ()=>{ applyChanges(); showToast(t('textSizeUpdated')); });
 
-  // when opening/closing, toggle a body class so we can shift the app content
-  const origOpen = open;
-  open = function(){
-    document.body.classList.add('options-open');
-    // Remove inert to make panel focusable
-    panel.removeAttribute('inert');
-    // focus management: save previously focused element and then focus first focusable in panel
-    open._prevFocus = document.activeElement;
-    
-    // Update input fields with current defaults before opening
-    updateFields();
-    
-    origOpen();
-    // set focus to first input
-    const first = panel.querySelector('input, button, [tabindex]');
-    if(first) first.focus();
-    // trap focus within panel
-    document.addEventListener('keydown', _trap);
-    // ESC to close
-    document.addEventListener('keydown', _escClose);
-  };
-  const origClose = close;
-  close = function(){
-    document.body.classList.remove('options-open');
-    // Make panel inert when closed to remove from tab order
-    panel.setAttribute('inert', '');
-    origClose();
-    // restore focus
-    try{ if(open._prevFocus && typeof open._prevFocus.focus === 'function') open._prevFocus.focus(); }catch(e){}
-    document.removeEventListener('keydown', _trap);
-    document.removeEventListener('keydown', _escClose);
-  };
-
-  function _escClose(e){ if (e.key === 'Escape' || e.key === 'Esc') close(); }
+  function _escClose(e){ if (e.key === 'Escape' || e.key === 'Esc') closePanel(); }
 
   function _trap(e){
     if (e.key !== 'Tab') return;
@@ -633,5 +597,31 @@ export function createOptionsPanel(defaults, onApply, onLanguageChange, onSave){
     }
   }
 
-  return { panel, open, close, updateFields };
+  /** Open the panel: shift page layout, restore from inert, trap focus, attach ESC handler. */
+  function openPanel(){
+    document.body.classList.add('options-open');
+    panel.removeAttribute('inert');
+    // save previously focused element so we can restore it on close
+    openPanel._prevFocus = document.activeElement;
+    // sync input fields with current runtime defaults before showing
+    updateFields();
+    panel.classList.add('open');
+    // move focus to first interactive element
+    const first = panel.querySelector('input, button, [tabindex]');
+    if(first) first.focus();
+    document.addEventListener('keydown', _trap);
+    document.addEventListener('keydown', _escClose);
+  }
+
+  /** Close the panel: restore layout, make inert, release focus trap. */
+  function closePanel(){
+    document.body.classList.remove('options-open');
+    panel.setAttribute('inert', '');
+    panel.classList.remove('open');
+    try{ if(openPanel._prevFocus && typeof openPanel._prevFocus.focus === 'function') openPanel._prevFocus.focus(); }catch(e){}
+    document.removeEventListener('keydown', _trap);
+    document.removeEventListener('keydown', _escClose);
+  }
+
+  return { panel, open: openPanel, close: closePanel, updateFields };
 }
