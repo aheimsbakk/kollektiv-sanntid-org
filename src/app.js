@@ -14,14 +14,14 @@
 
 import { DEFAULTS, VERSION, UI_EMOJIS } from './config.js';
 import { formatCountdown } from './time.js';
-import { createBoardElements, clearList, updateFooterTranslations } from './ui/ui.js';
+import { createBoardElements, clearList, updateFooterTranslations, updateFavoriteButton } from './ui/ui.js';
 import { createHeaderToggle } from './ui/header.js';
 import { createOptionsPanel } from './ui/options.js';
 import { createDepartureNode, updateDepartureCountdown } from './ui/departure.js';
 import { fetchDepartures, lookupStopId } from './entur.js';
 import { initLanguage, t, getLanguage } from './i18n.js';
 import { addRecentStation } from './ui/station-dropdown.js';
-import { initTheme, createThemeToggle } from './ui/theme-toggle.js';
+import { initTheme, createThemeToggle, getTheme } from './ui/theme-toggle.js';
 import { createShareButton, decodeSettings } from './ui/share-button.js';
 
 // Initialise language and theme before any DOM is built so that the correct
@@ -192,14 +192,37 @@ async function init() {
     try {
       localStorage.setItem('departure:settings', JSON.stringify(DEFAULTS));
     } catch (_) { /* ignore */ }
+
+    // Update heart button state
+    updateFavoriteButton(board.favoriteBtn, DEFAULTS.STOP_ID, DEFAULTS.TRANSPORT_MODES, getTheme());
   }
 
-  const board = createBoardElements(DEFAULTS.STATION_NAME, handleStationSelect);
+  /**
+   * Called when the user clicks the heart button to save to favorites.
+   * Adds the current station to favorites and updates the heart button state.
+   */
+  function handleFavoriteToggle() {
+    if (DEFAULTS.STATION_NAME && DEFAULTS.STOP_ID) {
+      addRecentStation(DEFAULTS.STATION_NAME, DEFAULTS.STOP_ID, DEFAULTS.TRANSPORT_MODES, {
+        numDepartures: DEFAULTS.NUM_DEPARTURES,
+        fetchInterval: DEFAULTS.FETCH_INTERVAL,
+        textSize:      DEFAULTS.TEXT_SIZE,
+        language:      getLanguage()
+      });
+      if (board.stationDropdown) board.stationDropdown.refresh();
+      updateFavoriteButton(board.favoriteBtn, DEFAULTS.STOP_ID, DEFAULTS.TRANSPORT_MODES, getTheme());
+    }
+  }
+
+  const board = createBoardElements(DEFAULTS.STATION_NAME, handleStationSelect, handleFavoriteToggle);
 
   // Sync dropdown title so mode icons show up when a filter is active
   if (board.stationDropdown) {
     board.stationDropdown.updateTitle(DEFAULTS.STATION_NAME, DEFAULTS.TRANSPORT_MODES);
   }
+
+  // Set initial heart button state
+  updateFavoriteButton(board.favoriteBtn, DEFAULTS.STOP_ID, DEFAULTS.TRANSPORT_MODES, getTheme());
 
   // ------------------------------------------------------------------
   // 4. Fetch loop state
@@ -288,26 +311,13 @@ async function init() {
 
     applyTextSize(newOpts.TEXT_SIZE);
 
+    // Update heart button state
+    updateFavoriteButton(board.favoriteBtn, DEFAULTS.STOP_ID, DEFAULTS.TRANSPORT_MODES, getTheme());
+
     // Fetch with new settings then restart the loop so the new interval is used
     doRefresh()
       .catch(err => console.warn('Manual refresh failed', err))
       .finally(() => startRefreshLoop());
-  }
-
-  /**
-   * Callback invoked by the options panel "Save to Favorites" button.
-   * Adds the current station to the dropdown and refreshes it.
-   */
-  function onSaveToFavorites() {
-    if (DEFAULTS.STATION_NAME && DEFAULTS.STOP_ID) {
-      addRecentStation(DEFAULTS.STATION_NAME, DEFAULTS.STOP_ID, DEFAULTS.TRANSPORT_MODES, {
-        numDepartures: DEFAULTS.NUM_DEPARTURES,
-        fetchInterval: DEFAULTS.FETCH_INTERVAL,
-        textSize:      DEFAULTS.TEXT_SIZE,
-        language:      getLanguage()
-      });
-      if (board.stationDropdown) board.stationDropdown.refresh();
-    }
   }
 
   /**
@@ -320,7 +330,7 @@ async function init() {
   }
 
   // Build options panel and append to body (hidden until opened)
-  const opts = createOptionsPanel(DEFAULTS, onApplySettings, onLanguageChange, onSaveToFavorites);
+  const opts = createOptionsPanel(DEFAULTS, onApplySettings, onLanguageChange);
   document.body.appendChild(opts.panel);
 
   // ------------------------------------------------------------------
@@ -342,7 +352,9 @@ async function init() {
   });
 
   // Theme toggle button (light / auto / dark cycle)
-  const themeBtn = createThemeToggle();
+  const themeBtn = createThemeToggle(() => {
+    updateFavoriteButton(board.favoriteBtn, DEFAULTS.STOP_ID, DEFAULTS.TRANSPORT_MODES, getTheme());
+  });
 
   // Settings gear button (opens / closes the options panel)
   const settingsBtn = document.createElement('button');
@@ -375,6 +387,8 @@ async function init() {
     shareComponents.button.setAttribute('aria-label', t('shareBoard'));
     themeBtn.title    = t('themeTooltip');
     settingsBtn.title = t('settingsTooltip');
+    // Refresh favorite button (tooltip + state)
+    updateFavoriteButton(board.favoriteBtn, DEFAULTS.STOP_ID, DEFAULTS.TRANSPORT_MODES, getTheme());
   }
 
   // ------------------------------------------------------------------

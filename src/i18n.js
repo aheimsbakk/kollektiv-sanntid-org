@@ -62,7 +62,14 @@ const translations = {
     
     // Station dropdown
     noStationSelected: 'No station selected',
-    noRecentStations: 'No recent stations'
+    noRecentStations: 'No recent stations',
+    
+    // Favorite button
+    saveToFavorites: 'Save to favorites',
+    alreadyInFavorites: 'Already in favorites',
+    
+    // Transport mode toggle
+    toggleAllModes: 'Toggle all transport modes'
   },
   
   no: {
@@ -126,7 +133,14 @@ const translations = {
     
     // Station dropdown
     noStationSelected: 'Ingen stasjon valgt',
-    noRecentStations: 'Ingen nylige stasjoner'
+    noRecentStations: 'Ingen nylige stasjoner',
+    
+    // Favorite button
+    saveToFavorites: 'Lagre i favoritter',
+    alreadyInFavorites: 'Allerede i favoritter',
+    
+    // Transport mode toggle
+    toggleAllModes: 'Velg/fjern alle transportmidler'
   },
   
   de: {
@@ -190,7 +204,14 @@ const translations = {
     
     // Station dropdown
     noStationSelected: 'Keine Station ausgewählt',
-    noRecentStations: 'Keine letzten Stationen'
+    noRecentStations: 'Keine letzten Stationen',
+    
+    // Favorite button
+    saveToFavorites: 'In Favoriten speichern',
+    alreadyInFavorites: 'Bereits in Favoriten',
+    
+    // Transport mode toggle
+    toggleAllModes: 'Alle Verkehrsmittel auswählen/abwählen'
   },
   
   es: {
@@ -254,7 +275,14 @@ const translations = {
     
     // Station dropdown
     noStationSelected: 'Ninguna estación seleccionada',
-    noRecentStations: 'No hay estaciones recientes'
+    noRecentStations: 'No hay estaciones recientes',
+    
+    // Favorite button
+    saveToFavorites: 'Guardar en favoritos',
+    alreadyInFavorites: 'Ya en favoritos',
+    
+    // Transport mode toggle
+    toggleAllModes: 'Seleccionar/deseleccionar todos los modos'
   },
   
   it: {
@@ -318,7 +346,14 @@ const translations = {
     
     // Station dropdown
     noStationSelected: 'Nessuna stazione selezionata',
-    noRecentStations: 'Nessuna stazione recente'
+    noRecentStations: 'Nessuna stazione recente',
+    
+    // Favorite button
+    saveToFavorites: 'Salva nei preferiti',
+    alreadyInFavorites: 'Già nei preferiti',
+    
+    // Transport mode toggle
+    toggleAllModes: 'Seleziona/deseleziona tutti i mezzi'
   },
   
   el: {
@@ -382,7 +417,14 @@ const translations = {
     
     // Station dropdown
     noStationSelected: 'Δεν επιλέχθηκε σταθμός',
-    noRecentStations: 'Δεν υπάρχουν πρόσφατοι σταθμοί'
+    noRecentStations: 'Δεν υπάρχουν πρόσφατοι σταθμοί',
+    
+    // Favorite button
+    saveToFavorites: 'Αποθήκευση στα αγαπημένα',
+    alreadyInFavorites: 'Ήδη στα αγαπημένα',
+    
+    // Transport mode toggle
+    toggleAllModes: 'Επιλογή/αποεπιλογή όλων των μέσων'
   },
   
   fa: {
@@ -444,6 +486,13 @@ const translations = {
     // Station dropdown
     noStationSelected: 'هیچ ایستگاهی انتخاب نشده',
     noRecentStations: 'ایستگاه اخیر وجود ندارد',
+    
+    // Favorite button
+    saveToFavorites: 'ذخیره در علاقه‌مندی‌ها',
+    alreadyInFavorites: 'قبلاً در علاقه‌مندی‌ها',
+    
+    // Transport mode toggle
+    toggleAllModes: 'انتخاب/عدم انتخاب همه وسایل نقلیه',
     
     // Share button
     shareBoard: 'اشتراک‌گذاری این تابلو',
@@ -511,6 +560,13 @@ const translations = {
     noStationSelected: 'कोई स्टेशन चयनित नहीं',
     noRecentStations: 'कोई हालिया स्टेशन नहीं',
     
+    // Favorite button
+    saveToFavorites: 'पसंदीदा में सहेजें',
+    alreadyInFavorites: 'पहले से पसंदीदा में है',
+    
+    // Transport mode toggle
+    toggleAllModes: 'सभी परिवहन साधन चुनें/हटाएं',
+    
     // Share button
     shareBoard: 'इस बोर्ड को साझा करें',
     noStationToShare: 'साझा करने के लिए कोई स्टेशन नहीं चुना गया',
@@ -576,6 +632,13 @@ const translations = {
     // Station dropdown
     noStationSelected: 'Engin stöð valin',
     noRecentStations: 'Engar nýlegar stöðvar',
+    
+    // Favorite button
+    saveToFavorites: 'Vista í eftirlæti',
+    alreadyInFavorites: 'Þegar í eftirlætum',
+    
+    // Transport mode toggle
+    toggleAllModes: 'Velja/afvelja allar samgöngur',
     
     // Share button
     shareBoard: 'Deila þessari töflu',
@@ -643,6 +706,13 @@ const translations = {
     noStationSelected: 'Станцію не вибрано',
     noRecentStations: 'Немає недавніх станцій',
     
+    // Favorite button
+    saveToFavorites: 'Зберегти в обране',
+    alreadyInFavorites: 'Вже в обраному',
+    
+    // Transport mode toggle
+    toggleAllModes: 'Вибрати/зняти всі засоби транспорту',
+    
     // Share button
     shareBoard: 'Поділитися цією дошкою',
     noStationToShare: 'Не вибрано станцію для спільного доступу',
@@ -709,6 +779,13 @@ const translations = {
     noStationSelected: 'Aucune station sélectionnée',
     noRecentStations: 'Aucune station récente',
     
+    // Favorite button
+    saveToFavorites: 'Enregistrer dans les favoris',
+    alreadyInFavorites: 'Déjà dans les favoris',
+    
+    // Transport mode toggle
+    toggleAllModes: 'Sélectionner/désélectionner tous les modes',
+    
     // Share button
     shareBoard: 'Partager ce tableau',
     noStationToShare: 'Aucune station sélectionnée à partager',
@@ -774,6 +851,13 @@ const translations = {
     // Station dropdown
     noStationSelected: 'Nie wybrano stacji',
     noRecentStations: 'Brak ostatnich stacji',
+    
+    // Favorite button
+    saveToFavorites: 'Zapisz w ulubionych',
+    alreadyInFavorites: 'Już w ulubionych',
+    
+    // Transport mode toggle
+    toggleAllModes: 'Zaznacz/odznacz wszystkie środki transportu',
     
     // Share button
     shareBoard: 'Udostępnij tę tablicę',

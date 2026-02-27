@@ -3,7 +3,7 @@ import { searchStations } from '../entur.js';
 import { t, setLanguage, getLanguage, getLanguages } from '../i18n.js';
 import { ALL_TRANSPORT_MODES, TRANSPORT_MODE_EMOJIS } from '../config.js';
 
-export function createOptionsPanel(defaults, onApply, onLanguageChange, onSave){
+export function createOptionsPanel(defaults, onApply, onLanguageChange){
   const panel = document.createElement('aside'); panel.className = 'options-panel';
   // Start with inert to remove from tab order when closed
   panel.setAttribute('inert', '');
@@ -53,7 +53,17 @@ export function createOptionsPanel(defaults, onApply, onLanguageChange, onSave){
 
   // transport modes (multiple checkboxes in table layout)
   const rowModes = document.createElement('div'); rowModes.className='options-row';
+  const modesLabelWrap = document.createElement('div'); modesLabelWrap.className='modes-label-wrap';
   const lblModes = document.createElement('label'); lblModes.textContent = t('transportModes');
+  
+  // "Select all" checkbox next to the Transport modes label
+  const toggleAllCb = document.createElement('input');
+  toggleAllCb.type = 'checkbox';
+  toggleAllCb.className = 'modes-toggle-all';
+  toggleAllCb.title = t('toggleAllModes');
+  toggleAllCb.setAttribute('aria-label', t('toggleAllModes'));
+  modesLabelWrap.append(lblModes, toggleAllCb);
+  
   const modesWrap = document.createElement('div'); modesWrap.className='modes-checkboxes';
   
   // Create table structure for 2x3 layout
@@ -99,6 +109,34 @@ export function createOptionsPanel(defaults, onApply, onLanguageChange, onSave){
   
   modesTable.appendChild(tbody);
   modesWrap.appendChild(modesTable);
+  
+  // Update the "toggle all" checkbox state based on individual mode checkboxes
+  function updateToggleAllState() {
+    const allCbs = Array.from(modesWrap.querySelectorAll('input[type=checkbox]'));
+    const checkedCount = allCbs.filter(cb => cb.checked).length;
+    if (checkedCount === 0) {
+      toggleAllCb.checked = false;
+      toggleAllCb.indeterminate = false;
+    } else if (checkedCount === allCbs.length) {
+      toggleAllCb.checked = true;
+      toggleAllCb.indeterminate = false;
+    } else {
+      toggleAllCb.checked = false;
+      toggleAllCb.indeterminate = true;
+    }
+  }
+  
+  // Handle toggle-all checkbox click
+  toggleAllCb.addEventListener('change', () => {
+    const shouldCheck = toggleAllCb.checked;
+    Array.from(modesWrap.querySelectorAll('input[type=checkbox]')).forEach(cb => {
+      cb.checked = shouldCheck;
+    });
+    toggleAllCb.indeterminate = false;
+    applyChanges();
+    showToast(t('filtersUpdated'));
+  });
+  
   // restore saved choices (if localStorage contains them)
   try{
     const saved = localStorage.getItem('departure:settings');
@@ -113,7 +151,9 @@ export function createOptionsPanel(defaults, onApply, onLanguageChange, onSave){
       if (s.TEXT_SIZE) selSize.value = s.TEXT_SIZE;
     }
   }catch(e){}
-  rowModes.append(lblModes, modesWrap);
+  // Set initial toggle-all state
+  updateToggleAllState();
+  rowModes.append(modesLabelWrap, modesWrap);
 
   // Language switcher
   const rowLang = document.createElement('div'); rowLang.className='options-row';
@@ -128,8 +168,9 @@ export function createOptionsPanel(defaults, onApply, onLanguageChange, onSave){
     lblInt.textContent = t('fetchInterval');
     lblSize.textContent = t('textSize');
     lblModes.textContent = t('transportModes');
+    toggleAllCb.title = t('toggleAllModes');
+    toggleAllCb.setAttribute('aria-label', t('toggleAllModes'));
     lblLang.textContent = t('switchLanguage');
-    btnSave.textContent = t('save');
     btnClose.textContent = t('close');
     
     // Update text size options
@@ -178,9 +219,8 @@ export function createOptionsPanel(defaults, onApply, onLanguageChange, onSave){
   rowLang.append(lblLang, langWrap);
 
   const actions = document.createElement('div'); actions.className='options-actions';
-  const btnSave = document.createElement('button'); btnSave.type='button'; btnSave.textContent = t('save');
   const btnClose = document.createElement('button'); btnClose.type='button'; btnClose.textContent = t('close');
-  actions.append(btnClose, btnSave);
+  actions.append(btnClose);
 
   panel.append(rowStation, rowNum, rowInt, rowSize, rowModes, rowLang, actions);
 
@@ -246,26 +286,7 @@ export function createOptionsPanel(defaults, onApply, onLanguageChange, onSave){
     }
   }
   
-  // Save current station + modes to favorites dropdown (only triggered by Save button)
-  function saveToFavorites(){
-    // Apply any pending changes first
-    applyChanges();
-    
-    // Call the onSave callback if provided
-    if (onSave && typeof onSave === 'function') {
-      try {
-        onSave();
-        showToast(t('savedToFavorites'));
-      } catch(e) {
-        console.warn('onSave failed', e);
-      }
-    }
-    
-    closePanel();
-  }
-
   btnClose.addEventListener('click', ()=> closePanel());
-  btnSave.addEventListener('click', ()=> saveToFavorites());
 
   // Enter key navigation: station -> departures -> interval -> text size -> Save
   inpNum.addEventListener('keydown', (e) => {
@@ -309,7 +330,7 @@ export function createOptionsPanel(defaults, onApply, onLanguageChange, onSave){
   selSize.addEventListener('keydown', (e) => {
     if (e.key === 'Enter'){
       e.preventDefault();
-      btnSave.focus();
+      btnClose.focus();
     }
   });
 
@@ -383,6 +404,7 @@ export function createOptionsPanel(defaults, onApply, onLanguageChange, onSave){
     checkboxes.forEach(cb => {
       cb.checked = (defaults.TRANSPORT_MODES || []).includes(cb.value);
     });
+    updateToggleAllState();
     
     // Reset lastQuery to ensure autocomplete works on first keystroke
     // This fixes the bug where autocomplete doesn't work after opening with default station
@@ -429,6 +451,7 @@ export function createOptionsPanel(defaults, onApply, onLanguageChange, onSave){
     // Check all transport mode checkboxes when selecting a new station
     const checkboxes = modesWrap.querySelectorAll('input[type=checkbox]');
     checkboxes.forEach(cb => { cb.checked = true; });
+    updateToggleAllState();
     
     // Apply changes immediately
     applyChanges();
@@ -574,6 +597,7 @@ export function createOptionsPanel(defaults, onApply, onLanguageChange, onSave){
   let modesDebounceTimer = null;
   modesWrap.addEventListener('change', (e)=>{
     if (e.target && e.target.type === 'checkbox'){
+      updateToggleAllState();
       clearTimeout(modesDebounceTimer);
       modesDebounceTimer = setTimeout(()=>{ applyChanges(); showToast(t('filtersUpdated')); }, 500);
     }
