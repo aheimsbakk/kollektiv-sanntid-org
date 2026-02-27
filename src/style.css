@@ -213,7 +213,8 @@ body.options-open .app-root {
   border-radius: 6px;
   cursor: pointer;
   padding: 6px 8px;
-  font-size: 0.9em;
+  /* Match the global header buttons (share/theme) for consistent sizing */
+  font-size: 26px;
   line-height: 1;
   transition: transform 0.12s ease, opacity 0.12s ease, background 0.12s ease, border-color 0.12s ease;
 }
