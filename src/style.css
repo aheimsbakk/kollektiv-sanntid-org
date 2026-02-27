@@ -179,6 +179,56 @@ body.options-open .app-root {
 }
 
 /* Station Dropdown */
+.station-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Shared header button style used by theme toggle, share, language flags, and favorite */
+.header-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1px solid var(--border-muted);
+  border-radius: 6px;
+  padding: 6px 8px;
+  cursor: pointer;
+}
+
+.header-btn:hover:not(:disabled) {
+  background: var(--overlay-light);
+  border-color: var(--accent);
+}
+
+.favorite-heart-btn {
+  /* Use the same visual button layout as other header buttons (theme/flags)
+     so it lines up and feels consistent. */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1px solid var(--border-muted);
+  border-radius: 6px;
+  cursor: pointer;
+  padding: 6px 8px;
+  font-size: 0.9em;
+  line-height: 1;
+  transition: transform 0.12s ease, opacity 0.12s ease, background 0.12s ease, border-color 0.12s ease;
+}
+
+.favorite-heart-btn:hover:not(:disabled) {
+  transform: translateY(-1px) scale(1.05);
+  background: var(--overlay-light);
+  border-color: var(--accent);
+}
+
+.favorite-heart-btn:disabled {
+  cursor: default;
+  opacity: 0.8;
+}
+
 .station-dropdown-container {
   position: relative;
   display: inline-block;
@@ -655,7 +705,7 @@ button:active {
 
 .options-actions {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   margin-top: 12px;
 }
 
@@ -687,6 +737,19 @@ button:active {
   flex-wrap: wrap;
   gap: 6px;
   margin-top: 8px;
+}
+
+.modes-label-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.modes-toggle-all {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
 }
 
 .mode-checkbox-label {

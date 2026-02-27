@@ -1,6 +1,6 @@
 // Version is defined here and in src/sw.js (service worker)
 // Both must be kept in sync - use scripts/bump-version.sh to update both
-export const VERSION = '1.30.7';
+export const VERSION = '1.31.0';
 
 export const DEFAULTS = {
   STATION_NAME: 'Jernbanetorget, Oslo',
@@ -42,7 +42,10 @@ export const UI_EMOJIS = {
   shareSuccess: '✓',
   themeLight: '🌞',
   themeAuto: '🌤️',
-  themeDark: '🌥️'
+  themeDark: '🌥️',
+  heartSave: '❤️',       // Not in favorites — click to save
+  heartSavedLight: '🤍', // Already in favorites (light theme)
+  heartSavedDark: '🖤'   // Already in favorites (dark theme)
 };
 
 // Cancellation display wrapper

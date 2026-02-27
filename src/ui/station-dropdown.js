@@ -2,7 +2,7 @@ import { t } from '../i18n.js';
 import { TRANSPORT_MODE_EMOJIS } from '../config.js';
 
 const STORAGE_KEY = 'recent-stations';
-const MAX_RECENT = 5;
+const MAX_RECENT = 10;
 
 /**
  * Mode order matches the options panel table (left to right, top to bottom):
@@ -123,6 +123,19 @@ export function addRecentStation(name, stopId, modes = [], settings = {}) {
   } catch (e) {
     console.error('Failed to save recent stations:', e);
   }
+}
+
+/**
+ * Check if a station (by stopId + modes combo) exists in the favorites list.
+ * A station with different transport modes is considered a separate favorite.
+ * @param {string} stopId - Station stop ID to check
+ * @param {Array<string>} [modes] - Transport modes to match
+ * @returns {boolean}
+ */
+export function isStationInFavorites(stopId, modes) {
+  if (!stopId) return false;
+  const recent = getRecentStations();
+  return recent.some(s => s.stopId === stopId && modesEqual(s.modes, modes));
 }
 
 /**
