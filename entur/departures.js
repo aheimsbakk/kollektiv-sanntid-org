@@ -56,6 +56,7 @@ function rawMatchesModes(rawObj, lowerModes) {
  * @param {string}   opts.stopId          - NSR stop-place ID (required)
  * @param {number}   [opts.numDepartures=2]
  * @param {string[]} [opts.modes=['bus']]
+ * @param {string}   [opts.lang='en']     - UI language code for situation text selection
  * @param {string}   [opts.apiUrl]        - GraphQL endpoint URL
  * @param {string}   [opts.clientName]    - ET-Client-Name header value
  * @param {Function} [opts.fetchFn=fetch] - Fetch implementation (injectable for tests)
@@ -66,6 +67,7 @@ export async function fetchDepartures({
   stopId,
   numDepartures = 2,
   modes         = ['bus'],
+  lang          = 'en',
   apiUrl        = 'https://api.entur.io/journey-planner/v3/graphql',
   clientName    = 'personal-js-app',
   fetchFn       = fetch
@@ -113,7 +115,7 @@ export async function fetchDepartures({
     throw new Error(`Network error: ${resp.status ?? 'unknown'} ${resp.statusText ?? ''} — ${String(txt).slice(0, 200)}`);
   }
 
-  let parsed = parseEnturResponse(json);
+  let parsed = parseEnturResponse(json, lang);
 
   // When we fell back to the no-filter server query, apply client-side filtering
   // to honour the caller's mode selection (the server returned unfiltered data).

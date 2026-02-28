@@ -8,6 +8,22 @@
 import { mapTokenToCanonical, detectModeFromRaw } from './modes.js';
 
 /**
+ * Pick the best-matching text entry from a language-tagged array.
+ *
+ * Priority: preferred lang → 'en' → any first entry.
+ *
+ * @param {Array<{value:string,language:string}>} entries
+ * @param {string} lang - BCP-47 language code (e.g. 'no', 'de', 'fr')
+ * @returns {string|null}
+ */
+function pickLocalised(entries, lang) {
+  if (!Array.isArray(entries) || entries.length === 0) return null;
+  const find = code => entries.find(d => d.language === code);
+  const entry = find(lang) ?? find('en') ?? entries[0];
+  return entry?.value ?? null;
+}
+
+/**
  * Parse a raw Entur GraphQL response into an array of normalised departure
  * objects.
  *
@@ -25,10 +41,11 @@ import { mapTokenToCanonical, detectModeFromRaw } from './modes.js';
  *   situations           {string[]}       — human-readable service disruption texts
  *   raw                  {Object}         — original call object (kept for downstream filtering)
  *
- * @param {Object} json - Parsed JSON from the GraphQL endpoint
+ * @param {Object} json        - Parsed JSON from the GraphQL endpoint
+ * @param {string} [lang='en'] - UI language code; used to pick situation text
  * @returns {Array<Object>}
  */
-export function parseEnturResponse(json) {
+export function parseEnturResponse(json, lang = 'en') {
   if (!json || !json.data || !json.data.stopPlace) return [];
   const calls = json.data.stopPlace.estimatedCalls || [];
 
@@ -52,18 +69,16 @@ export function parseEnturResponse(json) {
       : null;
 
     // --- Service disruption texts ---
-    // Prefer Norwegian ('no'/'nob') translations; fall back to first available.
+    // Priority: UI language → English → first available entry.
     const situations = [];
     if (Array.isArray(call.situations)) {
       for (const s of call.situations) {
-        // Check description first (more detailed), then summary
+        // Prefer description (more detailed) over summary.
         const source = Array.isArray(s?.description) ? s.description
                      : Array.isArray(s?.summary)     ? s.summary
                      : null;
-        if (source) {
-          const entry = source.find(d => d.language === 'no' || d.language === 'nob') ?? source[0];
-          if (entry?.value) situations.push(entry.value);
-        }
+        const text = pickLocalised(source, lang);
+        if (text) situations.push(text);
       }
     }
 
