@@ -30,7 +30,15 @@ User-facing features
 
 Architecture overview
 - `src/index.html`       — entry point, minimal markup, loads `src/app.js` as module
-- `src/app.js`           — bootstraps app, wires DOM, intervals, URL params, SW registration
+- `src/app.js`           — thin bootstrap: imports modules, wires DOMContentLoaded
+- `src/app/`
+  - `settings.js`        — load/save localStorage settings; applyTextSize
+  - `url-import.js`      — decode ?b= / ?board= shared-board params, clean URL
+  - `render.js`          — renderDepartures (departure list clear + populate)
+  - `fetch-loop.js`      — doRefresh, startRefreshLoop, tickCountdowns
+  - `handlers.js`        — handleStationSelect, handleFavoriteToggle, onApplySettings, onLanguageChange
+  - `action-bar.js`      — share + theme + settings buttons, global-gear container
+  - `sw-updater.js`      — SW registration, update toast, controllerchange reload
 - `src/config.js`        — all configurable constants: DEFAULTS, VERSION, emojis, template, platform symbol rules
 - `src/entur/`           — Entur API client (split into focused modules)
   - `index.js`           — public re-export facade (drop-in for former entur.js)
@@ -151,6 +159,7 @@ Current file tree (implemented)
 - `src/style.css`
 - `src/icons.css`
 - `src/app.js`
+- `src/app/` (settings.js, url-import.js, render.js, fetch-loop.js, handlers.js, action-bar.js, sw-updater.js)
 - `src/config.js`
 - `src/entur/` (index.js, modes.js, parser.js, query.js, http.js, departures.js, geocoder.js)
 - `src/time.js`

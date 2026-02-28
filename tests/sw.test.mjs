@@ -12,6 +12,7 @@ const __dirname = dirname(__filename);
 const swPath = join(__dirname, '../src/sw.js');
 const configPath = join(__dirname, '../src/config.js');
 const appPath = join(__dirname, '../src/app.js');
+const swUpdaterPath = join(__dirname, '../src/app/sw-updater.js');
 
 function runTests() {
   let passed = 0;
@@ -33,6 +34,7 @@ function runTests() {
   const swContent = readFileSync(swPath, 'utf-8');
   const configContent = readFileSync(configPath, 'utf-8');
   const appContent = readFileSync(appPath, 'utf-8');
+  const swUpdaterContent = readFileSync(swUpdaterPath, 'utf-8');
 
   test('Service worker has VERSION constant', () => {
     const hasVersion = /const VERSION = '[0-9]+\.[0-9]+\.[0-9]+';/.test(swContent);
@@ -131,8 +133,8 @@ function runTests() {
       throw new Error('App still contains manual reload/dismiss buttons (old update mechanism)');
     }
     
-    // Verify the new auto-reload mechanism is present
-    if (!appContent.includes('showUpdateNotification')) {
+    // Verify the new auto-reload mechanism is present (may live in app.js or app/sw-updater.js)
+    if (!appContent.includes('showUpdateNotification') && !swUpdaterContent.includes('showUpdateNotification')) {
       throw new Error('Auto-reload notification function not found');
     }
   });
