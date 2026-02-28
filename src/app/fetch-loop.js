@@ -11,7 +11,7 @@
 import { DEFAULTS } from '../config.js';
 import { fetchDepartures, lookupStopId } from '../entur/index.js';
 import { formatCountdown } from '../time.js';
-import { t } from '../i18n.js';
+import { t, getLanguage } from '../i18n.js';
 import { renderDepartures } from './render.js';
 
 /** Epoch-ms timestamp of the next scheduled automatic refresh */
@@ -44,6 +44,7 @@ export async function doRefresh(listEl) {
           stopId,
           numDepartures: DEFAULTS.NUM_DEPARTURES,
           modes:         DEFAULTS.TRANSPORT_MODES,
+          lang:          getLanguage(),
           apiUrl:        DEFAULTS.API_URL,
           clientName:    DEFAULTS.CLIENT_NAME
         })

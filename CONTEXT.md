@@ -1,11 +1,11 @@
-Overall Context: Kollektiv.Sanntid.org - Real-time Norwegian public transport departure board. Version 1.33.1.
+Overall Context: Kollektiv.Sanntid.org - Real-time Norwegian public transport departure board. Version 1.33.2.
 
 Current Goal: Maintain and extend the production app; codebase refactored for rules compliance.
 
 Last 3 Changes:
-- src/i18n/translations.js — added `dataFrom` key to all 12 languages
-- src/ui/ui.js — footer now has two lines: "Data from Entur 🔗" above "Version X.Y.Z 🔗"
-- src/css/footer.css — flex-column layout with gap; no separator
+- src/entur/parser.js — pickLocalised() helper; parseEnturResponse(json, lang) picks situation text by UI lang → en → first
+- src/entur/departures.js — fetchDepartures accepts lang option, forwards to parser
+- src/app/fetch-loop.js — passes getLanguage() as lang to fetchDepartures
 
 Next Steps:
 - Monitor deploy workflows after fixes go live
