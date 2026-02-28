@@ -1,7 +1,12 @@
+# Artifacts
 .DS_Store
 .vscode/
 node_modules/
 dist/
 build/
+
 # Test artifacts created by the agent
 tests/*.log
+
+# Temporary folder
+tmp/
