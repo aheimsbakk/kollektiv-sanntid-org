@@ -1,5 +1,5 @@
 import assert from 'assert/strict';
-import { fetchDepartures } from '../src/entur.js';
+import { fetchDepartures } from '../src/entur/index.js';
 
 console.log('Running entur.query.line.test.mjs');
 

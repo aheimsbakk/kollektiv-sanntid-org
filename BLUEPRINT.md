@@ -32,7 +32,14 @@ Architecture overview
 - `src/index.html`       — entry point, minimal markup, loads `src/app.js` as module
 - `src/app.js`           — bootstraps app, wires DOM, intervals, URL params, SW registration
 - `src/config.js`        — all configurable constants: DEFAULTS, VERSION, emojis, template, platform symbol rules
-- `src/entur.js`         — Entur GraphQL client (fetch wrapper, stop lookup, departure parse)
+- `src/entur/`           — Entur API client (split into focused modules)
+  - `index.js`           — public re-export facade (drop-in for former entur.js)
+  - `modes.js`           — CANONICAL_MODE_MAP, token→canonical mapping, raw mode detection
+  - `parser.js`          — pure `parseEnturResponse` function (no I/O)
+  - `query.js`           — `buildQuery` + `buildVariants` (GraphQL query construction)
+  - `http.js`            — `getContentType`, `postAndParse` (network transport only)
+  - `departures.js`      — `fetchDepartures` orchestration + client-side mode filter
+  - `geocoder.js`        — `lookupStopId`, `searchStations` (Entur geocoder REST API)
 - `src/time.js`          — pure utilities: iso → epoch, format countdown
 - `src/i18n.js`          — i18n strings for 12 languages; `t(key)` helper; language persistence
 - `src/style.css`        — main stylesheet (CSS variables, themes, responsive layout)
@@ -145,7 +152,7 @@ Current file tree (implemented)
 - `src/icons.css`
 - `src/app.js`
 - `src/config.js`
-- `src/entur.js`
+- `src/entur/` (index.js, modes.js, parser.js, query.js, http.js, departures.js, geocoder.js)
 - `src/time.js`
 - `src/i18n.js`
 - `src/sw.js`

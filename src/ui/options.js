@@ -1,5 +1,5 @@
 // Options panel UI: slide-in from right with controls to update DEFAULTS
-import { searchStations } from '../entur.js';
+import { searchStations } from '../entur/index.js';
 import { t, setLanguage, getLanguage, getLanguages } from '../i18n.js';
 import { ALL_TRANSPORT_MODES, TRANSPORT_MODE_EMOJIS } from '../config.js';
 

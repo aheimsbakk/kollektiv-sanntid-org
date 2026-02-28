@@ -1,5 +1,5 @@
 // Test to verify Norwegian characters (æøå) work correctly in station searches
-import { searchStations, lookupStopId } from '../src/entur.js';
+import { searchStations, lookupStopId } from '../src/entur/index.js';
 
 const TEST_NAME = 'entur.norwegian.chars.test.mjs';
 

@@ -1,5 +1,5 @@
 import assert from 'assert/strict';
-import { lookupStopId } from '../src/entur.js';
+import { lookupStopId } from '../src/entur/index.js';
 
 console.log('Running entur.lookup.test.mjs');
 

@@ -18,7 +18,7 @@ import { createBoardElements, clearList, updateFooterTranslations, updateFavorit
 import { createHeaderToggle } from './ui/header.js';
 import { createOptionsPanel } from './ui/options.js';
 import { createDepartureNode, updateDepartureCountdown } from './ui/departure.js';
-import { fetchDepartures, lookupStopId } from './entur.js';
+import { fetchDepartures, lookupStopId } from './entur/index.js';
 import { initLanguage, t, getLanguage } from './i18n.js';
 import { addRecentStation } from './ui/station-dropdown.js';
 import { initTheme, createThemeToggle, getTheme } from './ui/theme-toggle.js';

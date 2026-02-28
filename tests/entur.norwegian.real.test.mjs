@@ -1,6 +1,6 @@
 // Integration test to check if Norwegian characters work with real Entur API
 // This test makes real API calls to verify encoding works correctly
-import { searchStations, lookupStopId, fetchDepartures } from '../src/entur.js';
+import { searchStations, lookupStopId, fetchDepartures } from '../src/entur/index.js';
 
 const TEST_NAME = 'entur.norwegian.real.test.mjs';
 
