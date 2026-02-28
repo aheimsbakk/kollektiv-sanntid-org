@@ -1,10 +1,26 @@
-const VERSION = '1.31.6';
+const VERSION = '1.31.7';
 const CACHE_NAME = `departures-v${VERSION}`;
 const ASSETS = [
   './',
   './index.html',
   './style.css',
   './icons.css',
+  './css/tokens.css',
+  './css/base.css',
+  './css/buttons.css',
+  './css/layout.css',
+  './css/utils.css',
+  './css/header.css',
+  './css/toolbar.css',
+  './css/departures.css',
+  './css/options-panel.css',
+  './css/autocomplete.css',
+  './css/transport-modes.css',
+  './css/language-switcher.css',
+  './css/share-modal.css',
+  './css/toasts.css',
+  './css/footer.css',
+  './css/debug.css',
   './app.js',
   './app/settings.js',
   './app/url-import.js',

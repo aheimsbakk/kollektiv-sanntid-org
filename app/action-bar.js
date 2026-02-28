@@ -46,7 +46,7 @@ export function buildActionBar(board, onOpenSettings, onCloseSettings) {
 
   // Settings gear button (opens / closes the options panel)
   const settingsBtn = document.createElement('button');
-  settingsBtn.className   = 'gear-btn';
+  settingsBtn.className   = 'header-btn gear-btn';
   settingsBtn.type        = 'button';
   settingsBtn.textContent = UI_EMOJIS.settings;
   settingsBtn.title       = t('settingsTooltip');
