@@ -13,7 +13,7 @@ High-level constraints
 - Follow agents protocol before committing: create `docs/worklogs/YYYY-MM-DD-HH-mm-{short-desc}.md` and update `CONTEXT.md` (<=20 lines).
 
 User-facing features
-- Station header (clickable) opens favorites dropdown (up to 5 recent stations with saved settings).
+- Station header (clickable) opens favorites dropdown (up to NUM_FAVORITES recent stations with saved settings).
 - Up to N upcoming departures (configurable).
 - Departure line: destination, realtime indicator (● live / ○ scheduled), line number, transport emoji, platform symbol+code.
 - Cancelled departures shown with strikethrough and reduced opacity.
@@ -91,7 +91,7 @@ Architecture overview
     - `language-switcher.js` — flag buttons, updateTranslations(refs)
     - `panel-lifecycle.js`   — open/close, focus trap, ESC handler, toast
   - `share-button.js`    — share button, URL encode/decode (base64 array format)
-  - `station-dropdown.js`— favorites/recent stations dropdown (up to 5, with saved settings)
+  - `station-dropdown.js`— favorites/recent stations dropdown (up to NUM_FAVORITES, with saved settings)
   - `theme-toggle.js`    — light/auto/dark theme cycle button
 - No transpilation. Use `type="module"` for the scripts.
 

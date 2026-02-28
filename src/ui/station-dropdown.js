@@ -1,8 +1,7 @@
 import { t } from '../i18n.js';
-import { TRANSPORT_MODE_EMOJIS } from '../config.js';
+import { TRANSPORT_MODE_EMOJIS, DEFAULTS } from '../config.js';
 
 const STORAGE_KEY = 'recent-stations';
-const MAX_RECENT = 10;
 
 /**
  * Mode order matches the options panel table (left to right, top to bottom):
@@ -113,9 +112,9 @@ export function addRecentStation(name, stopId, modes = [], settings = {}) {
     language: settings.language
   });
   
-  // Keep only MAX_RECENT
-  if (recent.length > MAX_RECENT) {
-    recent = recent.slice(0, MAX_RECENT);
+  // Keep only NUM_FAVORITES
+  if (recent.length > DEFAULTS.NUM_FAVORITES) {
+    recent = recent.slice(0, DEFAULTS.NUM_FAVORITES);
   }
   
   try {
