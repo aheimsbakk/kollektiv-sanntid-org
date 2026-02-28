@@ -131,7 +131,7 @@ export function decodeSettings(encoded) {
  */
 export function createShareButton(getSettings) {
   const button = document.createElement('button');
-  button.className = 'header-button share-button';
+  button.className = 'header-btn share-button';
   button.setAttribute('aria-label', t('shareBoard'));
   button.title = t('shareBoard');
   button.textContent = UI_EMOJIS.share;

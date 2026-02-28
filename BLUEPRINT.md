@@ -56,8 +56,25 @@ Architecture overview
   - `languages.js`       — static metadata: code/flag/name list for language switcher UI
   - `detect.js`          — pure fn: detectBrowserLanguage() (reads navigator, no state)
   - `store.js`           — runtime state: currentLanguage, t(), setLanguage(), getLanguage(), initLanguage(), getLanguages()
-- `src/style.css`        — main stylesheet (CSS variables, themes, responsive layout)
+- `src/style.css`        — CSS entry point (@import manifest only; no rules)
 - `src/icons.css`        — CSS-only icon/badge helpers
+- `src/css/`             — component stylesheets (one responsibility each):
+  - `tokens.css`         — all CSS custom properties: colors, spacing, sizing, z-index, transitions
+  - `base.css`           — browser reset (html, body, * only)
+  - `buttons.css`        — button system: base + .btn-icon/.header-btn + .btn-action/.share-url-close
+  - `layout.css`         — page skeleton: .app-root, .board, body.options-open shift
+  - `utils.css`          — generic a11y helpers (.visually-hidden)
+  - `header.css`         — station header row, dropdown, status chip, favorite btn
+  - `toolbar.css`        — fixed top-right .global-gear action bar
+  - `departures.css`     — departure list, destination, time, platform, text-size-* utilities
+  - `options-panel.css`  — slide-in panel shell, .options-row, inputs, .options-actions
+  - `autocomplete.css`   — station search autocomplete list
+  - `transport-modes.css`— mode filter checkbox grid
+  - `language-switcher.css` — flag button row
+  - `share-modal.css`    — share URL full-screen overlay
+  - `toasts.css`         — ephemeral notifications: .options-toast + #sw-update-toast
+  - `footer.css`         — fixed bottom-left .app-footer
+  - `debug.css`          — .debug-panel (dev-only, safe to strip)
 - `src/sw.js`            — service worker: versioned cache, offline support, skip-waiting flow
 - `src/manifest.webmanifest` — PWA manifest (icons, theme color, display mode)
 - `src/icons/`           — PWA icon assets
@@ -101,10 +118,11 @@ Time and timezone
 - Avoid heavy libraries: small helper functions in `src/time.js`.
 
 UI/UX & styling
-- CSS variables (`:root`): `--bg`, `--fg`, `--accent`, `--danger`, `--mono`, `--large-scale` plus theme overrides.
-- Three themes: light / auto (system) / dark — toggled via `.theme-light`, `.theme-dark` on `<html>`, default follows `prefers-color-scheme`.
-- Five text sizes applied as class on `<html>`: `text-size-tiny` → `text-size-xlarge`.
-- Destination: large block using monospace font, heavy `font-size` + `text-shadow` for punch.
+- CSS entry point is `src/style.css` — an `@import` manifest only. All rules live in `src/css/*.css`.
+- Design tokens in `src/css/tokens.css`: `--bg`, `--text-primary`, `--accent`, `--danger`, `--mono`, `--large-scale`, button sizing vars, transition vars, z-index layer vars, plus theme overrides.
+- Three themes: light / auto (system) / dark — toggled via `.theme-light` on `<html>`, default follows `prefers-color-scheme`.
+- Five text sizes applied as class on `<html>`: `text-size-tiny` → `text-size-xlarge` (rules in `departures.css`).
+- Button system in `src/css/buttons.css`: `button` base → `.btn-icon`/`.header-btn` (icon toolbar) → `.btn-action`/`.share-url-close` (prominent actions). All three global toolbar buttons (share, theme, gear) carry `.header-btn` for uniform 26px emoji size.
 - Departure line rendered from `DEPARTURE_LINE_TEMPLATE` (configurable in `config.js`).
 - Platform symbol selected by `PLATFORM_SYMBOL_RULES` (ordered rule list in `config.js`): water→berth, bus+alphanumeric→bay, bus+single-letter→gate, bus→stop, tram→stop, rail/metro→platform.
 - Realtime indicator: `●` (solid, live) / `○` (hollow, scheduled) from `REALTIME_INDICATORS` in `config.js`.
@@ -169,8 +187,9 @@ Security & privacy
 
 Current file tree (implemented)
 - `src/index.html`
-- `src/style.css`
+- `src/style.css`        (import manifest)
 - `src/icons.css`
+- `src/css/`             (tokens, base, buttons, layout, utils, header, toolbar, departures, options-panel, autocomplete, transport-modes, language-switcher, share-modal, toasts, footer, debug)
 - `src/app.js`
 - `src/app/` (settings.js, url-import.js, render.js, fetch-loop.js, handlers.js, action-bar.js, sw-updater.js)
 - `src/config.js`
