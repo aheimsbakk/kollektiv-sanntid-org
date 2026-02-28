@@ -35,16 +35,32 @@ export function createBoardElements(stationName, onStationSelect, onFavoriteTogg
   headerLeft.append(stationRow, status);
   headerWrap.append(headerLeft);
   
-  // Footer with version and GitHub link
+  // Footer: two lines — data attribution above, version + GitHub below
   const footer = document.createElement('div'); footer.className='app-footer';
-  const versionText = document.createElement('span'); 
+
+  // Line 1: "Data from Entur 🔗"
+  const dataLine = document.createElement('div'); dataLine.className='footer-data-line';
+  const dataText = document.createElement('span');
+  dataText.textContent = `${t('dataFrom')} Entur `;
+  const enturLink = document.createElement('a');
+  enturLink.href = 'https://data.entur.no/';
+  enturLink.target = '_blank';
+  enturLink.rel = 'noopener noreferrer';
+  enturLink.textContent = '🔗';
+  dataLine.append(dataText, enturLink);
+
+  // Line 2: "Version X.Y.Z 🔗"
+  const versionLine = document.createElement('div'); versionLine.className='footer-version-line';
+  const versionText = document.createElement('span');
   versionText.textContent = `${t('version')} ${VERSION} `;
   const githubLink = document.createElement('a');
   githubLink.href = DEFAULTS.GITHUB_URL || 'https://github.com/aheimsbakk/departure';
   githubLink.target = '_blank';
   githubLink.rel = 'noopener noreferrer';
   githubLink.textContent = '🔗';
-  footer.append(versionText, githubLink);
+  versionLine.append(versionText, githubLink);
+
+  footer.append(dataLine, versionLine);
   
   el.append(headerWrap, list, footer);
   // expose header-wrap for other modules to attach controls
@@ -85,13 +101,15 @@ export function updateFavoriteButton(btn, stopId, modes, theme) {
 // Update footer translations when language changes
 export function updateFooterTranslations(footer) {
   if (!footer) return;
-  const versionSpan = footer.querySelector('span');
-  const githubLink = footer.querySelector('a');
-  if (versionSpan) {
-    versionSpan.textContent = `${t('version')} ${VERSION} `;
+  const dataLine = footer.querySelector('.footer-data-line');
+  const versionLine = footer.querySelector('.footer-version-line');
+  if (dataLine) {
+    const dataSpan = dataLine.querySelector('span');
+    if (dataSpan) dataSpan.textContent = `${t('dataFrom')} Entur `;
   }
-  if (githubLink) {
-    githubLink.textContent = '🔗';
+  if (versionLine) {
+    const versionSpan = versionLine.querySelector('span');
+    if (versionSpan) versionSpan.textContent = `${t('version')} ${VERSION} `;
   }
 }
 

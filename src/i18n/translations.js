@@ -57,6 +57,7 @@ const translations = {
     noDepartures: 'No departures...',
 
     // Footer
+    dataFrom: 'Data from',
     version: 'Version',
     starOnGitHub: 'GitHub',
 
@@ -128,6 +129,7 @@ const translations = {
     noDepartures: 'Ingen avganger...',
 
     // Footer
+    dataFrom: 'Data fra',
     version: 'Versjon',
     starOnGitHub: 'GitHub',
 
@@ -199,6 +201,7 @@ const translations = {
     noDepartures: 'Keine Abfahrten...',
 
     // Footer
+    dataFrom: 'Daten von',
     version: 'Version',
     starOnGitHub: 'GitHub',
 
@@ -270,6 +273,7 @@ const translations = {
     noDepartures: 'Sin salidas...',
 
     // Footer
+    dataFrom: 'Datos de',
     version: 'Versión',
     starOnGitHub: 'GitHub',
 
@@ -341,6 +345,7 @@ const translations = {
     noDepartures: 'Nessuna partenza...',
 
     // Footer
+    dataFrom: 'Dati da',
     version: 'Versione',
     starOnGitHub: 'GitHub',
 
@@ -412,6 +417,7 @@ const translations = {
     noDepartures: 'Δεν υπάρχουν αναχωρήσεις...',
 
     // Footer
+    dataFrom: 'Δεδομένα από',
     version: 'Έκδοση',
     starOnGitHub: 'GitHub',
 
@@ -483,6 +489,7 @@ const translations = {
     noDepartures: 'حرکتی وجود ندارد...',
 
     // Footer
+    dataFrom: 'داده‌ها از',
     version: 'نسخه',
     starOnGitHub: 'GitHub',
 
@@ -554,6 +561,7 @@ const translations = {
     noDepartures: 'कोई प्रस्थान नहीं...',
 
     // Footer
+    dataFrom: 'डेटा स्रोत',
     version: 'संस्करण',
     starOnGitHub: 'GitHub',
 
@@ -625,6 +633,7 @@ const translations = {
     noDepartures: 'Engar brottfarir...',
 
     // Footer
+    dataFrom: 'Gögn frá',
     version: 'Útgáfa',
     starOnGitHub: 'GitHub',
 
@@ -696,6 +705,7 @@ const translations = {
     noDepartures: 'Немає відправлень...',
 
     // Footer
+    dataFrom: 'Дані від',
     version: 'Версія',
     starOnGitHub: 'GitHub',
 
@@ -767,6 +777,7 @@ const translations = {
     noDepartures: 'Aucun départ...',
 
     // Footer
+    dataFrom: 'Données de',
     version: 'Version',
     starOnGitHub: 'GitHub',
 
@@ -838,6 +849,7 @@ const translations = {
     noDepartures: 'Brak odjazdów...',
 
     // Footer
+    dataFrom: 'Dane z',
     version: 'Wersja',
     starOnGitHub: 'GitHub',
 

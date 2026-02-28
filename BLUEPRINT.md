@@ -13,7 +13,7 @@ High-level constraints
 - Follow agents protocol before committing: create `docs/worklogs/YYYY-MM-DD-HH-mm-{short-desc}.md` and update `CONTEXT.md` (<=20 lines).
 
 User-facing features
-- Station header (clickable) opens favorites dropdown (up to NUM_FAVORITES recent stations with saved settings).
+- Station header (clickable) opens favorites dropdown (up to `NUM_FAVORITES` recent stations with saved settings; `DEFAULT_FAVORITE` pre-seeded when no favorites exist).
 - Up to N upcoming departures (configurable).
 - Departure line: destination, realtime indicator (● live / ○ scheduled), line number, transport emoji, platform symbol+code.
 - Cancelled departures shown with strikethrough and reduced opacity.
@@ -39,7 +39,7 @@ Architecture overview
   - `handlers.js`        — handleStationSelect, handleFavoriteToggle, onApplySettings, onLanguageChange
   - `action-bar.js`      — share + theme + settings buttons, global-gear container
   - `sw-updater.js`      — SW registration, update toast, controllerchange reload
-- `src/config.js`        — all configurable constants: DEFAULTS, VERSION, emojis, template, platform symbol rules
+- `src/config.js`        — all configurable constants: VERSION, DEFAULTS (includes NUM_FAVORITES, FETCH_INTERVAL, GITHUB_URL), DEFAULT_FAVORITE, ALL_TRANSPORT_MODES, REALTIME_INDICATORS, TRANSPORT_MODE_EMOJIS, UI_EMOJIS, CANCELLATION_WRAPPER, PLATFORM_SYMBOLS, PLATFORM_SYMBOL_RULES, DEPARTURE_LINE_TEMPLATE
 - `src/entur/`           — Entur API client (split into focused modules)
   - `index.js`           — public re-export facade (drop-in for former entur.js)
   - `modes.js`           — CANONICAL_MODE_MAP, token→canonical mapping, raw mode detection
@@ -122,7 +122,7 @@ UI/UX & styling
 - Design tokens in `src/css/tokens.css`: `--bg`, `--text-primary`, `--accent`, `--danger`, `--mono`, `--large-scale`, button sizing vars, transition vars, z-index layer vars, plus theme overrides.
 - Three themes: light / auto (system) / dark — toggled via `.theme-light` on `<html>`, default follows `prefers-color-scheme`.
 - Five text sizes applied as class on `<html>`: `text-size-tiny` → `text-size-xlarge` (rules in `departures.css`).
-- Button system in `src/css/buttons.css`: `button` base → `.btn-icon`/`.header-btn` (icon toolbar) → `.btn-action`/`.share-url-close` (prominent actions). All three global toolbar buttons (share, theme, gear) carry `.header-btn` for uniform 26px emoji size.
+- Button system in `src/css/buttons.css`: `button` base → `.btn-icon`/`.header-btn` (icon toolbar) → `.btn-action`/`.share-url-close` (prominent actions). All three global toolbar buttons (share, theme, gear) carry `.header-btn` for uniform 26px emoji size. Button emojis sourced from `UI_EMOJIS` in `config.js`.
 - Departure line rendered from `DEPARTURE_LINE_TEMPLATE` (configurable in `config.js`).
 - Platform symbol selected by `PLATFORM_SYMBOL_RULES` (ordered rule list in `config.js`): water→berth, bus+alphanumeric→bay, bus+single-letter→gate, bus→stop, tram→stop, rail/metro→platform.
 - Realtime indicator: `●` (solid, live) / `○` (hollow, scheduled) from `REALTIME_INDICATORS` in `config.js`.
@@ -139,9 +139,9 @@ Internationalisation (i18n)
 - Language switcher in options panel uses flag buttons; changing language updates all translatable strings in the open panel in-place (footer and tooltips refreshed via `onLanguageChange` callback — the panel is **not** recreated).
 
 Share URL format
-- Encoding: compact JSON array `[stationName, stopId, modes[], numDepartures, fetchInterval, textSize, language]` → JSON.stringify → btoa (URL-safe: `+`→`-`, `/`→`_`, strip `=`).
+- Encoding: compact JSON array `[stationName, stopId, modes[]]` (3 elements) → JSON.stringify → btoa (URL-safe: `+`→`-`, `/`→`_`, strip `=`).
 - URL param: `?b=<encoded>` (v1.24.0+). Legacy `?board=<encoded>` decoded for backward compat.
-- Decoding detects array vs object format automatically.
+- Decoding detects array vs object format automatically; supports legacy 7-element array `[name, stopId, modes, departures, interval, size, lang]` and legacy object format `{n, s, m, d, i, t, l}`.
 - Opening a shared link applies settings, saves to `localStorage`, adds station to favorites, then clears URL param.
 - Full spec: `docs/share_url_encoding.md`.
 
@@ -149,7 +149,7 @@ PWA & Service Worker
 - `src/manifest.webmanifest`: name, icons, `display: standalone`, theme color.
 - `src/sw.js`: versioned cache name (`kollektiv-v<VERSION>`), caches all app assets on install, serves from cache with network fallback.
 - Update flow: new SW detected → 5-second countdown toast shows old→new version → `skipWaiting` → `controllerchange` triggers hard reload with `?t=<timestamp>` cache-bust.
-- VERSION in `src/config.js` and `src/sw.js` must stay in sync — use `scripts/bump-version.sh`.
+- VERSION in `src/config.js` and `src/sw.js` must stay in sync — use `scripts/bump-version.sh`. Current version: `1.33.0`.
 
 Performance & DOM update pattern
 - Render template once per departure item; keep references to text nodes for countdown and situation.
