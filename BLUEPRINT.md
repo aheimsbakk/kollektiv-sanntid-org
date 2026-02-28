@@ -59,7 +59,14 @@ Architecture overview
   - `ui.js`              — DOM helpers, board element factory, render loop (minimize DOM thrash)
   - `departure.js`       — single departure component (template rendering, countdown update)
   - `header.js`          — station header toggle component
-  - `options.js`         — settings/options panel component
+  - `options.js`         — re-export shim → `./options/index.js` (backward compat)
+  - `options/`
+    - `index.js`             — orchestrator; assembles panel, wires sub-modules; same public API
+    - `settings-store.js`    — localStorage load/save, validateOptions, diffOptions
+    - `transport-modes.js`   — checkbox table, toggle-all, debounced apply
+    - `station-autocomplete.js` — debounced search, keyboard nav, candidate list DOM
+    - `language-switcher.js` — flag buttons, updateTranslations(refs)
+    - `panel-lifecycle.js`   — open/close, focus trap, ESC handler, toast
   - `share-button.js`    — share button, URL encode/decode (base64 array format)
   - `station-dropdown.js`— favorites/recent stations dropdown (up to 5, with saved settings)
   - `theme-toggle.js`    — light/auto/dark theme cycle button
@@ -170,7 +177,8 @@ Current file tree (implemented)
 - `src/ui/ui.js`
 - `src/ui/departure.js`
 - `src/ui/header.js`
-- `src/ui/options.js`
+- `src/ui/options.js` (shim)
+- `src/ui/options/` (index.js, settings-store.js, transport-modes.js, station-autocomplete.js, language-switcher.js, panel-lifecycle.js)
 - `src/ui/share-button.js`
 - `src/ui/station-dropdown.js`
 - `src/ui/theme-toggle.js`

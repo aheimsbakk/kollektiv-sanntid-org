@@ -18,7 +18,7 @@ import { initLanguage, t } from './i18n.js';
 import { initTheme } from './ui/theme-toggle.js';
 import { createBoardElements, updateFavoriteButton } from './ui/ui.js';
 import { createHeaderToggle } from './ui/header.js';
-import { createOptionsPanel } from './ui/options.js';
+import { createOptionsPanel } from './ui/options/index.js';
 import { getTheme } from './ui/theme-toggle.js';
 import { lookupStopId } from './entur/index.js';
 
