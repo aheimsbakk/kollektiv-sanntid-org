@@ -205,18 +205,32 @@ body.options-open .app-root {
 .favorite-heart-btn {
   /* Use the same visual button layout as other header buttons (theme/flags)
      so it lines up and feels consistent. */
-  display: inline-flex;
+  /* /* display: inline-flex;
   align-items: center;
   justify-content: center;
   background: transparent;
+  background: var(--overlay-light);
+  color: var(--text-primary);
   border: 1px solid var(--border-muted);
+
   border-radius: 6px;
   cursor: pointer;
-  padding: 6px 8px;
+  padding: 6px 8px; */
   /* Match the global header buttons (share/theme) for consistent sizing */
-  font-size: 26px;
+  /* font-size: 26px;
   line-height: 1;
-  transition: transform 0.12s ease, opacity 0.12s ease, background 0.12s ease, border-color 0.12s ease;
+  transition: transform 0.12s ease, opacity 0.12s ease, background 0.12s ease, border-color 0.12s ease; */
+  padding: 4px;
+  border-radius: 6px;
+  background: var(--overlay-light);
+  color: var(--text-primary);
+  border: 1px solid var(--border-muted);
+  cursor: pointer;
+  display: flex;
+  font-size: 0.8em;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s, color 0.2s, transform 0.2s;
 }
 
 .favorite-heart-btn:hover:not(:disabled) {
