@@ -9,6 +9,10 @@ permissions:
   contents: write
   pull-requests: write
 
+concurrency:
+  group: "gh-pages-deploy"
+  cancel-in-progress: false
+
 jobs:
   cleanup-preview:
     runs-on: ubuntu-latest
@@ -25,13 +29,13 @@ jobs:
           PR_FOLDER="pr-${PR_NUMBER}"
 
           if [ -d "${PR_FOLDER}" ]; then
-            rm -rf "${PR_FOLDER}"
-
             git config user.name "github-actions[bot]"
             git config user.email "github-actions[bot]@users.noreply.github.com"
 
-            # Pull latest remote changes BEFORE staging to avoid rebase discarding staged files
-            git pull --rebase --autostash
+            # Pull latest remote changes BEFORE modifying files
+            git pull --rebase
+
+            rm -rf "${PR_FOLDER}"
 
             git add .
             git commit -m "Remove PR #${PR_NUMBER} preview"

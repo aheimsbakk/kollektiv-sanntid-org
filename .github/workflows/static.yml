@@ -10,7 +10,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: "production-deploy"
+  group: "gh-pages-deploy"
   cancel-in-progress: false
 
 jobs:
@@ -31,19 +31,23 @@ jobs:
 
       - name: Deploy to root of gh-pages
         run: |
-          # Copy src/ contents to root of gh-pages (preserving PR folders and CNAME)
-          # --checksum: compare file contents, not mtime+size (Git checkouts all have the same mtime,
-          # so size-only comparison misses same-length edits like version string bumps)
-          rsync -av --checksum --delete --exclude='pr-*/' --exclude='.git' --exclude='CNAME' src/ gh-pages-content/
-
           cd gh-pages-content
 
           # Configure git
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          # Pull latest remote changes BEFORE staging to avoid rebase discarding staged files
-          git pull --rebase --autostash
+          # Pull latest remote changes BEFORE rsync so we start from the current remote state
+          git pull --rebase
+
+          cd ..
+
+          # Copy src/ contents to root of gh-pages (preserving PR folders and CNAME)
+          # --checksum: compare file contents, not mtime+size (Git checkouts all have the same mtime,
+          # so size-only comparison misses same-length edits like version string bumps)
+          rsync -av --checksum --delete --exclude='pr-*/' --exclude='.git' --exclude='CNAME' src/ gh-pages-content/
+
+          cd gh-pages-content
 
           git add .
           if git diff --staged --quiet; then

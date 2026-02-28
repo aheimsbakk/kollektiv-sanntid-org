@@ -34,16 +34,20 @@ jobs:
           PR_NUMBER=${{ github.event.pull_request.number }}
           PR_FOLDER="gh-pages-content/pr-${PR_NUMBER}"
 
+          cd gh-pages-content
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          # Pull latest remote changes BEFORE rsync so we start from the current remote state
+          git pull --rebase
+
+          cd ..
+
           # Create/update PR subfolder
           mkdir -p "${PR_FOLDER}"
           rsync -av --checksum --delete src/ "${PR_FOLDER}/"
 
           cd gh-pages-content
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-
-          # Pull latest remote changes BEFORE staging to avoid rebase discarding staged files
-          git pull --rebase --autostash
 
           git add .
 
