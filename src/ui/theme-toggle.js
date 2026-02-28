@@ -17,7 +17,7 @@ const ICONS = {
 /**
  * Get current theme from localStorage or default to 'auto'
  */
-function getTheme() {
+export function getTheme() {
   const stored = localStorage.getItem(THEME_KEY);
   return THEMES.includes(stored) ? stored : 'auto';
 }
@@ -62,10 +62,12 @@ function applyTheme(theme) {
 
 /**
  * Create and return theme toggle button
+ * @param {Function} [onChange] - Optional callback invoked after theme changes, receives the new theme string
  */
-export function createThemeToggle() {
+export function createThemeToggle(onChange) {
   const button = document.createElement('button');
-  button.className = 'theme-toggle-btn';
+  // Use same header button class so layout matches favorite and language flags
+  button.className = 'theme-toggle-btn header-btn';
   button.type = 'button';
   button.title = t('themeTooltip');
   
@@ -87,6 +89,7 @@ export function createThemeToggle() {
     saveTheme(currentTheme);
     applyTheme(currentTheme);
     updateButton();
+    if (typeof onChange === 'function') onChange(currentTheme);
   });
   
   // Listen for system preference changes when in auto mode

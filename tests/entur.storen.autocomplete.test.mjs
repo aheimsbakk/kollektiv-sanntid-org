@@ -2,7 +2,7 @@
 // This verifies the fix for fuzzy matching issues where geocoder ranks
 // "Storeng" higher than "Støren stasjon"
 
-import { searchStations } from '../src/entur.js';
+import { searchStations } from '../src/entur/index.js';
 
 const testStorenAutocomplete = async () => {
   console.log('Testing autocomplete for "Støren"...');

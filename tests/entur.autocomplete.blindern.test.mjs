@@ -1,7 +1,7 @@
 // Test to verify autocomplete issue is fixed: "Blindern, Oslo" vs "Blindern"
 // The issue: When user selects "Blindern, Oslo" from autocomplete, the app
 // should use the stored stopId instead of looking up the label again.
-import { searchStations, lookupStopId, fetchDepartures } from '../src/entur.js';
+import { searchStations, lookupStopId, fetchDepartures } from '../src/entur/index.js';
 
 const TEST_NAME = 'entur.autocomplete.blindern.test.mjs';
 

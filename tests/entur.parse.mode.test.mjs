@@ -1,5 +1,5 @@
 import assert from 'assert/strict';
-import { parseEnturResponse } from '../src/entur.js';
+import { parseEnturResponse } from '../src/entur/index.js';
 
 console.log('Running entur.parse.mode.test.mjs');
 

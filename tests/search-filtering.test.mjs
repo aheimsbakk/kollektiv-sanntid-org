@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { searchStations } from '../src/entur.js';
+import { searchStations } from '../src/entur/index.js';
 
 test('searchStations filters and scores results correctly', async () => {
   // Mock API response with 3 features like the real API returns for "berg"

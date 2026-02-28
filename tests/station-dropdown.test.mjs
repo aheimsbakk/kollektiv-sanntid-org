@@ -89,7 +89,7 @@ const { getRecentStations, addRecentStation, modesEqual } = await import('../src
   assert.equal(recent[2].name, 'Nationaltheatret');
 }
 
-// Test 5: Limit to max 5 stations
+// Test 5: Limit to max 10 stations
 {
   localStorage.clear();
   addRecentStation('Station 1', 'ID-1');
@@ -98,11 +98,16 @@ const { getRecentStations, addRecentStation, modesEqual } = await import('../src
   addRecentStation('Station 4', 'ID-4');
   addRecentStation('Station 5', 'ID-5');
   addRecentStation('Station 6', 'ID-6');
+  addRecentStation('Station 7', 'ID-7');
+  addRecentStation('Station 8', 'ID-8');
+  addRecentStation('Station 9', 'ID-9');
+  addRecentStation('Station 10', 'ID-10');
+  addRecentStation('Station 11', 'ID-11');
   
   const recent = getRecentStations();
-  assert.equal(recent.length, 5);
-  assert.equal(recent[0].name, 'Station 6');
-  assert.equal(recent[4].name, 'Station 2');
+  assert.equal(recent.length, 10);
+  assert.equal(recent[0].name, 'Station 11');
+  assert.equal(recent[9].name, 'Station 2');
   
   // Station 1 should be dropped
   const hasStation1 = recent.some(s => s.name === 'Station 1');

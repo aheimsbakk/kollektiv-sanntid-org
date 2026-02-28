@@ -30,11 +30,32 @@ User-facing features
 
 Architecture overview
 - `src/index.html`       — entry point, minimal markup, loads `src/app.js` as module
-- `src/app.js`           — bootstraps app, wires DOM, intervals, URL params, SW registration
+- `src/app.js`           — thin bootstrap: imports modules, wires DOMContentLoaded
+- `src/app/`
+  - `settings.js`        — load/save localStorage settings; applyTextSize
+  - `url-import.js`      — decode ?b= / ?board= shared-board params, clean URL
+  - `render.js`          — renderDepartures (departure list clear + populate)
+  - `fetch-loop.js`      — doRefresh, startRefreshLoop, tickCountdowns
+  - `handlers.js`        — handleStationSelect, handleFavoriteToggle, onApplySettings, onLanguageChange
+  - `action-bar.js`      — share + theme + settings buttons, global-gear container
+  - `sw-updater.js`      — SW registration, update toast, controllerchange reload
 - `src/config.js`        — all configurable constants: DEFAULTS, VERSION, emojis, template, platform symbol rules
-- `src/entur.js`         — Entur GraphQL client (fetch wrapper, stop lookup, departure parse)
+- `src/entur/`           — Entur API client (split into focused modules)
+  - `index.js`           — public re-export facade (drop-in for former entur.js)
+  - `modes.js`           — CANONICAL_MODE_MAP, token→canonical mapping, raw mode detection
+  - `parser.js`          — pure `parseEnturResponse` function (no I/O)
+  - `query.js`           — `buildQuery` + `buildVariants` (GraphQL query construction)
+  - `http.js`            — `getContentType`, `postAndParse` (network transport only)
+  - `departures.js`      — `fetchDepartures` orchestration + client-side mode filter
+  - `geocoder.js`        — `lookupStopId`, `searchStations` (Entur geocoder REST API)
 - `src/time.js`          — pure utilities: iso → epoch, format countdown
-- `src/i18n.js`          — i18n strings for 12 languages; `t(key)` helper; language persistence
+- `src/i18n.js`          — backward-compat shim → re-exports from `src/i18n/index.js`
+- `src/i18n/`
+  - `index.js`           — public facade; re-exports all symbols from store.js
+  - `translations.js`    — static string data only: 12-language keyed map
+  - `languages.js`       — static metadata: code/flag/name list for language switcher UI
+  - `detect.js`          — pure fn: detectBrowserLanguage() (reads navigator, no state)
+  - `store.js`           — runtime state: currentLanguage, t(), setLanguage(), getLanguage(), initLanguage(), getLanguages()
 - `src/style.css`        — main stylesheet (CSS variables, themes, responsive layout)
 - `src/icons.css`        — CSS-only icon/badge helpers
 - `src/sw.js`            — service worker: versioned cache, offline support, skip-waiting flow
@@ -44,7 +65,14 @@ Architecture overview
   - `ui.js`              — DOM helpers, board element factory, render loop (minimize DOM thrash)
   - `departure.js`       — single departure component (template rendering, countdown update)
   - `header.js`          — station header toggle component
-  - `options.js`         — settings/options panel component
+  - `options.js`         — re-export shim → `./options/index.js` (backward compat)
+  - `options/`
+    - `index.js`             — orchestrator; assembles panel, wires sub-modules; same public API
+    - `settings-store.js`    — localStorage load/save, validateOptions, diffOptions
+    - `transport-modes.js`   — checkbox table, toggle-all, debounced apply
+    - `station-autocomplete.js` — debounced search, keyboard nav, candidate list DOM
+    - `language-switcher.js` — flag buttons, updateTranslations(refs)
+    - `panel-lifecycle.js`   — open/close, focus trap, ESC handler, toast
   - `share-button.js`    — share button, URL encode/decode (base64 array format)
   - `station-dropdown.js`— favorites/recent stations dropdown (up to 5, with saved settings)
   - `theme-toggle.js`    — light/auto/dark theme cycle button
@@ -144,17 +172,20 @@ Current file tree (implemented)
 - `src/style.css`
 - `src/icons.css`
 - `src/app.js`
+- `src/app/` (settings.js, url-import.js, render.js, fetch-loop.js, handlers.js, action-bar.js, sw-updater.js)
 - `src/config.js`
-- `src/entur.js`
+- `src/entur/` (index.js, modes.js, parser.js, query.js, http.js, departures.js, geocoder.js)
 - `src/time.js`
-- `src/i18n.js`
+- `src/i18n.js` (shim)
+- `src/i18n/` (translations.js, languages.js, detect.js, store.js, index.js)
 - `src/sw.js`
 - `src/manifest.webmanifest`
 - `src/icons/`
 - `src/ui/ui.js`
 - `src/ui/departure.js`
 - `src/ui/header.js`
-- `src/ui/options.js`
+- `src/ui/options.js` (shim)
+- `src/ui/options/` (index.js, settings-store.js, transport-modes.js, station-autocomplete.js, language-switcher.js, panel-lifecycle.js)
 - `src/ui/share-button.js`
 - `src/ui/station-dropdown.js`
 - `src/ui/theme-toggle.js`
