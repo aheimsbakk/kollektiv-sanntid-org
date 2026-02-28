@@ -1,4 +1,4 @@
-const VERSION = '1.31.5';
+const VERSION = '1.31.6';
 const CACHE_NAME = `departures-v${VERSION}`;
 const ASSETS = [
   './',
@@ -53,12 +53,16 @@ self.addEventListener('install', (ev) => {
   ev.waitUntil(caches.open(CACHE_NAME).then(c => c.addAll(ASSETS)));
 });
 
-// Activate: claim clients and remove old caches
+// Activate: remove old caches, claim clients, then notify all windows that
+// the new SW is fully active and safe to reload into.
 self.addEventListener('activate', (ev) => {
   ev.waitUntil((async () => {
     const keys = await caches.keys();
     await Promise.all(keys.map(k => { if (k !== CACHE_NAME) return caches.delete(k); }));
     await clients.claim();
+    // Tell every open window: old caches are gone, reload is now safe.
+    const allClients = await clients.matchAll({ type: 'window' });
+    allClients.forEach(c => c.postMessage({ type: 'SW_ACTIVATED' }));
   })());
 });
 
@@ -104,11 +108,9 @@ self.addEventListener('fetch', (ev) => {
   
   ev.respondWith((async () => {
     const cache = await caches.open(CACHE_NAME);
-    // Try exact match first, then try ignoring query params for local assets
-    let cached = await cache.match(req);
-    if (!cached) {
-      cached = await cache.match(req, { ignoreSearch: true });
-    }
+    // Exact match only — do NOT use ignoreSearch, as that would serve stale
+    // assets when the page reloads after a SW update.
+    const cached = await cache.match(req);
     if (cached) return cached;
     
     try {

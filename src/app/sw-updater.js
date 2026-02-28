@@ -84,13 +84,16 @@ export async function registerServiceWorker() {
       });
     });
 
-    // When the new SW takes control, perform a hard reload to use fresh assets
+    // Reload only after the new SW has fully activated and cleared old caches.
+    // The SW posts SW_ACTIVATED after clients.claim(), guaranteeing fresh assets.
+    // Using this instead of 'controllerchange' prevents serving stale cached files
+    // during the brief window between controller change and activate completion.
     let reloading = false;
-    navigator.serviceWorker.addEventListener('controllerchange', () => {
+    navigator.serviceWorker.addEventListener('message', (ev) => {
+      if (ev.data?.type !== 'SW_ACTIVATED') return;
       if (reloading) return;
       reloading = true;
-      // Append a timestamp to bust any remaining in-memory caches
-      window.location.href = window.location.href.split('?')[0] + '?t=' + Date.now();
+      window.location.href = window.location.href.split('?')[0];
     });
   } catch (_) { /* SW registration failure is non-fatal */ }
 }
