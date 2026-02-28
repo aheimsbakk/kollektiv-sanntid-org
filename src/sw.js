@@ -1,4 +1,4 @@
-const VERSION = '1.31.4';
+const VERSION = '1.31.5';
 const CACHE_NAME = `departures-v${VERSION}`;
 const ASSETS = [
   './',
@@ -22,6 +22,11 @@ const ASSETS = [
   './entur/departures.js',
   './entur/geocoder.js',
   './i18n.js',
+  './i18n/index.js',
+  './i18n/translations.js',
+  './i18n/languages.js',
+  './i18n/detect.js',
+  './i18n/store.js',
   './time.js',
   './ui/ui.js',
   './ui/departure.js',
