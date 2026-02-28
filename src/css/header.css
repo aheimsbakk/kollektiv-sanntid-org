@@ -112,7 +112,7 @@
   white-space: nowrap;
 }
 
-.station-dropdown-item:hover,
+.station-dropdown-item:hover:not(:disabled),
 .station-dropdown-item.selected {
   background: var(--highlight-bg);
   color: var(--highlight-fg);

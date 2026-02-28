@@ -57,7 +57,49 @@ global.document = {
 
 const { getRecentStations, addRecentStation, isStationInFavorites } = await import('../src/ui/station-dropdown.js');
 const { updateFavoriteButton } = await import('../src/ui/ui.js');
-const { UI_EMOJIS } = await import('../src/config.js');
+const { UI_EMOJIS, DEFAULT_FAVORITE } = await import('../src/config.js');
+
+// --- Default favorite import tests ---
+
+// Test: Empty favorites + DEFAULT_FAVORITE set → imports default
+{
+  localStorage.clear();
+  const { resetDefaultFavoriteFlag } = await import('../src/ui/station-dropdown.js');
+  resetDefaultFavoriteFlag();
+  const favorites = getRecentStations();
+  assert.equal(favorites.length >= 1, true, 'Should import default favorite when none exist');
+  if (favorites.length > 0) {
+    assert.equal(favorites[0].name, 'Jernbanetorget, Oslo', 'Default favorite should be Jernbanetorget');
+    assert.equal(favorites[0].stopId, 'NSR:StopPlace:58366', 'Default favorite stopId should match');
+  }
+}
+
+// Test: Favorites already exist → no import
+{
+  localStorage.clear();
+  const { resetDefaultFavoriteFlag } = await import('../src/ui/station-dropdown.js');
+  resetDefaultFavoriteFlag();
+  addRecentStation('Custom Station', 'NSR:StopPlace:99999', ['bus']);
+  const favorites = getRecentStations();
+  assert.equal(favorites.length, 1, 'Should not import default when favorites exist');
+  assert.equal(favorites[0].name, 'Custom Station', 'Should keep existing favorite');
+}
+
+// Test: Import only happens once (flag prevents re-import)
+{
+  localStorage.clear();
+  const { resetDefaultFavoriteFlag } = await import('../src/ui/station-dropdown.js');
+  resetDefaultFavoriteFlag();
+  // First call imports
+  getRecentStations();
+  // Modify the stored favorites
+  const stored = JSON.parse(localStorage.getItem('recent-stations') || '[]');
+  stored[0].name = 'Modified Name';
+  localStorage.setItem('recent-stations', JSON.stringify(stored));
+  // Second call should not re-import
+  const favorites = getRecentStations();
+  assert.equal(favorites[0].name, 'Modified Name', 'Should not re-import default favorite');
+}
 
 // --- isStationInFavorites tests ---
 

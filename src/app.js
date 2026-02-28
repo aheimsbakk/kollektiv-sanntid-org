@@ -21,6 +21,7 @@ import { createHeaderToggle } from './ui/header.js';
 import { createOptionsPanel } from './ui/options/index.js';
 import { getTheme } from './ui/theme-toggle.js';
 import { lookupStopId } from './entur/index.js';
+import { getRecentStations } from './ui/station-dropdown.js';
 
 import { loadSettings, applyTextSize } from './app/settings.js';
 import { processUrlParams } from './app/url-import.js';
@@ -45,7 +46,18 @@ async function init() {
   // 2. Decode shared-board URL parameter (?b= or legacy ?board=)
   processUrlParams();
 
-  // 3. Build board DOM
+  // 3. Load favorites (triggers default import if none exist)
+  // This must happen before updateFavoriteButton is called below
+  const favorites = getRecentStations();
+
+  // 4. If no DEFAULTS but favorites exist, apply the first one
+  if (!DEFAULTS.STOP_ID && favorites.length > 0) {
+    DEFAULTS.STATION_NAME = favorites[0].name;
+    DEFAULTS.STOP_ID = favorites[0].stopId;
+    DEFAULTS.TRANSPORT_MODES = favorites[0].modes || DEFAULTS.TRANSPORT_MODES;
+  }
+
+  // 5. Build board DOM
   // optsRef is a mutable box so handlers.js can call opts.updateFields()
   // without a circular import — it is filled in after createOptionsPanel.
   const optsRef = { current: null };
@@ -64,7 +76,7 @@ async function init() {
   // Set initial heart button state
   updateFavoriteButton(board.favoriteBtn, DEFAULTS.STOP_ID, DEFAULTS.TRANSPORT_MODES, getTheme());
 
-  // 4. Build action bar (share + theme + settings buttons)
+  // 6. Build action bar (share + theme + settings buttons)
   //    Handlers need the button refs for tooltip updates, so build the bar first
   //    and pass the refs into wireHandlers below.
   const { shareComponents, themeBtn, settingsBtn } = buildActionBar(
@@ -73,13 +85,13 @@ async function init() {
     () => opts.close()
   );
 
-  // 5. Wire options panel
+  // 6. Wire options panel
   const handlers = wireHandlers(board, shareComponents, themeBtn, settingsBtn, optsRef);
   const opts = createOptionsPanel(DEFAULTS, handlers.onApplySettings, handlers.onLanguageChange);
   optsRef.current = opts;
   document.body.appendChild(opts.panel);
 
-  // 6. Header gear icon (opens options from the station header)
+  // 7. Header gear icon (opens options from the station header)
   const headerControls = createHeaderToggle(() => opts.open());
   const headerWrap = board.el.headerWrap || board.el.querySelector('.header-wrap') || board.el;
   const headerRight = document.createElement('div');
@@ -87,15 +99,15 @@ async function init() {
   headerRight.appendChild(headerControls.el);
   headerWrap.appendChild(headerRight);
 
-  // 7. Mount board and apply initial text size
+  // 8. Mount board and apply initial text size
   ROOT.appendChild(board.el);
   applyTextSize(DEFAULTS.TEXT_SIZE || 'medium');
   try { document.title = DEFAULTS.STATION_NAME || document.title; } catch (_) {}
 
-  // 8. Register service worker
+  // 9. Register service worker
   await registerServiceWorker();
 
-  // 9. Initial data load
+  // 10. Initial data load
   if (board.status) board.status.classList.add('visible');
   try {
     let stopId = DEFAULTS.STOP_ID;
@@ -117,7 +129,7 @@ async function init() {
   // Ensure an empty state is shown when the initial fetch produced nothing
   if (!data || data.length === 0) renderDepartures(board.list, []);
 
-  // 10. Start loops
+  // 11. Start loops
   startRefreshLoop(board.list);
   tickCountdowns(board.list, board.status);
   setInterval(() => tickCountdowns(board.list, board.status), 1000);
