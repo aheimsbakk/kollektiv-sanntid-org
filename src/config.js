@@ -1,6 +1,6 @@
 // Version is defined here and in src/sw.js (service worker)
 // Both must be kept in sync - use scripts/bump-version.sh to update both
-export const VERSION = '1.32.0';
+export const VERSION = '1.33.0';
 
 export const DEFAULTS = {
   STATION_NAME: 'Jernbanetorget, Oslo',
@@ -13,6 +13,10 @@ export const DEFAULTS = {
   API_URL: 'https://api.entur.io/journey-planner/v3/graphql',
   GITHUB_URL: 'https://github.com/aheimsbakk/kollektiv-sanntid-org'
 };
+
+// Default favorite station encoded as base64 share link (minimal 3-element format)
+// Used when user has no favorites stored. Set to null to disable.
+export const DEFAULT_FAVORITE = 'WyJKZXJuYmFuZXRvcmdldCwgT3NsbyIsIk5TUjpTdG9wUGxhY2U6NTgzNjYiLFsiYnVzIiwibWV0cm8iLCJ0cmFtIiwicmFpbCIsIndhdGVyIiwiY29hY2giXV0';
 
 // Immutable list of all transport modes for fallback when no modes are selected
 export const ALL_TRANSPORT_MODES = ['bus','tram','metro','rail','water','coach'];

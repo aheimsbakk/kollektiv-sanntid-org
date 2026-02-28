@@ -1,7 +1,16 @@
 import { t } from '../i18n.js';
-import { TRANSPORT_MODE_EMOJIS, DEFAULTS } from '../config.js';
+import { TRANSPORT_MODE_EMOJIS, DEFAULTS, DEFAULT_FAVORITE } from '../config.js';
+import { decodeSettings } from './share-button.js';
 
 const STORAGE_KEY = 'recent-stations';
+let defaultFavoriteImported = false;
+
+/**
+ * Reset the default favorite import flag (for testing)
+ */
+export function resetDefaultFavoriteFlag() {
+  defaultFavoriteImported = false;
+}
 
 /**
  * Mode order matches the options panel table (left to right, top to bottom):
@@ -73,12 +82,29 @@ export function modesEqual(modes1, modes2) {
 
 /**
  * Get recent stations from localStorage
+ * If no favorites exist and DEFAULT_FAVORITE is configured, import it once.
  * @returns {Array<{name: string, stopId: string, modes?: Array<string>}>}
  */
 export function getRecentStations() {
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
-    return stored ? JSON.parse(stored) : [];
+    const favorites = stored ? JSON.parse(stored) : [];
+    
+    // Import default favorite if no favorites exist and not yet imported
+    if (favorites.length === 0 && DEFAULT_FAVORITE && !defaultFavoriteImported) {
+      defaultFavoriteImported = true;
+      const decoded = decodeSettings(DEFAULT_FAVORITE);
+      if (decoded && decoded.stationName && decoded.stopId) {
+        favorites.unshift({
+          name: decoded.stationName,
+          stopId: decoded.stopId,
+          modes: decoded.transportModes || []
+        });
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(favorites));
+      }
+    }
+    
+    return favorites;
   } catch (e) {
     console.error('Failed to load recent stations:', e);
     return [];

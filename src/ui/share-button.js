@@ -4,22 +4,17 @@ import { UI_EMOJIS } from '../config.js';
 
 /**
  * Encode settings to compact base64 URL parameter
- * Uses array format instead of JSON object for 20-30% size reduction
+ * Uses minimal array format: [name, stopId, modes]
  * @param {Object} settings - Full settings object
  * @returns {string} Base64-encoded compact settings
  */
 export function encodeSettings(settings) {
   try {
-    // Encode as compact array: [name, stopId, modes, departures, interval, size, lang]
-    // This saves ~30% vs JSON object keys
+    // Encode as compact array: [name, stopId, modes]
     const data = [
       settings.STATION_NAME,
       settings.STOP_ID,
-      settings.TRANSPORT_MODES,
-      settings.NUM_DEPARTURES,
-      settings.FETCH_INTERVAL,
-      settings.TEXT_SIZE,
-      settings.language
+      settings.TRANSPORT_MODES
     ];
     
     const json = JSON.stringify(data);
@@ -35,8 +30,9 @@ export function encodeSettings(settings) {
 
 /**
  * Decode and validate settings from base64 URL parameter
- * @param {string} encoded - Base64-encoded settings
- * @returns {Object|null} Validated settings object or null if invalid
+ * Supports new format (3 elements) and legacy format (7 elements)
+ * @param {string} encoded - Base64-encodedreturns {Object|null settings
+ * @} Validated settings object or null if invalid
  */
 export function decodeSettings(encoded) {
   try {
@@ -51,12 +47,22 @@ export function decodeSettings(encoded) {
     const json = decodeURIComponent(escape(atob(base64)));
     const data = JSON.parse(json);
     
-    // Support both array format (new) and object format (legacy)
+    // Support both array formats:
+    // - New: [name, stopId, modes] (3 elements)
+    // - Legacy: [name, stopId, modes, departures, interval, size, lang] (7 elements)
+    // - Also legacy object format: {n, s, m, d, i, t, l}
     let n, s, m, d, i, t, l;
     
     if (Array.isArray(data)) {
-      // New array format: [name, stopId, modes, departures, interval, size, lang]
-      [n, s, m, d, i, t, l] = data;
+      if (data.length >= 7) {
+        // Legacy format: [name, stopId, modes, departures, interval, size, lang]
+        [n, s, m, d, i, t, l] = data;
+      } else if (data.length >= 3) {
+        // New format: [name, stopId, modes]
+        [n, s, m] = data;
+      } else {
+        return null; // Invalid array length
+      }
     } else {
       // Legacy object format
       ({ n, s, m, d, i, t, l } = data);
@@ -96,23 +102,23 @@ export function decodeSettings(encoded) {
       settings.transportModes = validModes;
     }
     
-    // Validate number of departures (1-20)
+    // Validate number of departures (1-20) - only from legacy format
     if (typeof d === 'number' && d >= 1 && d <= 20) {
       settings.numDepartures = Math.floor(d);
     }
     
-    // Validate fetch interval (minimum 20 seconds, max 300)
+    // Validate fetch interval (minimum 20 seconds, max 300) - only from legacy format
     if (typeof i === 'number' && i >= 20 && i <= 300) {
       settings.fetchInterval = Math.floor(i);
     }
     
-    // Validate text size (one of the valid sizes)
+    // Validate text size (one of the valid sizes) - only from legacy format
     const validSizes = ['tiny', 'small', 'medium', 'large', 'xlarge'];
     if (typeof t === 'string' && validSizes.includes(t)) {
       settings.textSize = t;
     }
     
-    // Validate language (2-3 letter code)
+    // Validate language (2-3 letter code) - only from legacy format
     if (typeof l === 'string' && /^[a-z]{2,3}$/.test(l)) {
       settings.language = l;
     }

@@ -1,11 +1,11 @@
-Overall Context: Kollektiv.Sanntid.org - Real-time Norwegian public transport departure board. Version 1.32.0.
+Overall Context: Kollektiv.Sanntid.org - Real-time Norwegian public transport departure board. Version 1.33.0.
 
 Current Goal: Maintain and extend the production app; codebase refactored for rules compliance.
 
 Last 3 Changes:
-- src/css/header.css — fixed station dropdown hover styling by adding :not(:disabled) for CSS specificity parity with global button:hover rule
-- src/config.js — added NUM_FAVORITES (default 10) to DEFAULTS; src/ui/station-dropdown.js now imports from config instead of hardcoded MAX_RECENT
-- src/style.css split into 16 focused files under src/css/ (tokens, base, buttons, layout, header, toolbar, departures, options-panel, autocomplete, transport-modes, language-switcher, share-modal, toasts, footer, debug, utils); style.css is now an @import manifest only
+- src/app.js — load favorites early and apply first favorite to DEFAULTS so heart button shows correct state
+- src/ui/share-button.js — simplified share link to encode only [name, stopId, modes]; added backward compat for 7-element legacy format
+- src/config.js + src/ui/station-dropdown.js — added DEFAULT_FAVORITE config; auto-import default when no favorites exist
 
 Next Steps:
 - Monitor deploy workflows after fixes go live
