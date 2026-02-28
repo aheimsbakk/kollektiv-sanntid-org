@@ -49,7 +49,13 @@ Architecture overview
   - `departures.js`      — `fetchDepartures` orchestration + client-side mode filter
   - `geocoder.js`        — `lookupStopId`, `searchStations` (Entur geocoder REST API)
 - `src/time.js`          — pure utilities: iso → epoch, format countdown
-- `src/i18n.js`          — i18n strings for 12 languages; `t(key)` helper; language persistence
+- `src/i18n.js`          — backward-compat shim → re-exports from `src/i18n/index.js`
+- `src/i18n/`
+  - `index.js`           — public facade; re-exports all symbols from store.js
+  - `translations.js`    — static string data only: 12-language keyed map
+  - `languages.js`       — static metadata: code/flag/name list for language switcher UI
+  - `detect.js`          — pure fn: detectBrowserLanguage() (reads navigator, no state)
+  - `store.js`           — runtime state: currentLanguage, t(), setLanguage(), getLanguage(), initLanguage(), getLanguages()
 - `src/style.css`        — main stylesheet (CSS variables, themes, responsive layout)
 - `src/icons.css`        — CSS-only icon/badge helpers
 - `src/sw.js`            — service worker: versioned cache, offline support, skip-waiting flow
@@ -170,7 +176,8 @@ Current file tree (implemented)
 - `src/config.js`
 - `src/entur/` (index.js, modes.js, parser.js, query.js, http.js, departures.js, geocoder.js)
 - `src/time.js`
-- `src/i18n.js`
+- `src/i18n.js` (shim)
+- `src/i18n/` (translations.js, languages.js, detect.js, store.js, index.js)
 - `src/sw.js`
 - `src/manifest.webmanifest`
 - `src/icons/`
