@@ -24,7 +24,7 @@ To save the station to your favorites, click the **❤️ heart button** to the 
 
 Click the **station name** at the top of the screen to open your favorites list. This shows your recently viewed stations with their transport filters. Click any favorite to instantly switch to that station.
 
-Your favorites list stores up to 7 stations with all their settings (transport modes, text size, update interval). The most recently used station appears at the top.
+Your favorites list stores up to 7 stations with all their settings. The most recently used station appears at the top.
 
 If you have no favorites yet, the app pre-seeds **Jernbanetorget, Oslo** as a starting point so the board is never empty on first use.
 
