@@ -14,25 +14,27 @@ This app uses [Entur's API](https://developer.entur.org/) to show live departure
 2. In the **Station or stop name** field, start typing your station name
 3. Select your station from the dropdown suggestions
 4. Choose which transport types you want to see (bus, tram, metro, etc.)
-5. Click **Save to Favorites** to remember this station
+5. Click **Close** to apply your settings
 
 Your departure board will now show live times for the next departures from your chosen station.
+
+To save the station to your favorites, click the **❤️ heart button** to the left of the station name on the departure board. The heart turns grey once the station is already saved.
 
 ### Using Favorites
 
 Click the **station name** at the top of the screen to open your favorites list. This shows your recently viewed stations with their transport filters. Click any favorite to instantly switch to that station.
 
-Your favorites list stores up to 5 stations with all their settings (transport modes, text size, update interval). The most recently used station appears at the top.
+Your favorites list stores up to 7 stations with all their settings (transport modes, text size, update interval). The most recently used station appears at the top.
+
+If you have no favorites yet, the app pre-seeds **Jernbanetorget, Oslo** as a starting point so the board is never empty on first use.
 
 ### Sharing Your Board
 
 Click the **📋 share** button (next to the theme toggle) to copy a shareable link to your clipboard. This link includes:
 - Your current station
 - Selected transport modes
-- Display settings (text size, update interval, number of departures)
-- Language preference
 
-When someone opens your link, the station is automatically added to their favorites with all your settings.
+When someone opens your link, the station is automatically added to their favorites.
 
 ## Features
 
@@ -99,6 +101,10 @@ Reload the web page. When a new version is available, you'll see a notification 
 ## Technical Details
 
 This is a pure JavaScript web app with no dependencies or build step. It works offline after your first visit thanks to service worker caching.
+
+### Data Attribution
+
+Departure data is provided by [Entur](https://entur.no/). The footer displays a translated "Data from Entur" attribution in all 12 supported languages.
 
 ### Languages Supported
 English, Norwegian, German, Spanish, Italian, Greek, Persian, Hindi, Icelandic, Ukrainian, French, Polish
