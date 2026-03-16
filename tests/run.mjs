@@ -24,6 +24,7 @@ import './sw-api-caching.test.mjs';
 import './fetch-loop.test.mjs';
 import './sw-updater.test.mjs';
 import './share-button-reset.test.mjs';
+import './departure-delay.test.mjs';
 
 // Catch assertion failures from async tests (e.g. gps-dropdown-click) whose
 // top-level awaits settle after the static-import phase completes.

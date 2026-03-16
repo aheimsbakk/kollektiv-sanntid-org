@@ -1,6 +1,6 @@
 // Version is defined here and in src/sw.js (service worker)
 // Both must be kept in sync - use scripts/bump-version.sh to update both
-export const VERSION = '1.38.15';
+export const VERSION = '1.39.2';
 
 // Brand name used in the options panel title and HTML <title>.
 // Intentionally not translated — this is a proper name.
@@ -39,6 +39,12 @@ export const REALTIME_INDICATORS = {
   realtime: '●', // Solid dot for live realtime data
   scheduled: '○', // Hollow dot for scheduled/static data
 };
+
+// Minimum delay in milliseconds before the realtime indicator turns red.
+// Entur's live feed continuously adjusts expectedDepartureTime by small amounts
+// (±30–60 s) even for on-time vehicles. A threshold prevents normal tracking
+// noise from being shown as a delay. 120 000 ms = 2 minutes.
+export const DELAY_THRESHOLD_MS = 120_000;
 
 // Transport mode emojis
 // Used to visually identify the type of transport in departures and UI
