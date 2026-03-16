@@ -8,8 +8,10 @@
  * `modes` array extracted from whichever Pelias property carries mode data.
  */
 
+import { ALL_TRANSPORT_MODES } from '../config.js';
+
 const GEOCODE_REVERSE_URL = 'https://api.entur.io/geocoder/v1/reverse';
-const VALID_MODES = new Set(['bus', 'tram', 'metro', 'rail', 'water', 'coach']);
+const VALID_MODES = new Set(ALL_TRANSPORT_MODES);
 
 /**
  * Maps every Entur Geocoder venue category (docs/entur-apis/geocorder-rev.md)

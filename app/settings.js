@@ -7,7 +7,7 @@
  *   - Apply text-size CSS class to <html>
  */
 
-import { DEFAULTS } from '../config.js';
+import { DEFAULTS, ALL_TRANSPORT_MODES } from '../config.js';
 
 const STORAGE_KEY = 'departure:settings';
 
@@ -23,8 +23,8 @@ const TEXT_SIZE_CLASSES = [
 /** Valid text-size tokens */
 const VALID_TEXT_SIZES = ['tiny', 'small', 'medium', 'large', 'xlarge'];
 
-/** Valid transport mode tokens */
-const VALID_MODES = ['bus', 'tram', 'metro', 'rail', 'water', 'coach'];
+/** Valid transport mode tokens — canonical list from config.js */
+const VALID_MODES = ALL_TRANSPORT_MODES;
 
 /**
  * Load persisted settings from localStorage into DEFAULTS.
