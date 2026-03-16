@@ -1,6 +1,6 @@
 // Share button component for sharing departure board configuration via URL
 import { t } from '../i18n.js';
-import { UI_EMOJIS } from '../config.js';
+import { UI_EMOJIS, ALL_TRANSPORT_MODES } from '../config.js';
 
 /**
  * Encode settings to compact base64 URL parameter
@@ -34,8 +34,8 @@ export function encodeSettings(settings) {
 /**
  * Decode and validate settings from base64 URL parameter
  * Supports new format (3 elements) and legacy format (7 elements)
- * @param {string} encoded - Base64-encodedreturns {Object|null settings
- * @} Validated settings object or null if invalid
+ * @param {string} encoded - Base64-encoded string
+ * @returns {Object|null} Validated settings object or null if invalid
  */
 export function decodeSettings(encoded) {
   try {
@@ -105,12 +105,11 @@ export function decodeSettings(encoded) {
     }
 
     // Validate transport modes (array of valid modes)
-    const validModes = ['bus', 'tram', 'metro', 'rail', 'water', 'coach'];
     if (Array.isArray(m)) {
-      const modes = m.filter((mode) => validModes.includes(mode));
-      settings.transportModes = modes.length > 0 ? modes : validModes;
+      const modes = m.filter((mode) => ALL_TRANSPORT_MODES.includes(mode));
+      settings.transportModes = modes.length > 0 ? modes : ALL_TRANSPORT_MODES;
     } else {
-      settings.transportModes = validModes;
+      settings.transportModes = ALL_TRANSPORT_MODES;
     }
 
     // Validate number of departures (1-20) - only from legacy format

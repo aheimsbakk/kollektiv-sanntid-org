@@ -6,24 +6,19 @@
 
 ## Summary
 
-| Severity  | Count | Status |
-| --------- | ----- | ------ |
-| 🔴 HIGH   | 2     | Open   |
-| 🟡 MEDIUM | 4     | Open   |
-| 🟢 LOW    | 1     | Open   |
+| Severity  | Count | Status                                        |
+| --------- | ----- | --------------------------------------------- |
+| 🔴 HIGH   | 2     | H1 ✅ Fixed / H2 Open                         |
+| 🟡 MEDIUM | 4     | M1 ✅ Fixed / M2 ✅ Fixed / M3 Open / M4 Open |
+| 🟢 LOW    | 1     | Open                                          |
 
 ---
 
 ## 🔴 HIGH
 
-### H1 — Rule 14 (DRY): `validModes` duplicated in 3 files
+### ~~H1 — Rule 14 (DRY): `validModes` duplicated in 3 files~~ ✅ Fixed
 
-- **Files:**
-  - `src/app/settings.js:27` — `const VALID_MODES = ['bus', 'tram', 'metro', 'rail', 'water', 'coach'];`
-  - `src/entur/gps-search.js:12` — `const VALID_MODES = new Set(['bus', 'tram', 'metro', 'rail', 'water', 'coach']);`
-  - `src/ui/share-button.js:108` — `const validModes = ['bus', 'tram', 'metro', 'rail', 'water', 'coach'];`
-- **Problem:** The canonical source of truth already exists — `ALL_TRANSPORT_MODES` in `src/config.js`. All three files re-declare the same list locally. If a new transport mode is added to `config.js`, these copies will silently diverge.
-- **Fix:** Replace all three local declarations with an import of `ALL_TRANSPORT_MODES` from `src/config.js`.
+- All three local declarations replaced with an import of `ALL_TRANSPORT_MODES` from `src/config.js`.
 
 ---
 
@@ -49,30 +44,15 @@ Rule 9 is explicit: **NO silent failures**. Each of the following swallows error
 
 ## 🟡 MEDIUM
 
-### M1 — Rule 16 (Workspace Hygiene): Missing `.gitignore` entries
+### ~~M1 — Rule 16 (Workspace Hygiene): Missing `.gitignore` entries~~ ✅ Fixed
 
-- **File:** `.gitignore`
-- **Missing entries** (explicitly required by Rule 16):
-  - `.env` — environment files
-  - `venv/` and `.venv/` — virtual environment directories
-  - `.qa-error.log` — QA workflow artifact
-- **Fix:** Add the three entries to `.gitignore`.
+- Added `.env`, `venv/`, `.venv/`, and `.qa-error.log` to `.gitignore`.
 
 ---
 
-### M2 — Rule 21 (Synchronized Docs): Corrupted JSDoc in `share-button.js`
+### ~~M2 — Rule 21 (Synchronized Docs): Corrupted JSDoc in `share-button.js`~~ ✅ Fixed
 
-- **File:** `src/ui/share-button.js:37-38`
-- **Problem:** The JSDoc for `decodeSettings()` has its `@param` and `@returns` tags mangled into one broken line:
-  ```js
-  * @param {string} encoded - Base64-encodedreturns {Object|null settings
-  * @} Validated settings object or null if invalid
-  ```
-- **Fix:** Restore correct JSDoc tags:
-  ```js
-  * @param {string} encoded - Base64-encoded string
-  * @returns {Object|null} Validated settings object or null if invalid
-  ```
+- Restored correct `@param` and `@returns` tags in `decodeSettings()` JSDoc.
 
 ---
 
