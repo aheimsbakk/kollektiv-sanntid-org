@@ -3,6 +3,7 @@ import {
   PLATFORM_SYMBOL_RULES,
   DEPARTURE_LINE_TEMPLATE,
   REALTIME_INDICATORS,
+  DELAY_THRESHOLD_MS,
 } from '../config.js';
 import { emojiForMode, labelForMode } from './mode-utils.js';
 
@@ -12,7 +13,9 @@ import { emojiForMode, labelForMode } from './mode-utils.js';
  * A departure is considered delayed when ALL of the following are true:
  *   1. Live realtime data is present (item.realtime === true)
  *   2. Both aimed and expected departure ISO strings are available
- *   3. aimedDepartureISO < expectedDepartureISO  (expected is later than aimed)
+ *   3. expectedDepartureISO − aimedDepartureISO >= DELAY_THRESHOLD_MS
+ *      (expected is at least 60 s later than aimed, filtering out normal
+ *      realtime tracking noise of ±30–60 s that Entur emits for on-time vehicles)
  *
  * @param {Object} item - Normalised departure object from parseEnturResponse
  * @returns {boolean}
@@ -22,7 +25,7 @@ export function isDepartureDelayed(item) {
   const aimed = item.aimedDepartureISO;
   const expected = item.expectedDepartureISO;
   if (!aimed || !expected) return false;
-  return Date.parse(aimed) < Date.parse(expected);
+  return Date.parse(expected) - Date.parse(aimed) >= DELAY_THRESHOLD_MS;
 }
 
 export function createDepartureNode(item) {

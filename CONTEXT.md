@@ -1,12 +1,12 @@
-Overall Context: Kollektiv.Sanntid.org - Real-time Norwegian public transport departure board. Version 1.38.15.
+Overall Context: Kollektiv.Sanntid.org - Real-time Norwegian public transport departure board. Version 1.39.1.
 
 Current Goal: Stable mobile PWA experience across Chrome and Firefox.
 
 Last 3 Changes:
 
-- Departure delay indicator (v1.38.15): red ● dot when realtime=true AND aimedDepartureISO < expectedDepartureISO; isDepartureDelayed() in departure.js; .indicator--delayed CSS class uses --danger token; indicator rendered as <span> for independent coloring
+- Fix delay indicator false positives (v1.39.1): DELAY_THRESHOLD_MS=60000 in config.js; isDepartureDelayed() now requires expected−aimed >= 60 s; sub-minute Entur tracking noise no longer triggers red dot; README consolidated and clarified
+- Departure delay indicator (v1.39.0): red ● dot when realtime=true AND aimed < expected; isDepartureDelayed() in departure.js; .indicator--delayed CSS uses --danger token; indicator rendered as <span>
 - Fix keyboard tab order (v1.38.12): explicit tabIndex 1–8 on GPS→share→theme→settings→heart→station→footer links; DOM append order no longer affects keyboard navigation
-- Unify dropdown styling and interaction (v1.38.11): shared --dropdown-item-gap token, 8px item padding, :focus-visible, GPS max-width removed, autocomplete li→button, GPS keyboard nav (↑↓/Enter/ESC)
 
 Next Steps:
 
