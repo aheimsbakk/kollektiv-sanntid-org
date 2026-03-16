@@ -68,10 +68,11 @@ The extra departures are temporary — the count resets when you switch station,
 The app displays upcoming departures with:
 
 - **Line number and destination** for each service (e.g., "Ski ● L2 🚅")
-- **Realtime indicators** - ● solid dot for live tracking, ○ hollow dot for scheduled times
+- **Realtime indicators** - ● solid dot for live tracking, ○ hollow dot for scheduled times; 🔴 **red solid dot** when a live-tracked departure is running late (aimed time earlier than expected time)
 - **Platform/gate information** - Shows platforms (⚏10), gates (◆A), or stops (▪B) where available
 - **Countdown timer** showing minutes until departure
 - **Transport icons** (🚌 🚋 🚇 🚅 🛳️ 🚍) to identify the vehicle type
+- **Delay indicator** - When live data shows a departure is running late, the solid dot turns **red** (●). This only appears when realtime tracking is active and the expected departure is later than the originally aimed time.
 - **Cancellation notices** - Cancelled departures appear with strikethrough and reduced opacity
 - **Automatic updates** every 60 seconds (configurable)
 

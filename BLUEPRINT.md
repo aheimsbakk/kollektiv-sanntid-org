@@ -20,7 +20,7 @@ User-facing features
 - Favorite heart button is always enabled. Gray heart 🩶 = not in favorites (click to add, theme-neutral). Red heart ❤️ = already in favorites (click to remove). `handleFavoriteToggle` in `handlers.js` performs the toggle; `removeFromFavorites` in `station-dropdown.js` handles removal.
 - GPS compass button 🧭 (fixed top-left, same `.header-btn` style as top-right buttons). Click → requests browser geolocation → fetches up to `GPS_MAX_RESULTS` (10) nearest stops within `GPS_SEARCH_RADIUS_KM` (2 km) via Entur Geocoder reverse API → shows a temporary dropdown listing stops rendered from `GPS_STOP_LINE_TEMPLATE` (name + distance + mode emojis). Selecting a stop sets it as the current station and closes the dropdown. The heart button is then available to save to favorites.
 - Up to N upcoming departures (configurable).
-- Departure line: destination, realtime indicator (● live / ○ scheduled), line number, transport emoji, platform symbol+code.
+- Departure line: destination, realtime indicator (● live / ○ scheduled / 🔴 delayed — red ● when realtime=true AND aimedDepartureISO < expectedDepartureISO), line number, transport emoji, platform symbol+code.
 - Cancelled departures shown with strikethrough and reduced opacity.
 - Live countdown (MM:SS), updates every second.
 - Platform/quay display with configurable symbol rules (bay ▣, gate ◆, platform ⚏, stop ▪, berth ⚓).
@@ -143,7 +143,7 @@ UI/UX & styling
 - Button system in `src/css/buttons.css`: `button` base → `.btn-icon`/`.header-btn` (icon toolbar) → `.btn-action`/`.share-url-close` (prominent actions). All three global toolbar buttons (share, theme, gear) carry `.header-btn` for uniform 26px emoji size. Button emojis sourced from `UI_EMOJIS` in `config.js`.
 - Departure line rendered from `DEPARTURE_LINE_TEMPLATE` (configurable in `config.js`).
 - Platform symbol selected by `PLATFORM_SYMBOL_RULES` (ordered rule list in `config.js`): water→berth, bus+alphanumeric→bay, bus+single-letter→gate, bus→stop, tram→stop, rail/metro→platform.
-- Realtime indicator: `●` (solid, live) / `○` (hollow, scheduled) from `REALTIME_INDICATORS` in `config.js`.
+- Realtime indicator: `●` (solid, live) / `○` (hollow, scheduled) from `REALTIME_INDICATORS` in `config.js`. When `realtime === true` AND `aimedDepartureISO < expectedDepartureISO`, the indicator span gets class `.indicator--delayed` (CSS `color: var(--danger)` → red). Logic lives in `isDepartureDelayed()` exported from `src/ui/departure.js`.
 - Cancellation: wraps line in `.departure-cancelled` (strikethrough + reduced opacity) via `CANCELLATION_WRAPPER` in `config.js`.
 - Auto-centering: Flexbox column + `justify-content:center; align-items:center; min-height:100vh`.
 - Responsive: text sizes reduce on small screens; vertical centering maintained.
