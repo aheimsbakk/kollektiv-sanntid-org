@@ -6,24 +6,19 @@
 
 ## Summary
 
-| Severity  | Count | Status |
-| --------- | ----- | ------ |
-| 🔴 HIGH   | 2     | Open   |
-| 🟡 MEDIUM | 4     | Open   |
-| 🟢 LOW    | 1     | Open   |
+| Severity  | Count | Status                |
+| --------- | ----- | --------------------- |
+| 🔴 HIGH   | 2     | H1 ✅ Fixed / H2 Open |
+| 🟡 MEDIUM | 4     | Open                  |
+| 🟢 LOW    | 1     | Open                  |
 
 ---
 
 ## 🔴 HIGH
 
-### H1 — Rule 14 (DRY): `validModes` duplicated in 3 files
+### ~~H1 — Rule 14 (DRY): `validModes` duplicated in 3 files~~ ✅ Fixed
 
-- **Files:**
-  - `src/app/settings.js:27` — `const VALID_MODES = ['bus', 'tram', 'metro', 'rail', 'water', 'coach'];`
-  - `src/entur/gps-search.js:12` — `const VALID_MODES = new Set(['bus', 'tram', 'metro', 'rail', 'water', 'coach']);`
-  - `src/ui/share-button.js:108` — `const validModes = ['bus', 'tram', 'metro', 'rail', 'water', 'coach'];`
-- **Problem:** The canonical source of truth already exists — `ALL_TRANSPORT_MODES` in `src/config.js`. All three files re-declare the same list locally. If a new transport mode is added to `config.js`, these copies will silently diverge.
-- **Fix:** Replace all three local declarations with an import of `ALL_TRANSPORT_MODES` from `src/config.js`.
+- All three local declarations replaced with an import of `ALL_TRANSPORT_MODES` from `src/config.js`.
 
 ---
 
