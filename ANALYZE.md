@@ -6,11 +6,11 @@
 
 ## Summary
 
-| Severity  | Count | Status                |
-| --------- | ----- | --------------------- |
-| 🔴 HIGH   | 2     | H1 ✅ Fixed / H2 Open |
-| 🟡 MEDIUM | 4     | Open                  |
-| 🟢 LOW    | 1     | Open                  |
+| Severity  | Count | Status                                        |
+| --------- | ----- | --------------------------------------------- |
+| 🔴 HIGH   | 2     | H1 ✅ Fixed / H2 Open                         |
+| 🟡 MEDIUM | 4     | M1 ✅ Fixed / M2 ✅ Fixed / M3 Open / M4 Open |
+| 🟢 LOW    | 1     | Open                                          |
 
 ---
 
@@ -44,30 +44,15 @@ Rule 9 is explicit: **NO silent failures**. Each of the following swallows error
 
 ## 🟡 MEDIUM
 
-### M1 — Rule 16 (Workspace Hygiene): Missing `.gitignore` entries
+### ~~M1 — Rule 16 (Workspace Hygiene): Missing `.gitignore` entries~~ ✅ Fixed
 
-- **File:** `.gitignore`
-- **Missing entries** (explicitly required by Rule 16):
-  - `.env` — environment files
-  - `venv/` and `.venv/` — virtual environment directories
-  - `.qa-error.log` — QA workflow artifact
-- **Fix:** Add the three entries to `.gitignore`.
+- Added `.env`, `venv/`, `.venv/`, and `.qa-error.log` to `.gitignore`.
 
 ---
 
-### M2 — Rule 21 (Synchronized Docs): Corrupted JSDoc in `share-button.js`
+### ~~M2 — Rule 21 (Synchronized Docs): Corrupted JSDoc in `share-button.js`~~ ✅ Fixed
 
-- **File:** `src/ui/share-button.js:37-38`
-- **Problem:** The JSDoc for `decodeSettings()` has its `@param` and `@returns` tags mangled into one broken line:
-  ```js
-  * @param {string} encoded - Base64-encodedreturns {Object|null settings
-  * @} Validated settings object or null if invalid
-  ```
-- **Fix:** Restore correct JSDoc tags:
-  ```js
-  * @param {string} encoded - Base64-encoded string
-  * @returns {Object|null} Validated settings object or null if invalid
-  ```
+- Restored correct `@param` and `@returns` tags in `decodeSettings()` JSDoc.
 
 ---
 

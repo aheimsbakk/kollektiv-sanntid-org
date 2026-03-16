@@ -5,6 +5,16 @@ node_modules/
 dist/
 build/
 
+# Environment files
+.env
+
+# Virtual environment directories
+venv/
+.venv/
+
+# QA workflow artifacts
+.qa-error.log
+
 # Test artifacts created by the agent
 tests/*.log
 

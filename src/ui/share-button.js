@@ -34,8 +34,8 @@ export function encodeSettings(settings) {
 /**
  * Decode and validate settings from base64 URL parameter
  * Supports new format (3 elements) and legacy format (7 elements)
- * @param {string} encoded - Base64-encodedreturns {Object|null settings
- * @} Validated settings object or null if invalid
+ * @param {string} encoded - Base64-encoded string
+ * @returns {Object|null} Validated settings object or null if invalid
  */
 export function decodeSettings(encoded) {
   try {
