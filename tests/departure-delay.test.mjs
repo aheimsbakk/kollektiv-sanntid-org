@@ -5,9 +5,9 @@
  * whether a departure should show a red (--danger) realtime indicator.
  *
  * Rule: delayed = realtime === true AND
- *       (expectedDepartureISO − aimedDepartureISO) >= DELAY_THRESHOLD_MS (60 s)
+ *       (expectedDepartureISO − aimedDepartureISO) >= DELAY_THRESHOLD_MS (120 s)
  *
- * The 60 s threshold filters out normal Entur realtime tracking noise
+ * The 120 s threshold filters out normal Entur realtime tracking noise
  * (±30–60 s adjustments that occur even for on-time vehicles).
  */
 
@@ -24,40 +24,40 @@ assert.equal(
     expectedDepartureISO: '2026-03-16T10:05:00Z',
   }),
   true,
-  'should be delayed when gap >= 60 s and realtime=true'
+  'should be delayed when gap >= 120 s and realtime=true'
 );
 
-// --- Exactly at threshold: 60 s gap → delayed ---
+// --- Exactly at threshold: 120 s gap → delayed ---
+assert.equal(
+  isDepartureDelayed({
+    realtime: true,
+    aimedDepartureISO: '2026-03-16T10:00:00Z',
+    expectedDepartureISO: '2026-03-16T10:02:00Z',
+  }),
+  true,
+  'should be delayed when gap is exactly 120 s (at threshold)'
+);
+
+// --- Sub-threshold: 60 s gap → NOT delayed ---
 assert.equal(
   isDepartureDelayed({
     realtime: true,
     aimedDepartureISO: '2026-03-16T10:00:00Z',
     expectedDepartureISO: '2026-03-16T10:01:00Z',
   }),
-  true,
-  'should be delayed when gap is exactly 60 s (at threshold)'
+  false,
+  'should NOT be delayed when gap is only 60 s (below 120 s threshold)'
 );
 
-// --- Sub-threshold noise: 30 s gap → NOT delayed ---
+// --- Sub-threshold: 119 s gap → NOT delayed ---
 assert.equal(
   isDepartureDelayed({
     realtime: true,
     aimedDepartureISO: '2026-03-16T10:00:00Z',
-    expectedDepartureISO: '2026-03-16T10:00:30Z',
+    expectedDepartureISO: '2026-03-16T10:01:59Z',
   }),
   false,
-  'should NOT be delayed when gap is only 30 s (below threshold — normal tracking noise)'
-);
-
-// --- Sub-threshold noise: 59 s gap → NOT delayed ---
-assert.equal(
-  isDepartureDelayed({
-    realtime: true,
-    aimedDepartureISO: '2026-03-16T10:00:00Z',
-    expectedDepartureISO: '2026-03-16T10:00:59Z',
-  }),
-  false,
-  'should NOT be delayed when gap is 59 s (just below threshold)'
+  'should NOT be delayed when gap is 119 s (just below threshold)'
 );
 
 // --- On-time: realtime=true, aimed === expected ---
