@@ -3,8 +3,30 @@ import {
   PLATFORM_SYMBOL_RULES,
   DEPARTURE_LINE_TEMPLATE,
   REALTIME_INDICATORS,
+  DELAY_THRESHOLD_MS,
 } from '../config.js';
 import { emojiForMode, labelForMode } from './mode-utils.js';
+
+/**
+ * Determine whether a departure is delayed.
+ *
+ * A departure is considered delayed when ALL of the following are true:
+ *   1. Live realtime data is present (item.realtime === true)
+ *   2. Both aimed and expected departure ISO strings are available
+ *   3. expectedDepartureISO − aimedDepartureISO >= DELAY_THRESHOLD_MS
+ *      (expected is at least 60 s later than aimed, filtering out normal
+ *      realtime tracking noise of ±30–60 s that Entur emits for on-time vehicles)
+ *
+ * @param {Object} item - Normalised departure object from parseEnturResponse
+ * @returns {boolean}
+ */
+export function isDepartureDelayed(item) {
+  if (!item || item.realtime !== true) return false;
+  const aimed = item.aimedDepartureISO;
+  const expected = item.expectedDepartureISO;
+  if (!aimed || !expected) return false;
+  return Date.parse(expected) - Date.parse(aimed) >= DELAY_THRESHOLD_MS;
+}
 
 export function createDepartureNode(item) {
   const container = document.createElement('div');
@@ -42,9 +64,20 @@ export function createDepartureNode(item) {
   const destinationText = item && item.destination ? String(item.destination) : '—';
   const lineNumberText = item && item.publicCode ? String(item.publicCode) : '';
 
-  // Determine realtime indicator based on item.realtime field
-  const indicator =
+  // Determine realtime indicator and whether this departure is delayed.
+  // Delayed = realtime data present AND aimedDepartureISO < expectedDepartureISO.
+  // Delayed departures get a solid dot rendered in --danger (red) color.
+  const isDelayed = isDepartureDelayed(item);
+  const indicatorSymbol =
     item && item.realtime === true ? REALTIME_INDICATORS.realtime : REALTIME_INDICATORS.scheduled;
+
+  // Build indicator as a DOM element so we can apply --danger color independently.
+  const indicatorEl = document.createElement('span');
+  indicatorEl.textContent = indicatorSymbol;
+  if (isDelayed) {
+    indicatorEl.className = 'indicator--delayed';
+    indicatorEl.setAttribute('aria-label', 'delayed');
+  }
 
   // Build platform/quay display with stacked format: {symbol}<br>{code}
   // Symbol is selected using PLATFORM_SYMBOL_RULES from config.js
@@ -86,30 +119,52 @@ export function createDepartureNode(item) {
     platformElement = stackedSpan;
   }
 
-  // Apply template to build the display line
-  // Available placeholders: {lineNumber}, {destination}, {emoji}, {platform}, {indicator}
-  // The {platform} placeholder will be replaced with a placeholder string that we'll swap with the element
+  // Apply template to build the display line.
+  // {platform} and {indicator} are replaced with DOM elements for independent styling.
+  // Both use a unique placeholder string that is swapped after textContent assignment.
   const PLATFORM_PLACEHOLDER = '<<<PLATFORM>>>';
+  const INDICATOR_PLACEHOLDER = '<<<INDICATOR>>>';
   let displayText = DEPARTURE_LINE_TEMPLATE.replace('{lineNumber}', lineNumberText)
     .replace('{destination}', destinationText)
     .replace('{emoji}', emoji)
-    .replace('{indicator}', indicator)
+    .replace('{indicator}', INDICATOR_PLACEHOLDER)
     .replace('{platform}', platformElement ? PLATFORM_PLACEHOLDER : '');
 
-  // Build the DOM: set text content, then replace placeholder with platform element
-  // If departure is cancelled, wrap everything with cancellation styling
+  // Build the DOM: set text content, then replace placeholders with DOM elements.
+  // If departure is cancelled, wrap everything with cancellation styling.
   const isCancelled = item && item.cancellation === true;
 
   try {
     dest.textContent = displayText;
+
+    // Helper: split current text content on a placeholder and insert a DOM element.
+    function insertElement(parent, placeholder, el) {
+      // Walk text nodes to find and split the placeholder
+      const walker = document.createTreeWalker(parent, NodeFilter.SHOW_TEXT);
+      let node;
+      while ((node = walker.nextNode())) {
+        const idx = node.nodeValue.indexOf(placeholder);
+        if (idx !== -1) {
+          const before = node.nodeValue.slice(0, idx);
+          const after = node.nodeValue.slice(idx + placeholder.length);
+          const parentNode = node.parentNode;
+          if (before) parentNode.insertBefore(document.createTextNode(before), node);
+          parentNode.insertBefore(el, node);
+          if (after) parentNode.insertBefore(document.createTextNode(after), node);
+          parentNode.removeChild(node);
+          return;
+        }
+      }
+    }
+
+    // Replace {indicator} placeholder with the indicator span element
+    if (displayText.includes(INDICATOR_PLACEHOLDER)) {
+      insertElement(dest, INDICATOR_PLACEHOLDER, indicatorEl);
+    }
+
+    // Replace {platform} placeholder with the platform stacked element
     if (platformElement && displayText.includes(PLATFORM_PLACEHOLDER)) {
-      // Replace the placeholder text with the actual platform element
-      const textContent = dest.textContent;
-      const parts = textContent.split(PLATFORM_PLACEHOLDER);
-      dest.textContent = '';
-      if (parts[0]) dest.appendChild(document.createTextNode(parts[0]));
-      dest.appendChild(platformElement);
-      if (parts[1]) dest.appendChild(document.createTextNode(parts[1]));
+      insertElement(dest, PLATFORM_PLACEHOLDER, platformElement);
     }
 
     // Wrap with cancellation styling if needed

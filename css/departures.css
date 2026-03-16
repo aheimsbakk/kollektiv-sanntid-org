@@ -63,6 +63,12 @@
   opacity: 0.6;
 }
 
+/* Delayed departure indicator: solid dot rendered in --danger (red).
+   Applied when realtime=true AND aimedDepartureISO < expectedDepartureISO. */
+.indicator--delayed {
+  color: var(--danger);
+}
+
 .departure-time {
   font-family: var(--mono);
   font-weight: 800;
