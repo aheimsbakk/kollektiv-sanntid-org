@@ -92,7 +92,8 @@ async function init() {
   // Restore GPS coords from favorites when settings didn't have them
   // (old saves pre-v1.40.9, or station typed manually without GPS).
   // loadSettings() now persists LAT/LON so this is only a last-resort fallback.
-  if (!DEFAULTS.LAT && !DEFAULTS.LON && favorites.length > 0) {
+  // Use strict null check — 0 is a valid coordinate value (equator / prime meridian).
+  if (DEFAULTS.LAT === null && DEFAULTS.LON === null && favorites.length > 0) {
     const match = favorites.find((f) => f.stopId === DEFAULTS.STOP_ID);
     const src = match || favorites[0];
     if (typeof src.lat === 'number') DEFAULTS.LAT = src.lat;
