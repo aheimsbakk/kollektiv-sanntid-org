@@ -1,4 +1,4 @@
-const VERSION = '1.40.10';
+const VERSION = '1.40.11';
 const CACHE_NAME = `departures-v${VERSION}`;
 const ASSETS = [
   './',

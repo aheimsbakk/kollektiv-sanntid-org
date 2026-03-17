@@ -98,7 +98,9 @@ export function wireHandlers(
     // Update the browser tab title
     try {
       document.title = station.name || document.title;
-    } catch (_) {}
+    } catch (err) {
+      console.warn('[handlers] Failed to update document.title', err);
+    }
 
     // Reset scroll-more temporary departure count on station change
     setNumDeparturesOverride(null);
@@ -200,7 +202,9 @@ export function wireHandlers(
     }
     try {
       document.title = DEFAULTS.STATION_NAME || document.title;
-    } catch (_) {}
+    } catch (err) {
+      console.warn('[handlers] Failed to update document.title', err);
+    }
 
     applyTextSize(newOpts.TEXT_SIZE);
     updateFavoriteButton(board.favoriteBtn, DEFAULTS.STOP_ID, DEFAULTS.TRANSPORT_MODES);

@@ -38,7 +38,8 @@ export async function lookupStopId({
   try {
     const j = await r.json();
     return j?.features?.[0]?.properties?.id ?? null;
-  } catch (_) {
+  } catch (err) {
+    console.warn('[geocoder] Failed to parse reverse-geocode response', err);
     return null;
   }
 }

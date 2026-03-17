@@ -87,8 +87,8 @@ export function loadSettings() {
     ) {
       DEFAULTS.LON = parsed.LON;
     }
-  } catch (_) {
-    /* ignore corrupt storage */
+  } catch (err) {
+    console.warn('[settings] Failed to load settings from localStorage', err);
   }
 }
 
@@ -112,8 +112,8 @@ export function saveSettings() {
       LON: typeof DEFAULTS.LON === 'number' ? DEFAULTS.LON : null,
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(toSave));
-  } catch (_) {
-    /* ignore */
+  } catch (err) {
+    console.warn('[settings] Failed to save settings to localStorage', err);
   }
 }
 
@@ -125,7 +125,7 @@ export function applyTextSize(size) {
   try {
     document.documentElement.classList.remove(...TEXT_SIZE_CLASSES);
     document.documentElement.classList.add(`text-size-${size || 'medium'}`);
-  } catch (_) {
-    /* non-critical */
+  } catch (err) {
+    console.warn('[settings] Failed to apply text-size class', err);
   }
 }

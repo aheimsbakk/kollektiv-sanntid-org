@@ -58,8 +58,8 @@ export function processUrlParams() {
       try {
         localStorage.setItem('departure:language', shared.language);
         initLanguage();
-      } catch (_) {
-        /* ignore */
+      } catch (err) {
+        console.warn('[url-import] Failed to persist imported language', err);
       }
     }
 

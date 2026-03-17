@@ -1,14 +1,14 @@
-Overall Context: Kollektiv.Sanntid.org - Real-time Norwegian public transport departure board. Version 1.40.6.
+Overall Context: Kollektiv.Sanntid.org - Real-time Norwegian public transport departure board. Version 1.40.11.
 
 Current Goal: Stable mobile PWA experience with OpenStreetMap integration. OSM feature complete and fully polished.
 
 Last 3 Changes:
 
-- Fix OSM button on reload (v1.40.6): restore LAT/LON from favorites unconditionally after station selection — loadSettings() was setting STOP_ID before the coord-restore guard ran, skipping it entirely
+- Fix silent catch blocks (v1.40.11): replaced 7 silent `catch (_)` blocks with `console.warn` in settings.js, handlers.js, url-import.js, geocoder.js
+- Fix OSM button on reload (v1.40.6→1.40.10): restore LAT/LON from favorites unconditionally; persist LAT/LON in saveSettings; strict null guards; sw.js ASSETS; flex-column layout
 - Fix OSM alert style (v1.40.5): split osm-status into shell + inner child (mirrors exact GPS dropdown two-level DOM structure)
-- Cleanup osm-button.js + CSS padding (v1.40.4): removed stale duplicate code block; fixed .osm-status shell padding to 6px
 
-OSM Feature Summary (complete as of v1.40.6):
+OSM Feature Summary (complete as of v1.40.11):
 
 - 🗺️ button in GPS bar; navigates same tab to OSM Transport layer with pin
 - coords flow: geocoder.js → station-autocomplete → options/index.js → handlers.js → DEFAULTS.LAT/LON
@@ -18,6 +18,4 @@ OSM Feature Summary (complete as of v1.40.6):
 
 Next Steps:
 
-- Fix H1: import ALL_TRANSPORT_MODES from config.js in settings.js, gps-search.js, share-button.js
-- Fix H2: add console.warn to 9 silent catch blocks
-- Fix M1: add .env, venv/, .venv/, .qa-error.log to .gitignore
+- No outstanding items — all H/M priority issues resolved
