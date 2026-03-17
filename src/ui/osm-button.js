@@ -56,20 +56,25 @@ export function createOsmButton(getCoords) {
   btn.title = t('osmTooltip');
   btn.setAttribute('aria-label', t('osmTooltip'));
 
-  // Status message shown below the button when no coords are available —
-  // mirrors .gps-dropdown-status / .gps-dropdown-error from gps-dropdown.js
-  const status = document.createElement('div');
-  status.className = 'gps-dropdown-status gps-dropdown-error osm-status';
-  status.setAttribute('aria-live', 'polite');
+  // Status shell — mirrors .gps-dropdown-menu (bg, padding:6px, shadow)
+  // Contains an inner text node that mirrors .gps-dropdown-status.gps-dropdown-error
+  // (padding:8px, danger color) — exact same two-level structure as GPS dropdown.
+  const statusShell = document.createElement('div');
+  statusShell.className = 'osm-status';
+
+  const statusInner = document.createElement('div');
+  statusInner.className = 'gps-dropdown-status gps-dropdown-error';
+  statusInner.setAttribute('aria-live', 'polite');
+  statusShell.appendChild(statusInner);
 
   let _statusTimer = null;
 
   function showStatus(msg) {
-    status.textContent = msg;
-    status.classList.add('visible');
+    statusInner.textContent = msg;
+    statusShell.classList.add('visible');
     clearTimeout(_statusTimer);
     _statusTimer = setTimeout(() => {
-      status.classList.remove('visible');
+      statusShell.classList.remove('visible');
     }, 3000);
   }
 
@@ -91,8 +96,8 @@ export function createOsmButton(getCoords) {
     btn.setAttribute('aria-label', t('osmTooltip'));
   };
 
-  // Expose status element so gps-bar.js can mount it inside the container
-  btn.statusEl = status;
+  // Expose shell so gps-bar.js can mount it inside the container
+  btn.statusEl = statusShell;
 
   return btn;
 }
