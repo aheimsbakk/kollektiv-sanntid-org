@@ -41,21 +41,26 @@ export function processUrlParams() {
     if (!shared) return false;
 
     // Only apply fields that were actually present in the share link.
-    // A null value means the field was absent (e.g. new 3-element format) —
+    // A null value means the field was absent (e.g. 3-element format) —
     // leave the current app value untouched so the user's own settings survive.
-    if (shared.stationName    != null) DEFAULTS.STATION_NAME    = shared.stationName;
-    if (shared.stopId         != null) DEFAULTS.STOP_ID         = shared.stopId;
+    if (shared.stationName != null) DEFAULTS.STATION_NAME = shared.stationName;
+    if (shared.stopId != null) DEFAULTS.STOP_ID = shared.stopId;
     if (shared.transportModes != null) DEFAULTS.TRANSPORT_MODES = shared.transportModes;
-    if (shared.numDepartures  != null) DEFAULTS.NUM_DEPARTURES  = shared.numDepartures;
-    if (shared.fetchInterval  != null) DEFAULTS.FETCH_INTERVAL  = shared.fetchInterval;
-    if (shared.textSize       != null) DEFAULTS.TEXT_SIZE       = shared.textSize;
+    if (shared.numDepartures != null) DEFAULTS.NUM_DEPARTURES = shared.numDepartures;
+    if (shared.fetchInterval != null) DEFAULTS.FETCH_INTERVAL = shared.fetchInterval;
+    if (shared.textSize != null) DEFAULTS.TEXT_SIZE = shared.textSize;
+    // GPS coordinates — present in the 5-element format only; null when absent
+    if (shared.lat != null) DEFAULTS.LAT = shared.lat;
+    if (shared.lon != null) DEFAULTS.LON = shared.lon;
 
     // Persist the imported language so it survives a reload
     if (shared.language) {
       try {
         localStorage.setItem('departure:language', shared.language);
         initLanguage();
-      } catch (_) { /* ignore */ }
+      } catch (_) {
+        /* ignore */
+      }
     }
 
     // Persist to localStorage so settings survive after URL is cleaned

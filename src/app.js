@@ -77,6 +77,9 @@ async function init() {
       DEFAULTS.STATION_NAME = favorites[0].name;
       DEFAULTS.STOP_ID = favorites[0].stopId;
       DEFAULTS.TRANSPORT_MODES = favorites[0].modes || DEFAULTS.TRANSPORT_MODES;
+      // Restore saved GPS coords so the OSM button works immediately on load
+      if (typeof favorites[0].lat === 'number') DEFAULTS.LAT = favorites[0].lat;
+      if (typeof favorites[0].lon === 'number') DEFAULTS.LON = favorites[0].lon;
     } else {
       const defaultStation = getDefaultStation();
       if (defaultStation) {
@@ -95,6 +98,7 @@ async function init() {
   const optsRef = { current: null };
   const gpsRef = { current: null };
   const scrollMoreRef = { current: null };
+  const osmRef = { current: null };
 
   const board = createBoardElements(
     DEFAULTS.STATION_NAME,
@@ -130,15 +134,20 @@ async function init() {
     settingsBtn,
     optsRef,
     gpsRef,
-    scrollMoreRef
+    scrollMoreRef,
+    osmRef
   );
   const opts = createOptionsPanel(DEFAULTS, handlers.onApplySettings, handlers.onLanguageChange);
   optsRef.current = opts;
   document.body.appendChild(opts.panel);
 
   // 7b. Mount the GPS compass bar (top-left) — uses dedicated handler that does NOT auto-save to favorites
-  const { gpsContainer } = buildGpsBar((station) => handlers.handleGpsStationSelect(station));
+  const { gpsContainer, osmBtn } = buildGpsBar(
+    (station) => handlers.handleGpsStationSelect(station),
+    () => ({ lat: DEFAULTS.LAT, lon: DEFAULTS.LON })
+  );
   gpsRef.current = gpsContainer;
+  osmRef.current = osmBtn;
 
   // Expose board and gpsRef to the module-level pagehide teardown so that
   // document-level listeners in station-dropdown and gps-dropdown are removed

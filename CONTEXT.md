@@ -1,12 +1,12 @@
-Overall Context: Kollektiv.Sanntid.org - Real-time Norwegian public transport departure board. Version 1.39.2.
+Overall Context: Kollektiv.Sanntid.org - Real-time Norwegian public transport departure board. Version 1.40.1.
 
-Current Goal: Stable mobile PWA experience across Chrome and Firefox.
+Current Goal: Stable mobile PWA experience with OpenStreetMap integration.
 
 Last 3 Changes:
 
+- Fix options panel coords (v1.40.1): lat/lon now flow from geocoder.js → station-autocomplete.js (getLat/getLon) → options/index.js applyChanges → handlers.js onApplySettings → DEFAULTS.LAT/LON
+- OpenStreetMap button (v1.40.0): 🗺️ button in GPS bar opens OSM Transport layer with pin at current stop; lat/lon stored in favorites and share URLs (5-element array, backward-compat); osmTooltip/osmNoCoords added to all 12 languages
 - Raise delay threshold to 120 s (v1.39.2): DELAY_THRESHOLD_MS=120000; red dot now requires 2 min late; boundary tests updated; README updated
-- Fix delay indicator false positives (v1.39.1): DELAY_THRESHOLD_MS=60000; isDepartureDelayed() requires expected−aimed >= threshold; sub-minute noise suppressed
-- Departure delay indicator (v1.39.0): red ● dot when realtime=true AND aimed < expected; isDepartureDelayed() in departure.js; .indicator--delayed CSS uses --danger token
 
 Next Steps:
 
