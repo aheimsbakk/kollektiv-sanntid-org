@@ -5,7 +5,8 @@
  *   - Render a single .header-btn button with the 🗺️ emoji
  *   - On click: build an OSM Transport Layer URL from the current station
  *     coordinates and open it in a new tab
- *   - When no coordinates are available, log a warning and do nothing visible
+ *   - When no coordinates are available, show a transient toast (#osm-toast)
+ *     with the `osmNoCoords` translation string
  *   - Expose updateTooltip() so language changes are applied without re-mounting
  *
  * URL format (per docs/openstreetmap/howto.md):
@@ -39,6 +40,28 @@ export function buildOsmUrl(lat, lon) {
 }
 
 /**
+ * Show a transient toast on document.body with the given message.
+ * Reuses a single #osm-toast element; auto-dismisses after 3 s.
+ *
+ * @param {string} msg
+ */
+let _osmToastTimer = null;
+function showOsmToast(msg) {
+  let toast = document.getElementById('osm-toast');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'osm-toast';
+    document.body.appendChild(toast);
+  }
+  toast.textContent = msg;
+  toast.classList.remove('hidden');
+  clearTimeout(_osmToastTimer);
+  _osmToastTimer = setTimeout(() => {
+    toast.classList.add('hidden');
+  }, 3000);
+}
+
+/**
  * Create the OSM map button element.
  *
  * @param {Function} getCoords - Returns { lat: number|null, lon: number|null }
@@ -60,7 +83,7 @@ export function createOsmButton(getCoords) {
 
     const coords = getCoords();
     if (coords == null || typeof coords.lat !== 'number' || typeof coords.lon !== 'number') {
-      console.warn('[osm-button] No coordinates available for the current station');
+      showOsmToast(t('osmNoCoords'));
       return;
     }
 

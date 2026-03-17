@@ -43,3 +43,24 @@
   opacity: 0;
   pointer-events: none;
 }
+
+/* OSM button "no coordinates" transient toast */
+#osm-toast {
+  position: fixed;
+  bottom: 18px;
+  left: 18px;
+  z-index: var(--z-share-modal);
+  font-size: 12px;
+  color: var(--text-primary);
+  background: var(--overlay-strong);
+  padding: 8px 12px;
+  border-radius: var(--btn-border-radius);
+  backdrop-filter: blur(8px);
+  opacity: 1;
+  transition: opacity var(--transition-toast);
+  pointer-events: none;
+}
+
+#osm-toast.hidden {
+  opacity: 0;
+}

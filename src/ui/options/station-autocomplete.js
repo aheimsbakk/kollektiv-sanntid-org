@@ -135,6 +135,8 @@ export function createStationAutocomplete(defaults, { onSelect, t }) {
     if (v === lastQuery) return;
     lastQuery = v;
     inpStation.dataset.stopId = '';
+    inpStation.dataset.lat = '';
+    inpStation.dataset.lon = '';
     clearTimeout(acTimer);
     if (v.trim().length < 3) {
       clearAutocomplete();
