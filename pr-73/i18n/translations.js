@@ -75,18 +75,22 @@ const translations = {
     toggleAllModes: 'Toggle all transport modes',
 
     // GPS nearby stops
-    gpsTooltip:           'Find nearby stops',
-    gpsLocating:          'Locating…',
-    gpsNoResults:         'No stops found nearby',
-    gpsFetchError:        'Could not fetch nearby stops',
-    gpsNotSupported:      'GPS not supported in this browser',
-    gpsPermissionDenied:  'Location access denied',
-    gpsUnavailable:       'Location unavailable',
-    gpsMeters:            'm',
+    gpsTooltip: 'Find nearby stops',
+    gpsLocating: 'Locating…',
+    gpsNoResults: 'No stops found nearby',
+    gpsFetchError: 'Could not fetch nearby stops',
+    gpsNotSupported: 'GPS not supported in this browser',
+    gpsPermissionDenied: 'Location access denied',
+    gpsUnavailable: 'Location unavailable',
+    gpsMeters: 'm',
+
+    // OpenStreetMap button
+    osmTooltip: 'Open stop on OpenStreetMap',
+    osmNoCoords: 'No location available for this stop',
 
     // Scroll-more (pull to load more departures)
-    scrollForMore:        'scroll for temporary more',
-    scrollMaxReached:     'for more change in ⚙️'
+    scrollForMore: 'scroll for temporary more',
+    scrollMaxReached: 'for more change in ⚙️',
   },
 
   no: {
@@ -163,18 +167,22 @@ const translations = {
     toggleAllModes: 'Velg/fjern alle transportmidler',
 
     // GPS nearby stops
-    gpsTooltip:           'Finn nærmeste holdeplasser',
-    gpsLocating:          'Finner posisjon…',
-    gpsNoResults:         'Ingen holdeplasser funnet i nærheten',
-    gpsFetchError:        'Kunne ikke hente holdeplasser',
-    gpsNotSupported:      'GPS støttes ikke i denne nettleseren',
-    gpsPermissionDenied:  'Tilgang til posisjon ble nektet',
-    gpsUnavailable:       'Posisjon utilgjengelig',
-    gpsMeters:            'm',
+    gpsTooltip: 'Finn nærmeste holdeplasser',
+    gpsLocating: 'Finner posisjon…',
+    gpsNoResults: 'Ingen holdeplasser funnet i nærheten',
+    gpsFetchError: 'Kunne ikke hente holdeplasser',
+    gpsNotSupported: 'GPS støttes ikke i denne nettleseren',
+    gpsPermissionDenied: 'Tilgang til posisjon ble nektet',
+    gpsUnavailable: 'Posisjon utilgjengelig',
+    gpsMeters: 'm',
+
+    // OpenStreetMap button
+    osmTooltip: 'Åpne holdeplass i OpenStreetMap',
+    osmNoCoords: 'Ingen posisjon tilgjengelig for denne holdeplassen',
 
     // Scroll-more
-    scrollForMore:        'dra for midlertidig flere',
-    scrollMaxReached:     'for flere endre i ⚙️'
+    scrollForMore: 'dra for midlertidig flere',
+    scrollMaxReached: 'for flere endre i ⚙️',
   },
 
   de: {
@@ -251,18 +259,22 @@ const translations = {
     toggleAllModes: 'Alle Verkehrsmittel auswählen/abwählen',
 
     // GPS nearby stops
-    gpsTooltip:           'Haltestellen in der Nähe finden',
-    gpsLocating:          'Standort wird ermittelt…',
-    gpsNoResults:         'Keine Haltestellen in der Nähe gefunden',
-    gpsFetchError:        'Haltestellen konnten nicht abgerufen werden',
-    gpsNotSupported:      'GPS wird in diesem Browser nicht unterstützt',
-    gpsPermissionDenied:  'Standortzugriff verweigert',
-    gpsUnavailable:       'Standort nicht verfügbar',
-    gpsMeters:            'm',
+    gpsTooltip: 'Haltestellen in der Nähe finden',
+    gpsLocating: 'Standort wird ermittelt…',
+    gpsNoResults: 'Keine Haltestellen in der Nähe gefunden',
+    gpsFetchError: 'Haltestellen konnten nicht abgerufen werden',
+    gpsNotSupported: 'GPS wird in diesem Browser nicht unterstützt',
+    gpsPermissionDenied: 'Standortzugriff verweigert',
+    gpsUnavailable: 'Standort nicht verfügbar',
+    gpsMeters: 'm',
+
+    // OpenStreetMap button
+    osmTooltip: 'Haltestelle in OpenStreetMap öffnen',
+    osmNoCoords: 'Kein Standort für diese Haltestelle verfügbar',
 
     // Scroll-more
-    scrollForMore:        'scrollen für vorübergehend mehr',
-    scrollMaxReached:     'für mehr ändern in ⚙️'
+    scrollForMore: 'scrollen für vorübergehend mehr',
+    scrollMaxReached: 'für mehr ändern in ⚙️',
   },
 
   es: {
@@ -339,18 +351,22 @@ const translations = {
     toggleAllModes: 'Seleccionar/deseleccionar todos los modos',
 
     // GPS nearby stops
-    gpsTooltip:           'Encontrar paradas cercanas',
-    gpsLocating:          'Localizando…',
-    gpsNoResults:         'No se encontraron paradas cercanas',
-    gpsFetchError:        'No se pudieron obtener paradas cercanas',
-    gpsNotSupported:      'GPS no compatible con este navegador',
-    gpsPermissionDenied:  'Acceso a la ubicación denegado',
-    gpsUnavailable:       'Ubicación no disponible',
-    gpsMeters:            'm',
+    gpsTooltip: 'Encontrar paradas cercanas',
+    gpsLocating: 'Localizando…',
+    gpsNoResults: 'No se encontraron paradas cercanas',
+    gpsFetchError: 'No se pudieron obtener paradas cercanas',
+    gpsNotSupported: 'GPS no compatible con este navegador',
+    gpsPermissionDenied: 'Acceso a la ubicación denegado',
+    gpsUnavailable: 'Ubicación no disponible',
+    gpsMeters: 'm',
+
+    // OpenStreetMap button
+    osmTooltip: 'Abrir parada en OpenStreetMap',
+    osmNoCoords: 'No hay ubicación disponible para esta parada',
 
     // Scroll-more
-    scrollForMore:        'desliza para más temporal',
-    scrollMaxReached:     'para más cambie en ⚙️'
+    scrollForMore: 'desliza para más temporal',
+    scrollMaxReached: 'para más cambie en ⚙️',
   },
 
   it: {
@@ -427,18 +443,22 @@ const translations = {
     toggleAllModes: 'Seleziona/deseleziona tutti i mezzi',
 
     // GPS nearby stops
-    gpsTooltip:           'Trova fermate vicine',
-    gpsLocating:          'Localizzazione in corso…',
-    gpsNoResults:         'Nessuna fermata trovata nelle vicinanze',
-    gpsFetchError:        'Impossibile recuperare le fermate vicine',
-    gpsNotSupported:      'GPS non supportato in questo browser',
-    gpsPermissionDenied:  'Accesso alla posizione negato',
-    gpsUnavailable:       'Posizione non disponibile',
-    gpsMeters:            'm',
+    gpsTooltip: 'Trova fermate vicine',
+    gpsLocating: 'Localizzazione in corso…',
+    gpsNoResults: 'Nessuna fermata trovata nelle vicinanze',
+    gpsFetchError: 'Impossibile recuperare le fermate vicine',
+    gpsNotSupported: 'GPS non supportato in questo browser',
+    gpsPermissionDenied: 'Accesso alla posizione negato',
+    gpsUnavailable: 'Posizione non disponibile',
+    gpsMeters: 'm',
+
+    // OpenStreetMap button
+    osmTooltip: 'Apri fermata su OpenStreetMap',
+    osmNoCoords: 'Nessuna posizione disponibile per questa fermata',
 
     // Scroll-more
-    scrollForMore:        'scorri per altri temporanei',
-    scrollMaxReached:     'per altri cambia in ⚙️'
+    scrollForMore: 'scorri per altri temporanei',
+    scrollMaxReached: 'per altri cambia in ⚙️',
   },
 
   el: {
@@ -515,18 +535,22 @@ const translations = {
     toggleAllModes: 'Επιλογή/αποεπιλογή όλων των μέσων',
 
     // GPS nearby stops
-    gpsTooltip:           'Εύρεση κοντινών στάσεων',
-    gpsLocating:          'Εντοπισμός τοποθεσίας…',
-    gpsNoResults:         'Δεν βρέθηκαν κοντινές στάσεις',
-    gpsFetchError:        'Αδύνατη η ανάκτηση κοντινών στάσεων',
-    gpsNotSupported:      'Το GPS δεν υποστηρίζεται σε αυτόν τον browser',
-    gpsPermissionDenied:  'Η πρόσβαση στην τοποθεσία απορρίφθηκε',
-    gpsUnavailable:       'Η τοποθεσία δεν είναι διαθέσιμη',
-    gpsMeters:            'm',
+    gpsTooltip: 'Εύρεση κοντινών στάσεων',
+    gpsLocating: 'Εντοπισμός τοποθεσίας…',
+    gpsNoResults: 'Δεν βρέθηκαν κοντινές στάσεις',
+    gpsFetchError: 'Αδύνατη η ανάκτηση κοντινών στάσεων',
+    gpsNotSupported: 'Το GPS δεν υποστηρίζεται σε αυτόν τον browser',
+    gpsPermissionDenied: 'Η πρόσβαση στην τοποθεσία απορρίφθηκε',
+    gpsUnavailable: 'Η τοποθεσία δεν είναι διαθέσιμη',
+    gpsMeters: 'm',
+
+    // OpenStreetMap button
+    osmTooltip: 'Άνοιγμα στάσης στο OpenStreetMap',
+    osmNoCoords: 'Δεν υπάρχει διαθέσιμη τοποθεσία για αυτή τη στάση',
 
     // Scroll-more
-    scrollForMore:        'σύρετε για προσωρινά περισσότερα',
-    scrollMaxReached:     'για περισσότερα αλλάξτε στο ⚙️'
+    scrollForMore: 'σύρετε για προσωρινά περισσότερα',
+    scrollMaxReached: 'για περισσότερα αλλάξτε στο ⚙️',
   },
 
   fa: {
@@ -603,18 +627,22 @@ const translations = {
     toggleAllModes: 'انتخاب/عدم انتخاب همه وسایل نقلیه',
 
     // GPS nearby stops
-    gpsTooltip:           'یافتن ایستگاه‌های نزدیک',
-    gpsLocating:          'در حال یافتن موقعیت…',
-    gpsNoResults:         'هیچ ایستگاهی در نزدیکی یافت نشد',
-    gpsFetchError:        'دریافت ایستگاه‌های نزدیک ناموفق بود',
-    gpsNotSupported:      'GPS در این مرورگر پشتیبانی نمی‌شود',
-    gpsPermissionDenied:  'دسترسی به موقعیت رد شد',
-    gpsUnavailable:       'موقعیت در دسترس نیست',
-    gpsMeters:            'm',
+    gpsTooltip: 'یافتن ایستگاه‌های نزدیک',
+    gpsLocating: 'در حال یافتن موقعیت…',
+    gpsNoResults: 'هیچ ایستگاهی در نزدیکی یافت نشد',
+    gpsFetchError: 'دریافت ایستگاه‌های نزدیک ناموفق بود',
+    gpsNotSupported: 'GPS در این مرورگر پشتیبانی نمی‌شود',
+    gpsPermissionDenied: 'دسترسی به موقعیت رد شد',
+    gpsUnavailable: 'موقعیت در دسترس نیست',
+    gpsMeters: 'm',
+
+    // OpenStreetMap button
+    osmTooltip: 'باز کردن ایستگاه در OpenStreetMap',
+    osmNoCoords: 'موقعیتی برای این ایستگاه در دسترس نیست',
 
     // Scroll-more
-    scrollForMore:        'بکشید برای بیشتر موقت',
-    scrollMaxReached:     'برای بیشتر در ⚙️ تغییر دهید'
+    scrollForMore: 'بکشید برای بیشتر موقت',
+    scrollMaxReached: 'برای بیشتر در ⚙️ تغییر دهید',
   },
 
   hi: {
@@ -691,18 +719,22 @@ const translations = {
     toggleAllModes: 'सभी परिवहन साधन चुनें/हटाएं',
 
     // GPS nearby stops
-    gpsTooltip:           'पास के स्टॉप खोजें',
-    gpsLocating:          'स्थान खोजा जा रहा है…',
-    gpsNoResults:         'पास में कोई स्टॉप नहीं मिला',
-    gpsFetchError:        'पास के स्टॉप नहीं मिल सके',
-    gpsNotSupported:      'इस ब्राउज़र में GPS समर्थित नहीं है',
-    gpsPermissionDenied:  'स्थान पहुँच अस्वीकृत',
-    gpsUnavailable:       'स्थान उपलब्ध नहीं',
-    gpsMeters:            'm',
+    gpsTooltip: 'पास के स्टॉप खोजें',
+    gpsLocating: 'स्थान खोजा जा रहा है…',
+    gpsNoResults: 'पास में कोई स्टॉप नहीं मिला',
+    gpsFetchError: 'पास के स्टॉप नहीं मिल सके',
+    gpsNotSupported: 'इस ब्राउज़र में GPS समर्थित नहीं है',
+    gpsPermissionDenied: 'स्थान पहुँच अस्वीकृत',
+    gpsUnavailable: 'स्थान उपलब्ध नहीं',
+    gpsMeters: 'm',
+
+    // OpenStreetMap button
+    osmTooltip: 'OpenStreetMap पर स्टॉप खोलें',
+    osmNoCoords: 'इस स्टॉप के लिए कोई स्थान उपलब्ध नहीं',
 
     // Scroll-more
-    scrollForMore:        'अस्थायी अधिक के लिए स्क्रॉल करें',
-    scrollMaxReached:     'अधिक के लिए ⚙️ में बदलें'
+    scrollForMore: 'अस्थायी अधिक के लिए स्क्रॉल करें',
+    scrollMaxReached: 'अधिक के लिए ⚙️ में बदलें',
   },
 
   is: {
@@ -779,18 +811,22 @@ const translations = {
     toggleAllModes: 'Velja/afvelja allar samgöngur',
 
     // GPS nearby stops
-    gpsTooltip:           'Finna nálægar stöðvar',
-    gpsLocating:          'Finnur staðsetningu…',
-    gpsNoResults:         'Engar stöðvar fundust í nágrenninu',
-    gpsFetchError:        'Ekki tókst að sækja nálægar stöðvar',
-    gpsNotSupported:      'GPS er ekki stutt í þessum vafra',
-    gpsPermissionDenied:  'Aðgangi að staðsetningu hafnað',
-    gpsUnavailable:       'Staðsetning ekki tiltæk',
-    gpsMeters:            'm',
+    gpsTooltip: 'Finna nálægar stöðvar',
+    gpsLocating: 'Finnur staðsetningu…',
+    gpsNoResults: 'Engar stöðvar fundust í nágrenninu',
+    gpsFetchError: 'Ekki tókst að sækja nálægar stöðvar',
+    gpsNotSupported: 'GPS er ekki stutt í þessum vafra',
+    gpsPermissionDenied: 'Aðgangi að staðsetningu hafnað',
+    gpsUnavailable: 'Staðsetning ekki tiltæk',
+    gpsMeters: 'm',
+
+    // OpenStreetMap button
+    osmTooltip: 'Opna stöð í OpenStreetMap',
+    osmNoCoords: 'Engin staðsetning tiltæk fyrir þessa stöð',
 
     // Scroll-more
-    scrollForMore:        'dragðu fyrir tímabundið meira',
-    scrollMaxReached:     'fyrir meira breyttu í ⚙️'
+    scrollForMore: 'dragðu fyrir tímabundið meira',
+    scrollMaxReached: 'fyrir meira breyttu í ⚙️',
   },
 
   uk: {
@@ -867,23 +903,27 @@ const translations = {
     toggleAllModes: 'Вибрати/зняти всі засоби транспорту',
 
     // GPS nearby stops
-    gpsTooltip:           'Знайти найближчі зупинки',
-    gpsLocating:          'Визначення місцезнаходження…',
-    gpsNoResults:         'Зупинок поблизу не знайдено',
-    gpsFetchError:        'Не вдалося отримати найближчі зупинки',
-    gpsNotSupported:      'GPS не підтримується у цьому браузері',
-    gpsPermissionDenied:  'Доступ до місцезнаходження заблоковано',
-    gpsUnavailable:       'Місцезнаходження недоступне',
-    gpsMeters:            'м',
+    gpsTooltip: 'Знайти найближчі зупинки',
+    gpsLocating: 'Визначення місцезнаходження…',
+    gpsNoResults: 'Зупинок поблизу не знайдено',
+    gpsFetchError: 'Не вдалося отримати найближчі зупинки',
+    gpsNotSupported: 'GPS не підтримується у цьому браузері',
+    gpsPermissionDenied: 'Доступ до місцезнаходження заблоковано',
+    gpsUnavailable: 'Місцезнаходження недоступне',
+    gpsMeters: 'м',
+
+    // OpenStreetMap button
+    osmTooltip: 'Відкрити зупинку в OpenStreetMap',
+    osmNoCoords: 'Місцезнаходження для цієї зупинки недоступне',
 
     // Scroll-more
-    scrollForMore:        'прокрутіть для тимчасового більшого',
-    scrollMaxReached:     'для більшого змініть у ⚙️'
+    scrollForMore: 'прокрутіть для тимчасового більшого',
+    scrollMaxReached: 'для більшого змініть у ⚙️',
   },
 
   fr: {
     // Options panel
-    stationName: 'Nom de la station ou de l\'arrêt',
+    stationName: "Nom de la station ou de l'arrêt",
     numberOfDepartures: 'Nombre de départs',
     fetchInterval: 'Intervalle de mise à jour (secondes)',
     textSize: 'Taille du texte',
@@ -955,18 +995,22 @@ const translations = {
     toggleAllModes: 'Sélectionner/désélectionner tous les modes',
 
     // GPS nearby stops
-    gpsTooltip:           'Trouver les arrêts proches',
-    gpsLocating:          'Localisation en cours…',
-    gpsNoResults:         'Aucun arrêt trouvé à proximité',
-    gpsFetchError:        'Impossible de récupérer les arrêts proches',
-    gpsNotSupported:      'GPS non pris en charge dans ce navigateur',
-    gpsPermissionDenied:  'Accès à la localisation refusé',
-    gpsUnavailable:       'Localisation indisponible',
-    gpsMeters:            'm',
+    gpsTooltip: 'Trouver les arrêts proches',
+    gpsLocating: 'Localisation en cours…',
+    gpsNoResults: 'Aucun arrêt trouvé à proximité',
+    gpsFetchError: 'Impossible de récupérer les arrêts proches',
+    gpsNotSupported: 'GPS non pris en charge dans ce navigateur',
+    gpsPermissionDenied: 'Accès à la localisation refusé',
+    gpsUnavailable: 'Localisation indisponible',
+    gpsMeters: 'm',
+
+    // OpenStreetMap button
+    osmTooltip: "Ouvrir l'arrêt sur OpenStreetMap",
+    osmNoCoords: 'Aucune position disponible pour cet arrêt',
 
     // Scroll-more
-    scrollForMore:        'faites défiler pour plus temporaire',
-    scrollMaxReached:     'pour plus changez dans ⚙️'
+    scrollForMore: 'faites défiler pour plus temporaire',
+    scrollMaxReached: 'pour plus changez dans ⚙️',
   },
 
   pl: {
@@ -1043,19 +1087,23 @@ const translations = {
     toggleAllModes: 'Zaznacz/odznacz wszystkie środki transportu',
 
     // GPS nearby stops
-    gpsTooltip:           'Znajdź pobliskie przystanki',
-    gpsLocating:          'Ustalanie lokalizacji…',
-    gpsNoResults:         'Nie znaleziono przystanków w pobliżu',
-    gpsFetchError:        'Nie udało się pobrać pobliskich przystanków',
-    gpsNotSupported:      'GPS nie jest obsługiwany w tej przeglądarce',
-    gpsPermissionDenied:  'Dostęp do lokalizacji został zablokowany',
-    gpsUnavailable:       'Lokalizacja niedostępna',
-    gpsMeters:            'm',
+    gpsTooltip: 'Znajdź pobliskie przystanki',
+    gpsLocating: 'Ustalanie lokalizacji…',
+    gpsNoResults: 'Nie znaleziono przystanków w pobliżu',
+    gpsFetchError: 'Nie udało się pobrać pobliskich przystanków',
+    gpsNotSupported: 'GPS nie jest obsługiwany w tej przeglądarce',
+    gpsPermissionDenied: 'Dostęp do lokalizacji został zablokowany',
+    gpsUnavailable: 'Lokalizacja niedostępna',
+    gpsMeters: 'm',
+
+    // OpenStreetMap button
+    osmTooltip: 'Otwórz przystanek w OpenStreetMap',
+    osmNoCoords: 'Brak lokalizacji dla tego przystanku',
 
     // Scroll-more
-    scrollForMore:        'przewiń aby zobaczyć więcej tymczasowo',
-    scrollMaxReached:     'aby zobaczyć więcej zmień w ⚙️'
-  }
+    scrollForMore: 'przewiń aby zobaczyć więcej tymczasowo',
+    scrollMaxReached: 'aby zobaczyć więcej zmień w ⚙️',
+  },
 };
 
 export { translations };

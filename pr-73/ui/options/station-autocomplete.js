@@ -121,6 +121,8 @@ export function createStationAutocomplete(defaults, { onSelect, t }) {
     if (!c) return;
     inpStation.value = c.name || c.title || c.id || '';
     inpStation.dataset.stopId = String(c.id || '');
+    inpStation.dataset.lat = typeof c.lat === 'number' ? String(c.lat) : '';
+    inpStation.dataset.lon = typeof c.lon === 'number' ? String(c.lon) : '';
     clearAutocomplete();
     onSelect();
   }
@@ -133,6 +135,8 @@ export function createStationAutocomplete(defaults, { onSelect, t }) {
     if (v === lastQuery) return;
     lastQuery = v;
     inpStation.dataset.stopId = '';
+    inpStation.dataset.lat = '';
+    inpStation.dataset.lon = '';
     clearTimeout(acTimer);
     if (v.trim().length < 3) {
       clearAutocomplete();
@@ -236,6 +240,14 @@ export function createStationAutocomplete(defaults, { onSelect, t }) {
   function getStopId() {
     return inpStation.dataset.stopId || '';
   }
+  function getLat() {
+    const v = parseFloat(inpStation.dataset.lat);
+    return Number.isFinite(v) ? v : null;
+  }
+  function getLon() {
+    const v = parseFloat(inpStation.dataset.lon);
+    return Number.isFinite(v) ? v : null;
+  }
   /** Returns true when the autocomplete dropdown is currently visible. */
   function isOpen() {
     return !!(acList && acList.classList.contains('open'));
@@ -250,6 +262,8 @@ export function createStationAutocomplete(defaults, { onSelect, t }) {
     updatingField = true;
     inpStation.value = name || '';
     inpStation.dataset.stopId = stopId || '';
+    inpStation.dataset.lat = '';
+    inpStation.dataset.lon = '';
     lastQuery = '';
     clearAutocomplete();
     updatingField = false;
@@ -273,6 +287,8 @@ export function createStationAutocomplete(defaults, { onSelect, t }) {
     inpStation,
     getValue,
     getStopId,
+    getLat,
+    getLon,
     isOpen,
     reset,
     updateField,

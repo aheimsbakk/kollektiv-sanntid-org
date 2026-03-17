@@ -126,11 +126,21 @@ export async function fetchNearbyStops({
       .filter((f) => f?.properties?.layer === 'venue')
       .map((f) => {
         const p = f.properties || {};
+        // GeoJSON geometry: { type: 'Point', coordinates: [lon, lat] }
+        const coords = f?.geometry?.coordinates;
+        const featureLon =
+          Array.isArray(coords) && typeof coords[0] === 'number' ? coords[0] : null;
+        const featureLat =
+          Array.isArray(coords) && typeof coords[1] === 'number' ? coords[1] : null;
         return {
           id: p.id || null,
           name: p.name || p.label || '',
           modes: extractModes(p),
           distance: typeof p.distance === 'number' ? Math.round(p.distance * 1000) : null,
+          /** WGS 84 latitude of the stop. null when geometry is absent. */
+          lat: featureLat,
+          /** WGS 84 longitude of the stop. null when geometry is absent. */
+          lon: featureLon,
         };
       })
       .filter((s) => s.id && s.name);

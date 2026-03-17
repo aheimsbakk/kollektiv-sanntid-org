@@ -166,6 +166,9 @@ export function createGpsButton(onStationSelect) {
           // Provide all modes reported for this stop; fall back to ALL_TRANSPORT_MODES
           // so the board shows every service available at the selected station.
           modes: stop.modes.length ? stop.modes : ALL_TRANSPORT_MODES.slice(),
+          // Pass GPS coords so handlers.js can populate DEFAULTS.LAT/LON
+          lat: stop.lat,
+          lon: stop.lon,
         });
       }
     }

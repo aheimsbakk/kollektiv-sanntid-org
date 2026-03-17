@@ -4,14 +4,18 @@ import { UI_EMOJIS, ALL_TRANSPORT_MODES } from '../config.js';
 
 /**
  * Encode settings to compact base64 URL parameter
- * Uses minimal array format: [name, stopId, modes]
+ * Uses minimal array format: [name, stopId, modes, lat, lon]
+ * lat/lon are numbers or null when coordinates are not available.
  * @param {Object} settings - Full settings object
  * @returns {string} Base64-encoded compact settings
  */
 export function encodeSettings(settings) {
   try {
-    // Encode as compact array: [name, stopId, modes]
-    const data = [settings.STATION_NAME, settings.STOP_ID, settings.TRANSPORT_MODES];
+    // Encode as compact array: [name, stopId, modes, lat, lon]
+    // lat/lon are null when not available (e.g. manually-typed station)
+    const lat = typeof settings.LAT === 'number' ? settings.LAT : null;
+    const lon = typeof settings.LON === 'number' ? settings.LON : null;
+    const data = [settings.STATION_NAME, settings.STOP_ID, settings.TRANSPORT_MODES, lat, lon];
 
     const json = JSON.stringify(data);
     // Use TextEncoder for correct UTF-8 → binary → base64 (replaces deprecated unescape/encodeURIComponent trick)
@@ -53,18 +57,22 @@ export function decodeSettings(encoded) {
     const json = new TextDecoder().decode(bytes);
     const data = JSON.parse(json);
 
-    // Support both array formats:
-    // - New: [name, stopId, modes] (3 elements)
+    // Support array formats:
+    // - Current: [name, stopId, modes, lat, lon]  (5 elements, v1.40+)
+    // - Previous: [name, stopId, modes]            (3 elements, v1.24–v1.39)
     // - Legacy: [name, stopId, modes, departures, interval, size, lang] (7 elements)
     // - Also legacy object format: {n, s, m, d, i, t, l}
-    let n, s, m, d, i, t, l;
+    let n, s, m, d, i, t, l, coordLat, coordLon;
 
     if (Array.isArray(data)) {
       if (data.length >= 7) {
         // Legacy format: [name, stopId, modes, departures, interval, size, lang]
         [n, s, m, d, i, t, l] = data;
+      } else if (data.length >= 5) {
+        // Current format: [name, stopId, modes, lat, lon]
+        [n, s, m, coordLat, coordLon] = data;
       } else if (data.length >= 3) {
-        // New format: [name, stopId, modes]
+        // Previous format: [name, stopId, modes]
         [n, s, m] = data;
       } else {
         return null; // Invalid array length
@@ -75,7 +83,7 @@ export function decodeSettings(encoded) {
     }
 
     // Validate all fields.
-    // Optional fields (numDepartures, fetchInterval, textSize, language) are
+    // Optional fields (numDepartures, fetchInterval, textSize, language, lat, lon) are
     // initialised to null so callers can distinguish "field was present in the
     // URL" from "field was absent and we fell back to a hardcoded default".
     // The 3-element new format only contains stationName / stopId / transportModes;
@@ -88,6 +96,10 @@ export function decodeSettings(encoded) {
       fetchInterval: null,
       textSize: null,
       language: null,
+      /** WGS 84 latitude decoded from the share URL, or null when absent */
+      lat: null,
+      /** WGS 84 longitude decoded from the share URL, or null when absent */
+      lon: null,
     };
 
     // Validate station name (required string)
@@ -131,6 +143,25 @@ export function decodeSettings(encoded) {
     // Validate language (2-3 letter code) - only from legacy format
     if (typeof l === 'string' && /^[a-z]{2,3}$/.test(l)) {
       settings.language = l;
+    }
+
+    // Validate GPS coordinates — present in the 5-element current format only
+    // Latitude: -90 to +90; Longitude: -180 to +180 (strict WGS 84 bounds)
+    if (
+      typeof coordLat === 'number' &&
+      Number.isFinite(coordLat) &&
+      coordLat >= -90 &&
+      coordLat <= 90
+    ) {
+      settings.lat = coordLat;
+    }
+    if (
+      typeof coordLon === 'number' &&
+      Number.isFinite(coordLon) &&
+      coordLon >= -180 &&
+      coordLon <= 180
+    ) {
+      settings.lon = coordLon;
     }
 
     return settings;

@@ -38,7 +38,8 @@ export async function lookupStopId({
   try {
     const j = await r.json();
     return j?.features?.[0]?.properties?.id ?? null;
-  } catch (_) {
+  } catch (err) {
+    console.warn('[geocoder] Failed to parse reverse-geocode response', err);
     return null;
   }
 }
@@ -119,6 +120,8 @@ export async function searchStations({
       id: f?.properties?.id ?? null,
       title: f?.properties?.label ?? f?.properties?.name ?? f?.properties?.title ?? f?.text ?? '',
       name: f?.properties?.name ?? f?.properties?.title ?? f?.text ?? '',
+      lat: typeof f?.geometry?.coordinates?.[1] === 'number' ? f.geometry.coordinates[1] : null,
+      lon: typeof f?.geometry?.coordinates?.[0] === 'number' ? f.geometry.coordinates[0] : null,
       raw: f,
     }));
   } catch (err) {

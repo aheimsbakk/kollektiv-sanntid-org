@@ -36,6 +36,9 @@ export function buildActionBar(board, onOpenSettings, onCloseSettings) {
       FETCH_INTERVAL: DEFAULTS.FETCH_INTERVAL,
       TEXT_SIZE: DEFAULTS.TEXT_SIZE,
       language: getLanguage(),
+      // GPS coordinates for the OSM pin — null when not available
+      LAT: DEFAULTS.LAT,
+      LON: DEFAULTS.LON,
     };
   });
 
