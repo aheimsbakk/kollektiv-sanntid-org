@@ -77,9 +77,6 @@ async function init() {
       DEFAULTS.STATION_NAME = favorites[0].name;
       DEFAULTS.STOP_ID = favorites[0].stopId;
       DEFAULTS.TRANSPORT_MODES = favorites[0].modes || DEFAULTS.TRANSPORT_MODES;
-      // Restore saved GPS coords so the OSM button works immediately on load
-      if (typeof favorites[0].lat === 'number') DEFAULTS.LAT = favorites[0].lat;
-      if (typeof favorites[0].lon === 'number') DEFAULTS.LON = favorites[0].lon;
     } else {
       const defaultStation = getDefaultStation();
       if (defaultStation) {
@@ -90,6 +87,16 @@ async function init() {
           : DEFAULTS.TRANSPORT_MODES;
       }
     }
+  }
+
+  // Restore GPS coords from the first favorite whose stopId matches the active
+  // station — runs unconditionally so that reloads (where loadSettings() already
+  // set STOP_ID before reaching the block above) also get coords.
+  if (!DEFAULTS.LAT && !DEFAULTS.LON && favorites.length > 0) {
+    const match = favorites.find((f) => f.stopId === DEFAULTS.STOP_ID);
+    const src = match || favorites[0];
+    if (typeof src.lat === 'number') DEFAULTS.LAT = src.lat;
+    if (typeof src.lon === 'number') DEFAULTS.LON = src.lon;
   }
 
   // 5. Build board DOM
