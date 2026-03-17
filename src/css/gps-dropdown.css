@@ -76,7 +76,7 @@
   white-space: nowrap;
   background: var(--overlay-medium);
   border-radius: var(--btn-border-radius);
-  padding: 6px 8px;
+  padding: 6px;
   box-shadow: 0 6px 18px var(--shadow-color);
   z-index: var(--z-dropdown);
 }

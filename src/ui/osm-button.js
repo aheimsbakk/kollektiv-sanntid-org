@@ -45,7 +45,7 @@ export function buildOsmUrl(lat, lon) {
  * @param {Function} getCoords - Returns { lat: number|null, lon: number|null }
  *   for the currently active station. Called on every click so it always
  *   reflects the live state without closures capturing stale values.
- * @returns {HTMLButtonElement} Button element; exposes .updateTooltip()
+ * @returns {HTMLButtonElement} Button element; exposes .updateTooltip() and .statusEl
  */
 export function createOsmButton(getCoords) {
   const btn = document.createElement('button');
@@ -91,74 +91,8 @@ export function createOsmButton(getCoords) {
     btn.setAttribute('aria-label', t('osmTooltip'));
   };
 
-  // Attach status to the button so callers can access it as btn.statusEl
+  // Expose status element so gps-bar.js can mount it inside the container
   btn.statusEl = status;
-
-  return btn;
-}
-  // Round to 6 decimal places (~11 cm precision) — sufficient for transit stops
-  const latStr = lat.toFixed(6);
-  const lonStr = lon.toFixed(6);
-  return `${OSM_BASE}?mlat=${latStr}&mlon=${lonStr}&zoom=${OSM_ZOOM}&layers=T`;
-}
-
-/**
- * Show a transient toast on document.body with the given message.
- * Reuses a single #osm-toast element; auto-dismisses after 3 s.
- *
- * @param {string} msg
- */
-let _osmToastTimer = null;
-function showOsmToast(msg) {
-  let toast = document.getElementById('osm-toast');
-  if (!toast) {
-    toast = document.createElement('div');
-    toast.id = 'osm-toast';
-    document.body.appendChild(toast);
-  }
-  toast.textContent = msg;
-  toast.classList.remove('hidden');
-  clearTimeout(_osmToastTimer);
-  _osmToastTimer = setTimeout(() => {
-    toast.classList.add('hidden');
-  }, 3000);
-}
-
-/**
- * Create the OSM map button element.
- *
- * @param {Function} getCoords - Returns { lat: number|null, lon: number|null }
- *   for the currently active station. Called on every click so it always
- *   reflects the live state without closures capturing stale values.
- * @returns {HTMLButtonElement} Button element; exposes .updateTooltip()
- */
-export function createOsmButton(getCoords) {
-  const btn = document.createElement('button');
-  btn.className = 'header-btn osm-btn';
-  btn.type = 'button';
-  btn.tabIndex = 1; // Shares the left-bar tab order with the compass button
-  btn.textContent = UI_EMOJIS.map;
-  btn.title = t('osmTooltip');
-  btn.setAttribute('aria-label', t('osmTooltip'));
-
-  btn.addEventListener('click', (e) => {
-    e.stopPropagation();
-
-    const coords = getCoords();
-    if (coords == null || typeof coords.lat !== 'number' || typeof coords.lon !== 'number') {
-      showOsmToast(t('osmNoCoords'));
-      return;
-    }
-
-    const url = buildOsmUrl(coords.lat, coords.lon);
-    window.location.href = url;
-  });
-
-  /** Re-read translation after a language change (called by onLanguageChange). */
-  btn.updateTooltip = function () {
-    btn.title = t('osmTooltip');
-    btn.setAttribute('aria-label', t('osmTooltip'));
-  };
 
   return btn;
 }
