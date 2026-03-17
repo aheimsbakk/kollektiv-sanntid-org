@@ -22,10 +22,17 @@ export function buildGpsBar(onStationSelect, getCoords) {
   const gpsContainer = createGpsButton(onStationSelect);
   const osmBtn = createOsmButton(getCoords);
 
+  // Wrap the OSM button in a relative container so the status message can be
+  // positioned absolutely below it — mirrors .gps-dropdown-container pattern.
+  const osmContainer = document.createElement('div');
+  osmContainer.className = 'gps-dropdown-container';
+  osmContainer.appendChild(osmBtn);
+  osmContainer.appendChild(osmBtn.statusEl);
+
   const gpsBar = document.createElement('div');
   gpsBar.className = 'gps-bar';
   gpsBar.appendChild(gpsContainer);
-  gpsBar.appendChild(osmBtn);
+  gpsBar.appendChild(osmContainer);
   document.body.appendChild(gpsBar);
 
   return { gpsContainer, osmBtn };

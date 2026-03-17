@@ -65,3 +65,22 @@
   color: var(--danger);
   font-style: normal;
 }
+
+/* OSM button "no coordinates" status — absolutely positioned below the button,
+   reuses .gps-dropdown-status / .gps-dropdown-error visual style */
+.osm-status {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  display: none;
+  white-space: nowrap;
+  background: var(--overlay-medium);
+  border-radius: var(--btn-border-radius);
+  padding: 6px 8px;
+  box-shadow: 0 6px 18px var(--shadow-color);
+  z-index: var(--z-dropdown);
+}
+
+.osm-status.visible {
+  display: block;
+}
