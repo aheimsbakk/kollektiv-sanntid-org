@@ -89,9 +89,9 @@ async function init() {
     }
   }
 
-  // Restore GPS coords from the first favorite whose stopId matches the active
-  // station — runs unconditionally so that reloads (where loadSettings() already
-  // set STOP_ID before reaching the block above) also get coords.
+  // Restore GPS coords from favorites when settings didn't have them
+  // (old saves pre-v1.40.9, or station typed manually without GPS).
+  // loadSettings() now persists LAT/LON so this is only a last-resort fallback.
   if (!DEFAULTS.LAT && !DEFAULTS.LON && favorites.length > 0) {
     const match = favorites.find((f) => f.stopId === DEFAULTS.STOP_ID);
     const src = match || favorites[0];
