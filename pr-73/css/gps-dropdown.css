@@ -15,7 +15,10 @@
   border-radius: var(--btn-border-radius);
   padding: 6px;
   width: max-content;
+  /* Clamp width so the menu never overflows past the right-edge buttons (18px gutter each side). */
+  max-width: calc(100vw - 36px);
   max-height: 420px;
+  overflow-x: hidden;
   overflow-y: auto;
   box-shadow: 0 6px 18px var(--shadow-color);
   z-index: var(--z-dropdown);
@@ -58,7 +61,8 @@
   padding: 8px;
   color: var(--text-secondary);
   font-style: italic;
-  white-space: nowrap;
+  white-space: normal;
+  word-break: break-word;
 }
 
 .gps-dropdown-error {
@@ -77,6 +81,8 @@
   background: var(--overlay-medium);
   border-radius: var(--btn-border-radius);
   padding: 6px;
+  /* Clamp width so the status box never overflows past the right-edge buttons (18px gutter each side). */
+  max-width: calc(100vw - 36px);
   box-shadow: 0 6px 18px var(--shadow-color);
   z-index: var(--z-dropdown);
 }
