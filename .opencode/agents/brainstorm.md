@@ -1,12 +1,12 @@
 ---
 description: Creative partner for bouncing ideas, discussing architecture, and solving open-ended problems
 mode: primary
-#model: anthropic/claude-sonnet-4-20250514
 temperature: 0.7
 tools:
   write: false
   edit: false
   bash: false
+  task: false
   question: false
   external_directory: false
 ---

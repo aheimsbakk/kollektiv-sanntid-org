@@ -1,9 +1,9 @@
 ---
 description: Core Software Engineer implementing features and writing code
 mode: subagent
-#model: anthropic/claude-sonnet-4-20250514
 temperature: 0.1
 tools:
+  task: false
   question: false
   external_directory: false
 ---

@@ -5,6 +5,7 @@ mode: subagent
 temperature: 0.4
 tools:
   bash: false
+  task: false
   question: false
   external_directory: false
 ---
