@@ -70,8 +70,25 @@ export function loadSettings() {
     if (typeof parsed.TEXT_SIZE === 'string' && VALID_TEXT_SIZES.includes(parsed.TEXT_SIZE)) {
       DEFAULTS.TEXT_SIZE = parsed.TEXT_SIZE;
     }
-  } catch (_) {
-    /* ignore corrupt storage */
+    // GPS coordinates — stored so the OSM button works after reload / share-link import
+    if (
+      typeof parsed.LAT === 'number' &&
+      Number.isFinite(parsed.LAT) &&
+      parsed.LAT >= -90 &&
+      parsed.LAT <= 90
+    ) {
+      DEFAULTS.LAT = parsed.LAT;
+    }
+    if (
+      typeof parsed.LON === 'number' &&
+      Number.isFinite(parsed.LON) &&
+      parsed.LON >= -180 &&
+      parsed.LON <= 180
+    ) {
+      DEFAULTS.LON = parsed.LON;
+    }
+  } catch (err) {
+    console.warn('[settings] Failed to load settings from localStorage', err);
   }
 }
 
@@ -90,10 +107,13 @@ export function saveSettings() {
       FETCH_INTERVAL: DEFAULTS.FETCH_INTERVAL,
       TRANSPORT_MODES: DEFAULTS.TRANSPORT_MODES,
       TEXT_SIZE: DEFAULTS.TEXT_SIZE,
+      // GPS coords — persisted so the OSM button survives reload and share-link import
+      LAT: typeof DEFAULTS.LAT === 'number' ? DEFAULTS.LAT : null,
+      LON: typeof DEFAULTS.LON === 'number' ? DEFAULTS.LON : null,
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(toSave));
-  } catch (_) {
-    /* ignore */
+  } catch (err) {
+    console.warn('[settings] Failed to save settings to localStorage', err);
   }
 }
 
@@ -105,7 +125,7 @@ export function applyTextSize(size) {
   try {
     document.documentElement.classList.remove(...TEXT_SIZE_CLASSES);
     document.documentElement.classList.add(`text-size-${size || 'medium'}`);
-  } catch (_) {
-    /* non-critical */
+  } catch (err) {
+    console.warn('[settings] Failed to apply text-size class', err);
   }
 }

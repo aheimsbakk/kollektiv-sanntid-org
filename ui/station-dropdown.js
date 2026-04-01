@@ -98,7 +98,7 @@ export function getDefaultStation() {
  * @param {string} name - Station name
  * @param {string} stopId - Station stop ID
  * @param {Array<string>} modes - Transport modes (e.g., ['bus', 'tram'])
- * @param {Object} settings - Optional full settings object { numDepartures, fetchInterval, textSize, language }
+ * @param {Object} settings - Optional full settings object { numDepartures, fetchInterval, textSize, language, lat, lon }
  */
 export function addRecentStation(name, stopId, modes = [], settings = {}) {
   if (!name || !stopId) return;
@@ -118,6 +118,10 @@ export function addRecentStation(name, stopId, modes = [], settings = {}) {
     fetchInterval: settings.fetchInterval,
     textSize: settings.textSize,
     language: settings.language,
+    /** GPS latitude (WGS 84) of the stop, or undefined when unknown */
+    lat: typeof settings.lat === 'number' ? settings.lat : undefined,
+    /** GPS longitude (WGS 84) of the stop, or undefined when unknown */
+    lon: typeof settings.lon === 'number' ? settings.lon : undefined,
   });
 
   // Keep only NUM_FAVORITES

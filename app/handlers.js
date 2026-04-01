@@ -30,6 +30,9 @@ import { doRefresh, startRefreshLoop, setNumDeparturesOverride } from './fetch-l
  * @param {HTMLElement} themeBtn        - Theme toggle button element
  * @param {HTMLElement} settingsBtn     - Settings gear button element
  * @param {{ updateFields?: Function }} optsRef - Mutable ref to the options panel API
+ * @param {{ current?: Object }} gpsRef          - Mutable ref to the GPS container
+ * @param {{ current?: Object }} scrollMoreRef   - Mutable ref to the scroll-more controller
+ * @param {{ current?: HTMLButtonElement }} osmRef - Mutable ref to the OSM map button
  * @returns {{ handleStationSelect, handleFavoriteToggle, onApplySettings, onLanguageChange }}
  */
 export function wireHandlers(
@@ -39,7 +42,8 @@ export function wireHandlers(
   settingsBtn,
   optsRef,
   gpsRef = {},
-  scrollMoreRef = {}
+  scrollMoreRef = {},
+  osmRef = {}
 ) {
   /**
    * Keep button tooltips in sync after a language change.
@@ -50,6 +54,7 @@ export function wireHandlers(
     themeBtn.title = t('themeTooltip');
     settingsBtn.title = t('settingsTooltip');
     if (gpsRef.current?.updateTooltip) gpsRef.current.updateTooltip();
+    if (osmRef.current?.updateTooltip) osmRef.current.updateTooltip();
     updateFavoriteButton(board.favoriteBtn, DEFAULTS.STOP_ID, DEFAULTS.TRANSPORT_MODES);
   }
 
@@ -57,7 +62,7 @@ export function wireHandlers(
    * Shared core for activating a new station.
    * Updates DEFAULTS, syncs UI, optionally promotes to favorites, and triggers a refresh.
    *
-   * @param {Object}  station         - { name, stopId, modes, numDepartures?, fetchInterval?, textSize?, language? }
+   * @param {Object}  station         - { name, stopId, modes, lat?, lon?, numDepartures?, fetchInterval?, textSize?, language? }
    * @param {boolean} addToFavorites  - When true, upserts into the favorites list and refreshes the dropdown
    */
   function applyStation(station, addToFavorites) {
@@ -66,6 +71,10 @@ export function wireHandlers(
     if (Array.isArray(station.modes)) {
       DEFAULTS.TRANSPORT_MODES = station.modes;
     }
+
+    // Update GPS coordinates for the OSM button; null when not available
+    DEFAULTS.LAT = typeof station.lat === 'number' ? station.lat : null;
+    DEFAULTS.LON = typeof station.lon === 'number' ? station.lon : null;
 
     // Sync the dropdown title and, if the options panel is open, its fields
     board.stationDropdown.updateTitle(station.name, station.modes || DEFAULTS.TRANSPORT_MODES);
@@ -80,6 +89,8 @@ export function wireHandlers(
         fetchInterval: station.fetchInterval ?? DEFAULTS.FETCH_INTERVAL,
         textSize: station.textSize ?? DEFAULTS.TEXT_SIZE,
         language: station.language ?? getLanguage(),
+        lat: DEFAULTS.LAT,
+        lon: DEFAULTS.LON,
       });
       board.stationDropdown.refresh();
     }
@@ -87,7 +98,9 @@ export function wireHandlers(
     // Update the browser tab title
     try {
       document.title = station.name || document.title;
-    } catch (_) {}
+    } catch (err) {
+      console.warn('[handlers] Failed to update document.title', err);
+    }
 
     // Reset scroll-more temporary departure count on station change
     setNumDeparturesOverride(null);
@@ -109,8 +122,9 @@ export function wireHandlers(
   /**
    * Called when the user selects a station from the favorites dropdown.
    * Promotes the selection to the top of the favorites list.
+   * GPS coordinates are restored from the saved favorite entry when present.
    *
-   * @param {Object} station - { name, stopId, modes, numDepartures?, fetchInterval?, textSize?, language? }
+   * @param {Object} station - { name, stopId, modes, lat?, lon?, numDepartures?, fetchInterval?, textSize?, language? }
    */
   function handleStationSelect(station) {
     applyStation(station, true);
@@ -121,13 +135,20 @@ export function wireHandlers(
    * Loads the stop without adding it to favorites — that is an explicit user action.
    * Resets transport modes to all modes reported for that stop so the board
    * shows every service available at the selected station.
+   * GPS coordinates from the Geocoder feature geometry are preserved.
    *
-   * @param {Object} station - { name, stopId, modes }
+   * @param {Object} station - { name, stopId, modes, lat?, lon? }
    */
   function handleGpsStationSelect(station) {
     // Always apply all transport modes — the stop's modes are display-only in the dropdown list.
     applyStation(
-      { name: station.name, stopId: station.stopId, modes: ALL_TRANSPORT_MODES.slice() },
+      {
+        name: station.name,
+        stopId: station.stopId,
+        modes: ALL_TRANSPORT_MODES.slice(),
+        lat: station.lat,
+        lon: station.lon,
+      },
       false
     );
   }
@@ -146,6 +167,8 @@ export function wireHandlers(
           fetchInterval: DEFAULTS.FETCH_INTERVAL,
           textSize: DEFAULTS.TEXT_SIZE,
           language: getLanguage(),
+          lat: DEFAULTS.LAT,
+          lon: DEFAULTS.LON,
         });
       }
       if (board.stationDropdown) board.stationDropdown.refresh();
@@ -167,13 +190,21 @@ export function wireHandlers(
     DEFAULTS.TRANSPORT_MODES = newOpts.TRANSPORT_MODES;
     DEFAULTS.TEXT_SIZE = newOpts.TEXT_SIZE;
 
+    // Update GPS coordinates for the OSM button when coming from station autocomplete
+    if (typeof newOpts.LAT === 'number') DEFAULTS.LAT = newOpts.LAT;
+    else if (newOpts.LAT === null) DEFAULTS.LAT = null;
+    if (typeof newOpts.LON === 'number') DEFAULTS.LON = newOpts.LON;
+    else if (newOpts.LON === null) DEFAULTS.LON = null;
+
     // Sync the dropdown title
     if (board.stationDropdown) {
       board.stationDropdown.updateTitle(DEFAULTS.STATION_NAME, DEFAULTS.TRANSPORT_MODES);
     }
     try {
       document.title = DEFAULTS.STATION_NAME || document.title;
-    } catch (_) {}
+    } catch (err) {
+      console.warn('[handlers] Failed to update document.title', err);
+    }
 
     applyTextSize(newOpts.TEXT_SIZE);
     updateFavoriteButton(board.favoriteBtn, DEFAULTS.STOP_ID, DEFAULTS.TRANSPORT_MODES);
