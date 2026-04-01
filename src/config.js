@@ -1,6 +1,6 @@
 // Version is defined here and in src/sw.js (service worker)
 // Both must be kept in sync - use scripts/bump-version.sh to update both
-export const VERSION = '1.39.2';
+export const VERSION = '1.40.17';
 
 // Brand name used in the options panel title and HTML <title>.
 // Intentionally not translated — this is a proper name.
@@ -9,6 +9,10 @@ export const APP_NAME = 'Kollektiv.Sanntid.org';
 export const DEFAULTS = {
   STATION_NAME: 'Jernbanetorget, Oslo',
   STOP_ID: null, // When set, skip lookup and use this ID directly
+  /** GPS latitude of the current station/stop (WGS 84). null when unknown. */
+  LAT: null,
+  /** GPS longitude of the current station/stop (WGS 84). null when unknown. */
+  LON: null,
   NUM_DEPARTURES: 5,
   NUM_FAVORITES: 8,
   FETCH_INTERVAL: 60,
@@ -38,6 +42,7 @@ export const MODE_GRID = [
 export const REALTIME_INDICATORS = {
   realtime: '●', // Solid dot for live realtime data
   scheduled: '○', // Hollow dot for scheduled/static data
+  delayed: '◆', // Black diamond for delayed departures
 };
 
 // Minimum delay in milliseconds before the realtime indicator turns red.
@@ -71,6 +76,7 @@ export const UI_EMOJIS = {
   footerLink: '🔗', // Entur data attribution link
   footerReadme: '📘', // GitHub README link
   compass: '🧭', // GPS nearby-stops button (top-left toolbar)
+  map: '🗺️', // OpenStreetMap button (top-left toolbar, below compass)
 };
 
 // Cancellation display wrapper

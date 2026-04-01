@@ -68,8 +68,11 @@ export function createDepartureNode(item) {
   // Delayed = realtime data present AND aimedDepartureISO < expectedDepartureISO.
   // Delayed departures get a solid dot rendered in --danger (red) color.
   const isDelayed = isDepartureDelayed(item);
-  const indicatorSymbol =
-    item && item.realtime === true ? REALTIME_INDICATORS.realtime : REALTIME_INDICATORS.scheduled;
+  const indicatorSymbol = isDelayed
+    ? REALTIME_INDICATORS.delayed
+    : item && item.realtime === true
+      ? REALTIME_INDICATORS.realtime
+      : REALTIME_INDICATORS.scheduled;
 
   // Build indicator as a DOM element so we can apply --danger color independently.
   const indicatorEl = document.createElement('span');

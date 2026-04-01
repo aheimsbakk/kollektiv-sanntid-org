@@ -16,6 +16,8 @@ There are two ways to pick a station:
 
 **By location** — click the **🧭 compass** button in the top left. The app asks for your location and instantly lists the nearest stops with their distance and transport modes. Click any result to load it.
 
+**On the map** — click the **🗺️ map** button (below the compass) to open the current station on [OpenStreetMap](https://www.openstreetmap.org/) in a new tab. The map opens at zoom level 16 with the transport layer active and a pin on the station's exact coordinates.
+
 Once a station is loaded, choose which transport types you want to see, then click **Close** to apply.
 
 To save the station to your favorites, click the **🩶 heart button** to the left of the station name. The heart is gray when a station is not saved. Once saved, the heart turns red ❤️ — and remains **clickable**. Click it again to **remove** the station from your favorites.
@@ -32,7 +34,7 @@ If you have no favorites yet, the app pre-seeds **Jernbanetorget, Oslo** as a st
 
 ### Sharing Your Board
 
-Click the **📋 share** button (next to the theme toggle) to copy a shareable link to your clipboard. This link includes:
+Click the **📋 share** button (top left, next to the compass) to copy a shareable link to your clipboard. This link includes:
 
 - Your current station
 - Selected transport modes
@@ -52,6 +54,13 @@ Click the **🧭 compass** button in the top left to find stops near your curren
 
 The dropdown closes automatically when you select a stop or press **Escape**.
 
+### OpenStreetMap View
+
+Click the **🗺️ map** button (below the compass) to open the current station on [OpenStreetMap](https://www.openstreetmap.org/) in a new tab:
+
+- Opens at **zoom level 16** with the **Transport layer** active
+- Places a **pin marker** at the station's exact coordinates
+
 ### Loading More Departures
 
 Scroll down past the last departure to progressively load more:
@@ -68,8 +77,8 @@ The extra departures are temporary — the count resets when you switch station,
 The app displays upcoming departures with:
 
 - **Line number and destination** for each service (e.g., "Ski ● L2 🚅")
-- **Realtime indicators** — ● solid dot for live tracking, ○ hollow dot for scheduled times
-- **Delay indicator** — the solid dot turns **red** (●) when a live-tracked departure is running **2 minutes or more late**. Only shown when realtime tracking is active and the expected departure is at least 120 seconds after the originally scheduled time. Small adjustments under 2 minutes are treated as normal tracking noise and do not trigger the red dot.
+- **Realtime indicators** — ● solid dot for live tracking, ○ hollow dot for scheduled times, ◆ diamond for delayed
+- **Delay indicator** — the indicator changes to a **red diamond** (◆) when a live-tracked departure is running **2 minutes or more late**. Only shown when realtime tracking is active and the expected departure is at least 120 seconds after the originally scheduled time. Small adjustments under 2 minutes are treated as normal tracking noise and do not trigger the delay symbol.
 - **Platform/gate information** — shows platforms (⚏10), gates (◆A), or stops (▪B) where available
 - **Countdown timer** showing minutes until departure
 - **Transport icons** (🚌 🚋 🚇 🚅 🛳️ 🚍) to identify the vehicle type
@@ -125,7 +134,7 @@ Your theme choice is saved automatically.
 
 ### Keyboard Navigation
 
-- Press **Tab** to navigate between station dropdown, compass button, theme toggle, settings, and GitHub link
+- Press **Tab** to navigate between station dropdown, compass button, share button, map button, theme toggle, settings, and GitHub link
 - Press **Escape** to close the settings panel or GPS nearby-stops dropdown
 - Tab through settings panel fields when open
 

@@ -89,12 +89,24 @@ async function init() {
     }
   }
 
+  // Restore GPS coords from favorites when settings didn't have them
+  // (old saves pre-v1.40.9, or station typed manually without GPS).
+  // loadSettings() now persists LAT/LON so this is only a last-resort fallback.
+  // Use strict null check — 0 is a valid coordinate value (equator / prime meridian).
+  if (DEFAULTS.LAT === null && DEFAULTS.LON === null && favorites.length > 0) {
+    const match = favorites.find((f) => f.stopId === DEFAULTS.STOP_ID);
+    const src = match || favorites[0];
+    if (typeof src.lat === 'number') DEFAULTS.LAT = src.lat;
+    if (typeof src.lon === 'number') DEFAULTS.LON = src.lon;
+  }
+
   // 5. Build board DOM
   // optsRef is a mutable box so handlers.js can call opts.updateFields()
   // without a circular import — it is filled in after createOptionsPanel.
   const optsRef = { current: null };
   const gpsRef = { current: null };
   const scrollMoreRef = { current: null };
+  const osmRef = { current: null };
 
   const board = createBoardElements(
     DEFAULTS.STATION_NAME,
@@ -130,15 +142,22 @@ async function init() {
     settingsBtn,
     optsRef,
     gpsRef,
-    scrollMoreRef
+    scrollMoreRef,
+    osmRef
   );
   const opts = createOptionsPanel(DEFAULTS, handlers.onApplySettings, handlers.onLanguageChange);
   optsRef.current = opts;
   document.body.appendChild(opts.panel);
 
   // 7b. Mount the GPS compass bar (top-left) — uses dedicated handler that does NOT auto-save to favorites
-  const { gpsContainer } = buildGpsBar((station) => handlers.handleGpsStationSelect(station));
+  //     Share button is passed in to render it to the right of the compass button.
+  const { gpsContainer, osmBtn } = buildGpsBar(
+    (station) => handlers.handleGpsStationSelect(station),
+    () => ({ lat: DEFAULTS.LAT, lon: DEFAULTS.LON }),
+    shareComponents.button
+  );
   gpsRef.current = gpsContainer;
+  osmRef.current = osmBtn;
 
   // Expose board and gpsRef to the module-level pagehide teardown so that
   // document-level listeners in station-dropdown and gps-dropdown are removed

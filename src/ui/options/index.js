@@ -143,6 +143,8 @@ export function createOptionsPanel(defaults, onApply, onLanguageChange) {
     const raw = {
       STATION_NAME: stationAC.getValue(),
       STOP_ID: stationAC.getStopId() || null,
+      LAT: stationAC.getLat(),
+      LON: stationAC.getLon(),
       NUM_DEPARTURES: inpNum.value,
       FETCH_INTERVAL: inpInt.value,
       TRANSPORT_MODES: modes.getChecked(),

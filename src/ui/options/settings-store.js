@@ -17,13 +17,15 @@ export function loadSettings() {
 export function saveSettings(opts) {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(opts));
-  } catch (e) { /* ignore */ }
+  } catch (e) {
+    /* ignore */
+  }
 }
 
 /**
  * Validate and normalise raw form values against defaults.
  * Enforces minimums and fills missing fields.
- * @param {object} raw   — { STATION_NAME, STOP_ID, NUM_DEPARTURES, FETCH_INTERVAL, TRANSPORT_MODES, TEXT_SIZE }
+ * @param {object} raw   — { STATION_NAME, STOP_ID, LAT, LON, NUM_DEPARTURES, FETCH_INTERVAL, TRANSPORT_MODES, TEXT_SIZE }
  * @param {object} defaults
  * @returns {object} normalised options object
  */
@@ -34,13 +36,16 @@ export function validateOptions(raw, defaults) {
   let fetchInterval = Number(raw.FETCH_INTERVAL) || defaults.FETCH_INTERVAL;
   if (fetchInterval < 20) fetchInterval = 20;
 
-  const modes = Array.isArray(raw.TRANSPORT_MODES) && raw.TRANSPORT_MODES.length
-    ? raw.TRANSPORT_MODES
-    : ALL_TRANSPORT_MODES;
+  const modes =
+    Array.isArray(raw.TRANSPORT_MODES) && raw.TRANSPORT_MODES.length
+      ? raw.TRANSPORT_MODES
+      : ALL_TRANSPORT_MODES;
 
   return {
     STATION_NAME: raw.STATION_NAME || defaults.STATION_NAME,
     STOP_ID: raw.STOP_ID || null,
+    LAT: typeof raw.LAT === 'number' ? raw.LAT : null,
+    LON: typeof raw.LON === 'number' ? raw.LON : null,
     NUM_DEPARTURES: numDepartures,
     FETCH_INTERVAL: fetchInterval,
     TRANSPORT_MODES: modes,

@@ -19,6 +19,7 @@ User-facing features
 - Station header (clickable) opens favorites dropdown (up to `NUM_FAVORITES` recent stations with saved settings). On first load with empty favorites, `getDefaultStation()` (decodes `DEFAULT_FAVORITE`) is used as the startup station — it is **not written** to the favorites list.
 - Favorite heart button is always enabled. Gray heart 🩶 = not in favorites (click to add, theme-neutral). Red heart ❤️ = already in favorites (click to remove). `handleFavoriteToggle` in `handlers.js` performs the toggle; `removeFromFavorites` in `station-dropdown.js` handles removal.
 - GPS compass button 🧭 (fixed top-left, same `.header-btn` style as top-right buttons). Click → requests browser geolocation → fetches up to `GPS_MAX_RESULTS` (10) nearest stops within `GPS_SEARCH_RADIUS_KM` (2 km) via Entur Geocoder reverse API → shows a temporary dropdown listing stops rendered from `GPS_STOP_LINE_TEMPLATE` (name + distance + mode emojis). Selecting a stop sets it as the current station and closes the dropdown. The heart button is then available to save to favorites.
+- OpenStreetMap button 🗺️ (fixed top-left, same `.header-btn` style, below compass button). Opens `https://www.openstreetmap.org/?mlat={lat}&mlon={lon}&zoom=16&layers=T` (Transport layer, zoom 16, pin marker) in a new tab for the current station's coordinates. Disabled (no action) when no coordinates are available, tooltip changes to `osmNoCoords` translation. Coordinates (`LAT`/`LON`) are stored in `DEFAULTS`, in favorites (as `lat`/`lon` fields), and in share URLs (5-element encoded array).
 - Up to N upcoming departures (configurable).
 - Departure line: destination, realtime indicator (● live / ○ scheduled / 🔴 delayed — red ● when realtime=true AND aimedDepartureISO < expectedDepartureISO), line number, transport emoji, platform symbol+code.
 - Cancelled departures shown with strikethrough and reduced opacity.
@@ -29,7 +30,7 @@ User-facing features
 - Settings persisted to `localStorage` (`departure:settings`): station name, stop ID, N, modes, text size, fetch interval.
 - Language persisted to `localStorage` (`departure:language`): 12 supported languages.
 - Theme persisted to `localStorage` (`departure:theme`): light / auto / dark cycle.
-- Share button: encodes full board config as compact base64 URL (`?b=`), backward-compatible with `?board=` (legacy).
+- Share button: encodes full board config as compact base64 URL (`?b=`), backward-compatible with `?board=` (legacy). GPS coordinates included as 5-element array `[name, stopId, modes, lat, lon]`.
 - PWA: installable via `manifest.webmanifest`, offline-capable via service worker (`sw.js`).
 - Auto-update flow: service worker detects new version, shows 5-second countdown toast, then reloads.
 - No external fonts required — use system fonts + CSS for visual effect.
@@ -143,7 +144,7 @@ UI/UX & styling
 - Button system in `src/css/buttons.css`: `button` base → `.btn-icon`/`.header-btn` (icon toolbar) → `.btn-action`/`.share-url-close` (prominent actions). All three global toolbar buttons (share, theme, gear) carry `.header-btn` for uniform 26px emoji size. Button emojis sourced from `UI_EMOJIS` in `config.js`.
 - Departure line rendered from `DEPARTURE_LINE_TEMPLATE` (configurable in `config.js`).
 - Platform symbol selected by `PLATFORM_SYMBOL_RULES` (ordered rule list in `config.js`): water→berth, bus+alphanumeric→bay, bus+single-letter→gate, bus→stop, tram→stop, rail/metro→platform.
-- Realtime indicator: `●` (solid, live) / `○` (hollow, scheduled) from `REALTIME_INDICATORS` in `config.js`. When `realtime === true` AND `aimedDepartureISO < expectedDepartureISO`, the indicator span gets class `.indicator--delayed` (CSS `color: var(--danger)` → red). Logic lives in `isDepartureDelayed()` exported from `src/ui/departure.js`.
+- Realtime indicator: `●` (solid, live) / `○` (hollow, scheduled) / `◆` (black diamond, delayed) from `REALTIME_INDICATORS` in `config.js`. When `realtime === true` AND `aimedDepartureISO < expectedDepartureISO`, the indicator span gets class `.indicator--delayed` (CSS `color: var(--danger)` → red) and uses `REALTIME_INDICATORS.delayed`. Logic lives in `isDepartureDelayed()` exported from `src/ui/departure.js`.
 - Cancellation: wraps line in `.departure-cancelled` (strikethrough + reduced opacity) via `CANCELLATION_WRAPPER` in `config.js`.
 - Auto-centering: Flexbox column + `justify-content:center; align-items:center; min-height:100vh`.
 - Responsive: text sizes reduce on small screens; vertical centering maintained.
@@ -155,12 +156,12 @@ Internationalisation (i18n)
 - `t(key)` returns the string for the current language (falls back to `en`).
 - Language persisted in `localStorage` key `departure:language`.
 - Supported: `en`, `no`, `de`, `es`, `it`, `el`, `fa`, `hi`, `is`, `uk`, `fr`, `pl`.
-- All 12 languages carry the full key set including GPS keys (`gpsTooltip`, `gpsLocating`, `gpsNoResults`, `gpsFetchError`, `gpsNotSupported`, `gpsPermissionDenied`, `gpsUnavailable`, `gpsMeters`) and scroll-more keys (`scrollForMore`, `scrollMaxReached`).
+- All 12 languages carry the full key set including GPS keys (`gpsTooltip`, `gpsLocating`, `gpsNoResults`, `gpsFetchError`, `gpsNotSupported`, `gpsPermissionDenied`, `gpsUnavailable`, `gpsMeters`), OSM keys (`osmTooltip`, `osmNoCoords`), and scroll-more keys (`scrollForMore`, `scrollMaxReached`).
 - Language switcher in options panel uses flag buttons; changing language updates all translatable strings in the open panel in-place (footer and tooltips refreshed via `onLanguageChange` callback — the panel is **not** recreated).
 
 Share URL format
 
-- Encoding: compact JSON array `[stationName, stopId, modes[]]` (3 elements) → JSON.stringify → btoa (URL-safe: `+`→`-`, `/`→`_`, strip `=`).
+- Encoding: compact JSON array `[stationName, stopId, modes[]]` (3 elements, legacy) or `[stationName, stopId, modes[], lat, lon]` (5 elements, v1.40.0+) → JSON.stringify → btoa (URL-safe: `+`→`-`, `/`→`_`, strip `=`).
 - URL param: `?b=<encoded>` (v1.24.0+). Legacy `?board=<encoded>` decoded for backward compat.
 - Decoding detects array vs object format automatically; supports legacy 7-element array `[name, stopId, modes, departures, interval, size, lang]` and legacy object format `{n, s, m, d, i, t, l}`.
 - Opening a shared link applies settings, saves to `localStorage`, sets as current station (does NOT add to favorites), then clears URL param.
@@ -172,7 +173,7 @@ PWA & Service Worker
 - `src/sw.js`: versioned cache name (`kollektiv-v<VERSION>`), caches all app assets on install, serves from cache with network fallback.
 - Update flow: new SW detected → 5-second countdown toast shows old→new version → `skipWaiting` → `controllerchange` triggers hard reload with `?t=<timestamp>` cache-bust.
 - PWA wake-up on resume: `visibilitychange` in `fetch-loop.js` checks wall-clock elapsed time vs `FETCH_INTERVAL`; triggers immediate `doRefresh()` if stale. `pageshow` (event.persisted) in `app.js` forces full reload on BFCache cold-start.
-- VERSION in `src/config.js` and `src/sw.js` must stay in sync — use `scripts/bump-version.sh`. Current version: `1.38.7`.
+- VERSION in `src/config.js` and `src/sw.js` must stay in sync — use `scripts/bump-version.sh`. Current version: `1.40.0`.
 
 Performance & DOM update pattern
 
@@ -198,12 +199,10 @@ Settings & persistence
 Testing & dev workflow (no deps)
 
 - Manual smoke tests:
-
   - Load `src/index.html` via local server, confirm station lookup, departures, countdowns decrement.
   - Simulate network failure using devtools offline.
 
 - Node-local unit tests:
-
   - Place tests under `tests/` as ESM modules (e.g. `tests/time.test.mjs`). Run: `node tests/run.mjs` or `npm test`.
   - Use Node's built-in `assert` API — no test framework.
   - Keep tests hermetic: no DOM APIs or `fetch`.
@@ -225,7 +224,7 @@ Current file tree (implemented)
 - `src/css/` (tokens, base, buttons, layout, utils, header, toolbar, departures, scroll-more, options-panel, autocomplete, transport-modes, language-switcher, share-modal, toasts, footer, debug)
 - `src/app.js`
 - `src/app/` (settings.js, url-import.js, render.js, fetch-loop.js, handlers.js, action-bar.js, gps-bar.js, scroll-more.js, sw-updater.js)
-  - `gps-bar.js` — mounts `.gps-bar` fixed top-left container with compass button
+  - `gps-bar.js` — mounts `.gps-bar` fixed top-left container with compass button and OSM map button; returns `{ gpsContainer, osmBtn }`
 - `src/config.js`
 - `src/entur/` (index.js, modes.js, parser.js, query.js, http.js, departures.js, geocoder.js, gps-search.js)
 - `src/time.js`
@@ -243,6 +242,7 @@ Current file tree (implemented)
 - `src/ui/share-button.js`
 - `src/ui/station-dropdown.js`
 - `src/ui/theme-toggle.js`
+- `src/ui/osm-button.js` — `buildOsmUrl(lat, lon)` pure function + `createOsmButton(getCoords)` factory; opens OSM Transport layer at zoom=16 with pin marker; exposes `updateTooltip()` for i18n refresh
 - `src/ui/mode-utils.js` — shared helpers: `emojiForMode(mode)`, `labelForMode(mode)` (consolidated from departure.js, station-dropdown.js, transport-modes.js)
 
 Commit & agent protocol notes (required)
