@@ -16,7 +16,7 @@ There are two ways to pick a station:
 
 **By location** — click the **🧭 compass** button in the top left. The app asks for your location and instantly lists the nearest stops with their distance and transport modes. Click any result to load it.
 
-**On the map** — click the **🗺️ map** button (below the compass) to open the current station on [OpenStreetMap](https://www.openstreetmap.org/) in a new tab. The map opens at zoom level 16 with the transport layer active and a pin on the station's exact coordinates. The button is disabled when no coordinates are available for the current station.
+**On the map** — click the **🗺️ map** button (below the compass) to open the current station on [OpenStreetMap](https://www.openstreetmap.org/) in a new tab. The map opens at zoom level 16 with the transport layer active and a pin on the station's exact coordinates.
 
 Once a station is loaded, choose which transport types you want to see, then click **Close** to apply.
 
@@ -60,9 +60,6 @@ Click the **🗺️ map** button (below the compass) to open the current station
 
 - Opens at **zoom level 16** with the **Transport layer** active
 - Places a **pin marker** at the station's exact coordinates
-- Useful for confirming which physical stop or entrance to head for
-
-The button is disabled when no coordinates are available for the current station (e.g. a station loaded by name search before coordinates are resolved). Coordinates are saved automatically when a station is selected via GPS nearby stops or a shared link.
 
 ### Loading More Departures
 
