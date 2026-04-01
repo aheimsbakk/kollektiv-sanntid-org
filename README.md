@@ -16,6 +16,8 @@ There are two ways to pick a station:
 
 **By location** — click the **🧭 compass** button in the top left. The app asks for your location and instantly lists the nearest stops with their distance and transport modes. Click any result to load it.
 
+**On the map** — click the **🗺️ map** button (below the compass) to open the current station on [OpenStreetMap](https://www.openstreetmap.org/) in a new tab. The map opens at zoom level 16 with the transport layer active and a pin on the station's exact coordinates. The button is disabled when no coordinates are available for the current station.
+
 Once a station is loaded, choose which transport types you want to see, then click **Close** to apply.
 
 To save the station to your favorites, click the **🩶 heart button** to the left of the station name. The heart is gray when a station is not saved. Once saved, the heart turns red ❤️ — and remains **clickable**. Click it again to **remove** the station from your favorites.
@@ -32,7 +34,7 @@ If you have no favorites yet, the app pre-seeds **Jernbanetorget, Oslo** as a st
 
 ### Sharing Your Board
 
-Click the **📋 share** button (next to the theme toggle) to copy a shareable link to your clipboard. This link includes:
+Click the **📋 share** button (top left, next to the compass) to copy a shareable link to your clipboard. This link includes:
 
 - Your current station
 - Selected transport modes
@@ -51,6 +53,16 @@ Click the **🧭 compass** button in the top left to find stops near your curren
 - Click any stop to load it immediately — then use the ❤️ heart to save it
 
 The dropdown closes automatically when you select a stop or press **Escape**.
+
+### OpenStreetMap View
+
+Click the **🗺️ map** button (below the compass) to open the current station on [OpenStreetMap](https://www.openstreetmap.org/) in a new tab:
+
+- Opens at **zoom level 16** with the **Transport layer** active
+- Places a **pin marker** at the station's exact coordinates
+- Useful for confirming which physical stop or entrance to head for
+
+The button is disabled when no coordinates are available for the current station (e.g. a station loaded by name search before coordinates are resolved). Coordinates are saved automatically when a station is selected via GPS nearby stops or a shared link.
 
 ### Loading More Departures
 
@@ -125,7 +137,7 @@ Your theme choice is saved automatically.
 
 ### Keyboard Navigation
 
-- Press **Tab** to navigate between station dropdown, compass button, theme toggle, settings, and GitHub link
+- Press **Tab** to navigate between station dropdown, compass button, share button, map button, theme toggle, settings, and GitHub link
 - Press **Escape** to close the settings panel or GPS nearby-stops dropdown
 - Tab through settings panel fields when open
 

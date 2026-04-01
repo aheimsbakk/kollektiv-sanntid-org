@@ -150,9 +150,11 @@ async function init() {
   document.body.appendChild(opts.panel);
 
   // 7b. Mount the GPS compass bar (top-left) — uses dedicated handler that does NOT auto-save to favorites
+  //     Share button is passed in to render it to the right of the compass button.
   const { gpsContainer, osmBtn } = buildGpsBar(
     (station) => handlers.handleGpsStationSelect(station),
-    () => ({ lat: DEFAULTS.LAT, lon: DEFAULTS.LON })
+    () => ({ lat: DEFAULTS.LAT, lon: DEFAULTS.LON }),
+    shareComponents.button
   );
   gpsRef.current = gpsContainer;
   osmRef.current = osmBtn;

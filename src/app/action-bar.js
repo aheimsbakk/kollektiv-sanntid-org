@@ -4,7 +4,7 @@
  * Responsibilities:
  *   - Create the share button, theme toggle, and settings gear button
  *   - Bundle theme+settings into the fixed top-right `.settings-bar` container (above panel)
- *   - Bundle share into the separate `.share-bar` container (below panel, covered when open)
+ *   - Return shareComponents (button mounted by gps-bar.js into the top-left bar)
  *   - Append the share URL-display fallback box to the body
  *   - Return references needed by other modules (tooltips, theme callback)
  */
@@ -71,21 +71,6 @@ export function buildActionBar(board, onOpenSettings, onCloseSettings) {
   document.body.appendChild(settingsBar);
 
   shareComponents.button.tabIndex = 2;
-
-  // .share-bar: share button only — sits below the options panel (covered when open).
-  // Position is anchored to the left edge of .settings-bar so the gap is always exact,
-  // regardless of emoji rendering width. Measured once after first paint via rAF.
-  const shareBar = document.createElement('div');
-  shareBar.className = 'share-bar';
-  shareBar.appendChild(shareComponents.button);
-  document.body.appendChild(shareBar);
-
-  requestAnimationFrame(() => {
-    const rect = settingsBar.getBoundingClientRect();
-    // right = distance from viewport right edge to settings-bar left edge + gap
-    const rightOffset = window.innerWidth - rect.left + 8;
-    shareBar.style.right = `${rightOffset}px`;
-  });
 
   // Fallback URL-display box (shown when clipboard write is unavailable)
   document.body.appendChild(shareComponents.urlBox);
