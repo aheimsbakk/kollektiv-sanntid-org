@@ -1,9 +1,12 @@
 /**
- * gps-bar.js — GPS action bar (top-left: compass button + OSM map button)
+ * gps-bar.js — GPS action bar (top-left: compass button, share button, OSM map button)
  *
- * Creates a fixed top-left bar containing:
- *   1. GPS nearby-stops button (🧭 compass)
- *   2. OpenStreetMap button (🗺️) — opens OSM with a pin at the current station
+ * Creates a fixed top-left bar with the following layout:
+ *   🧭  📋
+ *   🗺️
+ *
+ * The compass and OSM buttons are stacked vertically in a column; the share
+ * button sits to the right of the compass button on the top row.
  *
  * Mirrors the pattern of action-bar.js (top-right bar) for the left side.
  */
@@ -14,11 +17,12 @@ import { createOsmButton } from '../ui/osm-button.js';
 /**
  * Build and mount the GPS action bar.
  *
- * @param {Function} onStationSelect - Called with { name, stopId, modes } when a nearby stop is chosen
- * @param {Function} getCoords       - Returns { lat, lon } for the active station (called on each OSM click)
+ * @param {Function}     onStationSelect - Called with { name, stopId, modes } when a nearby stop is chosen
+ * @param {Function}     getCoords       - Returns { lat, lon } for the active station (called on each OSM click)
+ * @param {HTMLElement}  shareBtn        - The share button element (from action-bar.js)
  * @returns {{ gpsContainer: HTMLElement, osmBtn: HTMLButtonElement }}
  */
-export function buildGpsBar(onStationSelect, getCoords) {
+export function buildGpsBar(onStationSelect, getCoords, shareBtn) {
   const gpsContainer = createGpsButton(onStationSelect);
   const osmBtn = createOsmButton(getCoords);
 
@@ -29,10 +33,16 @@ export function buildGpsBar(onStationSelect, getCoords) {
   osmContainer.appendChild(osmBtn);
   osmContainer.appendChild(osmBtn.statusEl);
 
+  // Left column: compass on top, OSM map below
+  const leftCol = document.createElement('div');
+  leftCol.className = 'gps-bar__col';
+  leftCol.appendChild(gpsContainer);
+  leftCol.appendChild(osmContainer);
+
   const gpsBar = document.createElement('div');
   gpsBar.className = 'gps-bar';
-  gpsBar.appendChild(gpsContainer);
-  gpsBar.appendChild(osmContainer);
+  gpsBar.appendChild(leftCol);
+  if (shareBtn) gpsBar.appendChild(shareBtn);
   document.body.appendChild(gpsBar);
 
   return { gpsContainer, osmBtn };

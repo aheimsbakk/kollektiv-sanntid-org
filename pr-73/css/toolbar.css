@@ -2,8 +2,7 @@
    GLOBAL TOOLBAR
    Fixed top-right action bar: two separate stacking contexts.
      .settings-bar  — theme + settings gear (always ABOVE options panel)
-     .share-bar     — share button only (BELOW options panel, covered when open)
-   Fixed top-left GPS bar (compass nearby-stops button, BELOW options panel).
+   Fixed top-left GPS bar (compass, share, OSM buttons — BELOW options panel).
    Mirrors: src/app/action-bar.js, src/app/gps-bar.js
    ====================================================================== */
 
@@ -26,31 +25,22 @@
   transform: scale(0.95);
 }
 
-/* Share button: sits left of the settings bar, covered by options panel when open.
-   Exact right offset is set by action-bar.js via getBoundingClientRect after first paint. */
-.share-bar {
-  position: fixed;
-  top: 18px;
-  z-index: var(--z-share);
-  display: flex;
-  align-items: center;
-}
-
-.share-bar button:hover:not(:disabled) {
-  transform: scale(1.05);
-}
-
-.share-bar button:active:not(:disabled) {
-  transform: scale(0.95);
-}
-
 /* ── Top-left GPS bar ───────────────────────────────────────────────── */
-/* Compass button: below the options panel */
+/* Layout:  🧭  📋
+            🗺️
+   .gps-bar__col stacks compass + OSM vertically; share sits beside the col. */
 .gps-bar {
   position: fixed;
   left: 18px;
   top: 18px;
   z-index: var(--z-compass);
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.gps-bar__col {
   display: flex;
   flex-direction: column;
   gap: 8px;
