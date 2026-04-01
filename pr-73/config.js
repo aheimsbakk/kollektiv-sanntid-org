@@ -1,6 +1,6 @@
 // Version is defined here and in src/sw.js (service worker)
 // Both must be kept in sync - use scripts/bump-version.sh to update both
-export const VERSION = '1.40.16';
+export const VERSION = '1.40.17';
 
 // Brand name used in the options panel title and HTML <title>.
 // Intentionally not translated — this is a proper name.
@@ -42,7 +42,7 @@ export const MODE_GRID = [
 export const REALTIME_INDICATORS = {
   realtime: '●', // Solid dot for live realtime data
   scheduled: '○', // Hollow dot for scheduled/static data
-  delayed: '⬦', // White medium diamond for delayed departures
+  delayed: '◆', // Black diamond for delayed departures
 };
 
 // Minimum delay in milliseconds before the realtime indicator turns red.
