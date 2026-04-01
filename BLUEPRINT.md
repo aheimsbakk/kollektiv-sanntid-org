@@ -144,7 +144,7 @@ UI/UX & styling
 - Button system in `src/css/buttons.css`: `button` base → `.btn-icon`/`.header-btn` (icon toolbar) → `.btn-action`/`.share-url-close` (prominent actions). All three global toolbar buttons (share, theme, gear) carry `.header-btn` for uniform 26px emoji size. Button emojis sourced from `UI_EMOJIS` in `config.js`.
 - Departure line rendered from `DEPARTURE_LINE_TEMPLATE` (configurable in `config.js`).
 - Platform symbol selected by `PLATFORM_SYMBOL_RULES` (ordered rule list in `config.js`): water→berth, bus+alphanumeric→bay, bus+single-letter→gate, bus→stop, tram→stop, rail/metro→platform.
-- Realtime indicator: `●` (solid, live) / `○` (hollow, scheduled) / `⬦` (white diamond, delayed) from `REALTIME_INDICATORS` in `config.js`. When `realtime === true` AND `aimedDepartureISO < expectedDepartureISO`, the indicator span gets class `.indicator--delayed` (CSS `color: var(--danger)` → red) and uses `REALTIME_INDICATORS.delayed`. Logic lives in `isDepartureDelayed()` exported from `src/ui/departure.js`.
+- Realtime indicator: `●` (solid, live) / `○` (hollow, scheduled) / `◆` (black diamond, delayed) from `REALTIME_INDICATORS` in `config.js`. When `realtime === true` AND `aimedDepartureISO < expectedDepartureISO`, the indicator span gets class `.indicator--delayed` (CSS `color: var(--danger)` → red) and uses `REALTIME_INDICATORS.delayed`. Logic lives in `isDepartureDelayed()` exported from `src/ui/departure.js`.
 - Cancellation: wraps line in `.departure-cancelled` (strikethrough + reduced opacity) via `CANCELLATION_WRAPPER` in `config.js`.
 - Auto-centering: Flexbox column + `justify-content:center; align-items:center; min-height:100vh`.
 - Responsive: text sizes reduce on small screens; vertical centering maintained.
