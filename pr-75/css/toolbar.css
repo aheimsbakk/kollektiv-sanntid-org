@@ -1,0 +1,56 @@
+/* ======================================================================
+   GLOBAL TOOLBAR
+   Fixed top-right action bar: two separate stacking contexts.
+     .settings-bar  — theme + settings gear (always ABOVE options panel)
+   Fixed top-left GPS bar (compass, share, OSM buttons — BELOW options panel).
+   Mirrors: src/app/action-bar.js, src/app/gps-bar.js
+   ====================================================================== */
+
+/* Theme + settings: always above the options panel */
+.settings-bar {
+  position: fixed;
+  right: 18px;
+  top: 18px;
+  z-index: var(--z-global-gear);
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.settings-bar button:hover:not(:disabled) {
+  transform: scale(1.05);
+}
+
+.settings-bar button:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+/* ── Top-left GPS bar ───────────────────────────────────────────────── */
+/* Layout:  🧭  📋
+            🗺️
+   .gps-bar__col stacks compass + OSM vertically; share sits beside the col. */
+.gps-bar {
+  position: fixed;
+  left: 18px;
+  top: 18px;
+  z-index: var(--z-compass);
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.gps-bar__col {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+}
+
+.gps-bar button:hover:not(:disabled) {
+  transform: scale(1.05);
+}
+
+.gps-bar button:active:not(:disabled) {
+  transform: scale(0.95);
+}
