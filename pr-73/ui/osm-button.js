@@ -67,15 +67,33 @@ export function createOsmButton(getCoords) {
   statusInner.setAttribute('aria-live', 'polite');
   statusShell.appendChild(statusInner);
 
-  let _statusTimer = null;
+  let _onDocClick = null;
+
+  function hideStatus() {
+    statusShell.classList.remove('visible');
+    if (_onDocClick) {
+      document.removeEventListener('click', _onDocClick);
+      _onDocClick = null;
+    }
+  }
 
   function showStatus(msg) {
     statusInner.textContent = msg;
     statusShell.classList.add('visible');
-    clearTimeout(_statusTimer);
-    _statusTimer = setTimeout(() => {
-      statusShell.classList.remove('visible');
-    }, 3000);
+
+    // Dismiss on any click outside the OSM container (the status shell's parent)
+    if (_onDocClick) {
+      document.removeEventListener('click', _onDocClick);
+    }
+    _onDocClick = (e) => {
+      const container = statusShell.parentElement;
+      if (!container || !container.contains(e.target)) {
+        hideStatus();
+      }
+    };
+    // Defer by one tick so the current click that triggered showStatus doesn't
+    // immediately dismiss the message.
+    setTimeout(() => document.addEventListener('click', _onDocClick), 0);
   }
 
   btn.addEventListener('click', (e) => {
