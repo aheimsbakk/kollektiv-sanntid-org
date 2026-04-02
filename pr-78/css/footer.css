@@ -30,13 +30,18 @@
   gap: 0;
 }
 
-
-
 .app-footer a {
   color: var(--accent);
   text-decoration: none;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .app-footer a:hover {
   text-decoration: underline;
+}
+
+.app-footer a:focus-visible {
+  outline: revert;
+  outline-offset: 2px;
 }

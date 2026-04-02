@@ -48,14 +48,20 @@
   transition:
     background var(--transition-fast),
     color var(--transition-fast);
+  -webkit-tap-highlight-color: transparent;
 }
 
 .station-autocomplete-list button.highlighted,
-.station-autocomplete-list button:hover,
+.station-autocomplete-list button:hover {
+  background: var(--highlight-bg);
+  color: var(--highlight-fg);
+}
+
 .station-autocomplete-list button:focus-visible {
   background: var(--highlight-bg);
   color: var(--highlight-fg);
-  outline: none;
+  outline: revert;
+  outline-offset: -2px;
 }
 
 /* Locality suffix (e.g. ", Oslo") — visually de-emphasised */
