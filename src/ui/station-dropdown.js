@@ -1,5 +1,5 @@
 import { t } from '../i18n.js';
-import { DEFAULTS, DEFAULT_FAVORITE, STATION_LINE_TEMPLATE } from '../config.js';
+import { DEFAULTS, DEFAULT_FAVORITE, STATION_LINE_TEMPLATE, STATION_DROPDOWN } from '../config.js';
 import { decodeSettings } from './share-button.js';
 import { emojiForMode } from './mode-utils.js';
 
@@ -198,7 +198,7 @@ export function createStationDropdown(currentStationName, onStationSelect) {
   // Dropdown arrow indicator
   const arrow = document.createElement('span');
   arrow.className = 'dropdown-arrow';
-  arrow.textContent = ' ▼';
+  arrow.textContent = ' ' + STATION_DROPDOWN.ARROW_COLLAPSED;
   titleBtn.appendChild(arrow);
 
   // Dropdown menu
@@ -265,7 +265,9 @@ export function createStationDropdown(currentStationName, onStationSelect) {
       menu.classList.remove('open');
     }
     titleBtn.setAttribute('aria-expanded', isOpen.toString());
-    arrow.textContent = isOpen ? ' ▲' : ' ▼';
+    arrow.textContent = isOpen
+      ? ' ' + STATION_DROPDOWN.ARROW_EXPANDED
+      : ' ' + STATION_DROPDOWN.ARROW_COLLAPSED;
 
     if (isOpen) {
       populateMenu();
@@ -280,7 +282,7 @@ export function createStationDropdown(currentStationName, onStationSelect) {
     isOpen = false;
     menu.classList.remove('open');
     titleBtn.setAttribute('aria-expanded', 'false');
-    arrow.textContent = ' ▼';
+    arrow.textContent = ' ' + STATION_DROPDOWN.ARROW_COLLAPSED;
     selectedIndex = -1;
 
     // Clear selection highlight
