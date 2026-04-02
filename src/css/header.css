@@ -64,12 +64,11 @@
   outline: none;
 }
 
-/* Restore a subtle highlight exclusively for keyboard navigation (Tab key),
-   matching the background/color convention used by all other interactive elements. */
+/* Restore a focus ring exclusively for keyboard navigation (Tab key).
+   Uses currentColor so it matches the text in both light and dark themes. */
 .station-title:focus-visible {
-  outline: none;
-  background: var(--highlight-bg);
-  color: var(--highlight-fg);
+  outline: 2px solid currentColor;
+  outline-offset: 3px;
 }
 
 .station-title:hover:not(:disabled) {
