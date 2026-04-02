@@ -55,6 +55,19 @@
   cursor: pointer;
   padding: 0;
   text-align: left;
+  /* Suppress the iOS/WebKit tap highlight flash on touch */
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Remove the focus ring triggered by mouse clicks or touch events */
+.station-title:focus {
+  outline: none;
+}
+
+/* Restore the focus ring exclusively for keyboard navigation (Tab key) */
+.station-title:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 
 .station-title:hover:not(:disabled) {
