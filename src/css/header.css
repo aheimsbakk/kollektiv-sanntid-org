@@ -55,12 +55,6 @@
   cursor: pointer;
   padding: 0;
   text-align: left;
-  outline: none;
-  -webkit-tap-highlight-color: transparent;
-}
-
-.station-title:focus-visible {
-  outline: revert;
   outline-offset: 3px;
 }
 
@@ -118,20 +112,14 @@
     background var(--transition-fast),
     color var(--transition-fast);
   white-space: nowrap;
-  -webkit-tap-highlight-color: transparent;
 }
 
 .station-dropdown-item:hover:not(:disabled),
-.station-dropdown-item.selected {
-  background: var(--highlight-bg);
-  color: var(--highlight-fg);
-}
-
+.station-dropdown-item.selected,
 .station-dropdown-item:focus-visible {
   background: var(--highlight-bg);
   color: var(--highlight-fg);
-  outline: revert;
-  outline-offset: -2px;
+  outline: none;
 }
 
 .station-dropdown-empty {
