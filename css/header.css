@@ -55,6 +55,7 @@
   cursor: pointer;
   padding: 0;
   text-align: left;
+  outline-offset: 3px;
 }
 
 .station-title:hover:not(:disabled) {
