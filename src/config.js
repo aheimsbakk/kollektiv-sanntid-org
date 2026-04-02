@@ -1,6 +1,6 @@
 // Version is defined here and in src/sw.js (service worker)
 // Both must be kept in sync - use scripts/bump-version.sh to update both
-export const VERSION = '1.40.18';
+export const VERSION = '1.40.19';
 
 // Brand name used in the options panel title and HTML <title>.
 // Intentionally not translated — this is a proper name.
@@ -25,7 +25,7 @@ export const DEFAULTS = {
 // Default favorite station encoded as base64 share link (minimal 3-element format)
 // Used when user has no favorites stored. Set to null to disable.
 export const DEFAULT_FAVORITE =
-  'WyJPc2xvIFMiLCJOU1I6U3RvcFBsYWNlOjU5ODcyIixbImJ1cyIsInRyYW0iLCJjb2FjaCIsIm1ldHJvIiwid2F0ZXIiLCJyYWlsIl1d';
+  'WyJPc2xvIFMiLCJOU1I6U3RvcFBsYWNlOjU5ODcyIixbInRyYW0iLCJidXMiLCJtZXRybyIsImNvYWNoIiwicmFpbCIsIndhdGVyIl0sNTkuOTEwMzU3LDEwLjc1MzA1MV0';
 
 // Immutable list of all transport modes for fallback when no modes are selected
 export const ALL_TRANSPORT_MODES = ['bus', 'tram', 'metro', 'rail', 'water', 'coach'];
