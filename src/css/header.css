@@ -59,8 +59,9 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-/* Remove the focus ring triggered by mouse clicks or touch events */
-.station-title:focus {
+/* Remove the focus ring triggered by mouse clicks, touch events, or active press */
+.station-title:focus,
+.station-title:active {
   outline: none;
 }
 

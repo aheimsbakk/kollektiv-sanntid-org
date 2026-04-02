@@ -268,9 +268,16 @@ export function createStationDropdown(currentStationName, onStationSelect) {
     arrow.textContent = isOpen ? ' ▲' : ' ▼';
 
     if (isOpen) {
-      populateMenu();
+      // Defer populateMenu() to the next microtask so the DOM re-render does
+      // not occur during the browser's focus-modality detection window.
+      // This prevents WebKit from losing the touch context and incorrectly
+      // triggering :focus-visible on the first post-reload tap.
+      Promise.resolve().then(populateMenu);
       selectedIndex = -1;
-      titleBtn.focus();
+      // Pass { preventScroll: true } to avoid layout side-effects.
+      // Do NOT pass { focusVisible: false } — it is not yet broadly supported;
+      // the :focus/:active outline:none rules in CSS handle the visual suppression.
+      titleBtn.focus({ preventScroll: true });
     }
   }
 
