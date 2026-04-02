@@ -188,8 +188,8 @@ export const STATION_LINE_TEMPLATE = '{name} {modes}';
 // ARROW_COLLAPSED — symbol shown on the station title button when the dropdown is closed
 // ARROW_EXPANDED  — symbol shown on the station title button when the dropdown is open
 export const STATION_DROPDOWN = {
-  ARROW_COLLAPSED: '▼',
-  ARROW_EXPANDED: '▲',
+  ARROW_COLLAPSED: '🔻',
+  ARROW_EXPANDED: '🔺',
 };
 
 // Scroll-more (pull-to-load-more) tuning
