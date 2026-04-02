@@ -46,14 +46,20 @@
     background var(--transition-fast),
     color var(--transition-fast);
   white-space: nowrap;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .gps-dropdown-item:hover:not(:disabled),
-.gps-dropdown-item.highlighted,
+.gps-dropdown-item.highlighted {
+  background: var(--highlight-bg);
+  color: var(--highlight-fg);
+}
+
 .gps-dropdown-item:focus-visible {
   background: var(--highlight-bg);
   color: var(--highlight-fg);
-  outline: none;
+  outline: revert;
+  outline-offset: -2px;
 }
 
 /* ── Status / error messages ───────────────────────────────────────── */
