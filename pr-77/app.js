@@ -247,3 +247,10 @@ window.addEventListener('pagehide', () => {
 });
 
 document.addEventListener('DOMContentLoaded', init, { once: true });
+
+// Prime WebKit/iOS Safari's input-modality heuristic on the very first screen
+// interaction. Without this, the browser has not yet classified the input device
+// as "touch" before the first tap lands on the station title, causing it to
+// incorrectly display the :focus-visible ring on that initial tap after a reload.
+// The listener is passive and fires once, then removes itself.
+document.body.addEventListener('touchstart', function () {}, { once: true, passive: true });
