@@ -1,6 +1,6 @@
 // Version is defined here and in src/sw.js (service worker)
 // Both must be kept in sync - use scripts/bump-version.sh to update both
-export const VERSION = '1.40.20';
+export const VERSION = '1.40.21';
 
 // Brand name used in the options panel title and HTML <title>.
 // Intentionally not translated — this is a proper name.
@@ -183,6 +183,14 @@ export const GPS_STOP_LINE_TEMPLATE = '{name} 🏃‍➡️ {distance} {modes}';
 //   '{modes} {name}'        — emojis first: "🚅 Oslo S"
 //   '{name} [{modes}]'      — bracketed: "Oslo S [🚅]"
 export const STATION_LINE_TEMPLATE = '{name} {modes}';
+
+// Station dropdown arrow symbols
+// ARROW_COLLAPSED — symbol shown on the station title button when the dropdown is closed
+// ARROW_EXPANDED  — symbol shown on the station title button when the dropdown is open
+export const STATION_DROPDOWN = {
+  ARROW_COLLAPSED: '🔻',
+  ARROW_EXPANDED: '🔺',
+};
 
 // Scroll-more (pull-to-load-more) tuning
 // SCROLL_STEPS        — Fibonacci-like departure count progression
