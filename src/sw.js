@@ -1,4 +1,4 @@
-const VERSION = '1.40.21';
+const VERSION = '1.40.22';
 const CACHE_NAME = `departures-v${VERSION}`;
 const ASSETS = [
   './',
@@ -69,7 +69,9 @@ const ASSETS = [
   './manifest.webmanifest',
   './icons/favicon.svg',
   './icons/icon-192.svg',
+  './icons/icon-192-maskable.svg',
   './icons/icon-512.svg',
+  './icons/icon-512-maskable.svg',
 ];
 
 // Install: cache core assets, bypassing the HTTP cache so that a new
