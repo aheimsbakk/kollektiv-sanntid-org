@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" fill="none">
-  <!-- Circle background -->
-  <circle cx="256" cy="256" r="256" fill="#ffffff"/>
+  <!-- Solid full-bleed background for maskable icon (no circle) -->
+  <rect x="0" y="0" width="512" height="512" fill="#ffffff"/>
   
   <!-- Emoji pin instead of KS -->
   <text x="256" y="352" font-family="Apple Color Emoji,Segoe UI Emoji,Noto Color Emoji,Segoe UI Symbol,Arial,Helvetica,sans-serif" font-size="288" font-weight="700" fill="#0b0f1a" text-anchor="middle">🚏</text>
