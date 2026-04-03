@@ -5,6 +5,6 @@
   
   <!-- Emoji pin instead of KS -->
   <text x="16" y="22" font-family="Apple Color Emoji,Segoe UI Emoji,Noto Color Emoji,Segoe UI Symbol,Arial,Helvetica,sans-serif" font-size="18" font-weight="700" fill="#0b0f1a" text-anchor="middle">🚏</text>
-  <!-- Underline for emoji (half length and half thickness) -->
-  <line x1="12" y1="26" x2="20" y2="26" stroke="#333333" stroke-width="0.5" stroke-linecap="round" />
+  <!-- Underline for emoji (moved 1px lower, 6px wider total) -->
+  <line x1="8" y1="26" x2="24" y2="26" stroke="#2d8659" stroke-width="0.5" stroke-linecap="round" />
 </svg>
