@@ -85,6 +85,8 @@ export function getDefaultStation() {
         name: decoded.stationName,
         stopId: decoded.stopId,
         modes: decoded.transportModes || [],
+        lat: typeof decoded.lat === 'number' ? decoded.lat : undefined,
+        lon: typeof decoded.lon === 'number' ? decoded.lon : undefined,
       };
     }
   } catch (e) {
@@ -245,6 +247,8 @@ export function createStationDropdown(currentStationName, onStationSelect) {
       item.dataset.stopId = station.stopId;
       item.dataset.name = station.name;
       item.dataset.modes = JSON.stringify(station.modes || []);
+      item.dataset.lat = typeof station.lat === 'number' ? String(station.lat) : '';
+      item.dataset.lon = typeof station.lon === 'number' ? String(station.lon) : '';
       item.dataset.index = index;
 
       item.addEventListener('click', (e) => {
@@ -327,10 +331,14 @@ export function createStationDropdown(currentStationName, onStationSelect) {
       case 'Enter':
         e.preventDefault();
         if (selectedIndex >= 0 && items[selectedIndex]) {
+          const rawLat = parseFloat(items[selectedIndex].dataset.lat);
+          const rawLon = parseFloat(items[selectedIndex].dataset.lon);
           const station = {
             name: items[selectedIndex].dataset.name,
             stopId: items[selectedIndex].dataset.stopId,
             modes: JSON.parse(items[selectedIndex].dataset.modes || '[]'),
+            lat: Number.isFinite(rawLat) ? rawLat : undefined,
+            lon: Number.isFinite(rawLon) ? rawLon : undefined,
           };
           selectStation(station);
         }

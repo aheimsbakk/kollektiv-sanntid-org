@@ -143,8 +143,12 @@ export function createOptionsPanel(defaults, onApply, onLanguageChange) {
     const raw = {
       STATION_NAME: stationAC.getValue(),
       STOP_ID: stationAC.getStopId() || null,
-      LAT: stationAC.getLat(),
-      LON: stationAC.getLon(),
+      // Preserve existing coordinates unless the user explicitly selected a new
+      // station via the autocomplete list. updateField() wipes dataset.lat/lon
+      // (it has no coords to fill), so falling back to defaults when no explicit
+      // selection was made prevents every settings change from nulling LAT/LON.
+      LAT: stationAC.wasStationSelected() ? stationAC.getLat() : defaults.LAT,
+      LON: stationAC.wasStationSelected() ? stationAC.getLon() : defaults.LON,
       NUM_DEPARTURES: inpNum.value,
       FETCH_INTERVAL: inpInt.value,
       TRANSPORT_MODES: modes.getChecked(),

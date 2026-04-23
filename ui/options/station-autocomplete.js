@@ -46,6 +46,13 @@ export function createStationAutocomplete(defaults, { onSelect, t }) {
   let lastCandidates = [];
   let updatingField = false;
   let _destroyed = false;
+  /**
+   * True only when the user has explicitly picked a candidate from the autocomplete
+   * list in this panel session. Reset to false by updateField() (panel open / refresh).
+   * Used by applyChanges() to decide whether to trust getLat()/getLon() or fall back
+   * to the existing DEFAULTS.LAT/LON.
+   */
+  let _explicitSelection = false;
   /** AbortController for the current in-flight station search fetch */
   let _searchAbortCtrl = null;
 
@@ -123,6 +130,7 @@ export function createStationAutocomplete(defaults, { onSelect, t }) {
     inpStation.dataset.stopId = String(c.id || '');
     inpStation.dataset.lat = typeof c.lat === 'number' ? String(c.lat) : '';
     inpStation.dataset.lon = typeof c.lon === 'number' ? String(c.lon) : '';
+    _explicitSelection = true;
     clearAutocomplete();
     onSelect();
   }
@@ -248,6 +256,14 @@ export function createStationAutocomplete(defaults, { onSelect, t }) {
     const v = parseFloat(inpStation.dataset.lon);
     return Number.isFinite(v) ? v : null;
   }
+  /**
+   * Returns true only when the user explicitly selected a station from the
+   * autocomplete candidate list during this panel session.
+   * False after updateField() (panel open/refresh) or on a fresh mount.
+   */
+  function wasStationSelected() {
+    return _explicitSelection;
+  }
   /** Returns true when the autocomplete dropdown is currently visible. */
   function isOpen() {
     return !!(acList && acList.classList.contains('open'));
@@ -264,6 +280,7 @@ export function createStationAutocomplete(defaults, { onSelect, t }) {
     inpStation.dataset.stopId = stopId || '';
     inpStation.dataset.lat = '';
     inpStation.dataset.lon = '';
+    _explicitSelection = false;
     lastQuery = '';
     clearAutocomplete();
     updatingField = false;
@@ -289,6 +306,7 @@ export function createStationAutocomplete(defaults, { onSelect, t }) {
     getStopId,
     getLat,
     getLon,
+    wasStationSelected,
     isOpen,
     reset,
     updateField,
