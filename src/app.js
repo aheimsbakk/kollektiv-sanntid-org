@@ -85,6 +85,8 @@ async function init() {
         DEFAULTS.TRANSPORT_MODES = defaultStation.modes.length
           ? defaultStation.modes
           : DEFAULTS.TRANSPORT_MODES;
+        if (typeof defaultStation.lat === 'number') DEFAULTS.LAT = defaultStation.lat;
+        if (typeof defaultStation.lon === 'number') DEFAULTS.LON = defaultStation.lon;
       }
     }
   }

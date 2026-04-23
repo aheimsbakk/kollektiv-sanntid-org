@@ -85,6 +85,8 @@ export function getDefaultStation() {
         name: decoded.stationName,
         stopId: decoded.stopId,
         modes: decoded.transportModes || [],
+        lat: typeof decoded.lat === 'number' ? decoded.lat : undefined,
+        lon: typeof decoded.lon === 'number' ? decoded.lon : undefined,
       };
     }
   } catch (e) {
