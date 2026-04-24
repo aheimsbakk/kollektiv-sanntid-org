@@ -2,7 +2,9 @@
 
 Real-time public transport departure board for Norway. Track buses, trams, metro, trains, ferries, and coaches with live departure times from any station or stop across the country.
 
-## About
+**Live app:** [kollektiv.sanntid.org](https://kollektiv.sanntid.org)
+
+## How it works
 
 This app uses [Entur's API](https://developer.entur.org/) to show live departures from Norwegian public transport. It's built with the [JourneyPlanner API](https://developer.entur.org/pages-journeyplanner-journeyplanner) and is the first app I've created using vibe coding.
 
@@ -14,9 +16,9 @@ There are two ways to pick a station:
 
 **By name** — click the **⚙️ settings** button in the top right, type in the **Station or stop name** field, and select from the dropdown suggestions.
 
-**By location** — click the **🧭 compass** button in the top left. The app asks for your location and instantly lists the nearest stops with their distance and transport modes. Click any result to load it.
+**By location** — click the **🧭 compass** button in the top left. The app requests your device's GPS position (one-time, no tracking) and lists up to **8 nearest stops** within a **2 km radius**. Each result shows the stop name, distance in metres, and transport mode icons. Click any result to load it. The dropdown closes when you select a stop or press **Escape**.
 
-**On the map** — click the **🗺️ map** button (below the compass) to open the current station on [OpenStreetMap](https://www.openstreetmap.org/) in a new tab. The map opens at zoom level 16 with the transport layer active and a pin on the station's exact coordinates.
+**On the map** — click the **🗺️ map** button (below the compass) to open the current station on [OpenStreetMap](https://www.openstreetmap.org/) in a new tab. Opens at **zoom level 16** with the **Transport layer** active and a **pin marker** at the station's exact coordinates.
 
 Once a station is loaded, choose which transport types you want to see, then click **Close** to apply.
 
@@ -24,7 +26,7 @@ To save the station to your favorites, click the **🩶 heart button** to the le
 
 ### Using Favorites
 
-Click the **station name** at the top of the screen to open your favorites list. This shows your recently viewed stations with their transport filters. Click any favorite to instantly switch to that station.
+Click the **station name** at the top of the screen to open your favorites list. This shows your recently viewed stations with their transport filters. Click any favorite to switch to that station.
 
 Your favorites list stores up to 8 stations with all their settings. The most recently used station appears at the top.
 
@@ -42,24 +44,6 @@ Click the **📋 share** button (top left, next to the compass) to copy a sharea
 When someone opens your link, the station is automatically added to their favorites.
 
 ## Features
-
-### GPS Nearby Stops
-
-Click the **🧭 compass** button in the top left to find stops near your current location:
-
-- The app requests your device's GPS position (one-time, no tracking)
-- Lists up to **8 nearest stops** within a **2 km radius**
-- Each result shows the stop name, distance in metres, and transport mode icons
-- Click any stop to load it immediately — then use the ❤️ heart to save it
-
-The dropdown closes automatically when you select a stop or press **Escape**.
-
-### OpenStreetMap View
-
-Click the **🗺️ map** button (below the compass) to open the current station on [OpenStreetMap](https://www.openstreetmap.org/) in a new tab:
-
-- Opens at **zoom level 16** with the **Transport layer** active
-- Places a **pin marker** at the station's exact coordinates
 
 ### Loading More Departures
 
@@ -120,7 +104,7 @@ Uncheck any type to hide it from your departures.
 
 #### Language
 
-Choose from 12 languages using the flag buttons. The entire interface updates instantly.
+Choose from 12 languages using the flag buttons. The entire interface updates right away.
 
 ### Theme Toggle
 
@@ -138,9 +122,24 @@ Your theme choice is saved automatically.
 - Press **Escape** to close the settings panel or GPS nearby-stops dropdown
 - Tab through settings panel fields when open
 
-## Updates
+## App Updates
 
 Reload the web page. When a new version is available, you'll see a notification counting down from 5 seconds. The app will automatically reload with the latest features. All your settings and favorites are preserved.
+
+## Run Locally
+
+This app has no build step. To run it:
+
+1. Clone the repository.
+2. Serve the files with any local HTTP server (service workers require HTTP, not `file://`).
+
+```sh
+npx serve .
+# or
+python3 -m http.server
+```
+
+3. Open `http://localhost:3000` (or the port your server reports) in your browser.
 
 ## Technical Details
 
@@ -157,6 +156,10 @@ English, Norwegian, German, Spanish, Italian, Greek, Persian, Hindi, Icelandic, 
 ### Browser Requirements
 
 Modern browsers with service worker support (Chrome 102+, Firefox 112+, Safari 15.5+)
+
+## Contributing
+
+Bug reports and suggestions are welcome — [open an issue](../../issues) on GitHub.
 
 ## License
 
