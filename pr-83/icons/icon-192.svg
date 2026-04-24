@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192" viewBox="0 0 192 192" fill="none">
+  <!-- Circle background -->
+  <circle cx="96" cy="96" r="96" fill="#ffffff"/>
+  
+  <!-- Emoji pin instead of KS -->
+  <text x="96" y="128" font-family="Apple Color Emoji,Segoe UI Emoji,Noto Color Emoji,Segoe UI Symbol,Arial,Helvetica,sans-serif" font-size="108" font-weight="700" fill="#0b0f1a" text-anchor="middle">🚏</text>
+  <!-- Underline for emoji (half length, updated color) -->
+  <line x1="68" y1="148" x2="124" y2="148" stroke="#2d8659" stroke-width="8" stroke-linecap="round" />
+</svg>
