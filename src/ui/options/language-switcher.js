@@ -23,7 +23,7 @@ export function createLanguageSwitcher({ onLanguageChange, showToast }) {
   const langWrap = document.createElement('div');
   langWrap.className = 'language-switcher';
 
-  getLanguages().forEach(lang => {
+  getLanguages().forEach((lang) => {
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.className = 'language-flag';
@@ -34,7 +34,7 @@ export function createLanguageSwitcher({ onLanguageChange, showToast }) {
 
     btn.addEventListener('click', () => {
       setLanguage(lang.code);
-      langWrap.querySelectorAll('.language-flag').forEach(b => b.classList.remove('active'));
+      langWrap.querySelectorAll('.language-flag').forEach((b) => b.classList.remove('active'));
       btn.classList.add('active');
       // Caller is responsible for calling updateTranslations with live refs
       if (typeof onLanguageChange === 'function') onLanguageChange();
@@ -52,8 +52,15 @@ export function createLanguageSwitcher({ onLanguageChange, showToast }) {
    */
   function updateTranslations(refs) {
     const {
-      lblStation, lblNum, lblInt, lblSize, lblModes,
-      toggleAllCb, btnClose, selSize, modesWrap,
+      lblStation,
+      lblNum,
+      lblInt,
+      lblSize,
+      lblModes,
+      toggleAllCb,
+      btnClose,
+      selSize,
+      modesWrap,
     } = refs;
 
     lblStation.textContent = t('stationName');
@@ -69,12 +76,22 @@ export function createLanguageSwitcher({ onLanguageChange, showToast }) {
     // Text size <option> labels
     const sizeOpts = selSize.querySelectorAll('option');
     const sizeKeys = ['tiny', 'small', 'medium', 'large', 'extraLarge'];
-    sizeOpts.forEach((opt, i) => { opt.textContent = t(sizeKeys[i]); });
+    sizeOpts.forEach((opt, i) => {
+      opt.textContent = t(sizeKeys[i]);
+    });
 
-    // Transport mode span labels
-    const modeKeys = ['bus', 'metro', 'tram', 'rail', 'water', 'coach'];
-    const modeLabels = modesWrap.querySelectorAll('.mode-checkbox-label span:last-child');
-    modeLabels.forEach((label, i) => { label.textContent = t(modeKeys[i]); });
+    // Transport mode span labels — iterate per-label, using each checkbox's
+    // value as the translation key. This is robust against any DOM order
+    // (unlike the previous buggy code that used a hardcoded index-based array
+    //  which didn't match the MODE_GRID layout order).
+    const modeLabels = modesWrap.querySelectorAll('.mode-checkbox-label');
+    modeLabels.forEach((label) => {
+      const cb = label.querySelector('input[type=checkbox]');
+      if (cb) {
+        const span = label.querySelector('span:last-child');
+        if (span) span.textContent = t(cb.value);
+      }
+    });
   }
 
   return { rowLang, lblLang, updateTranslations };
