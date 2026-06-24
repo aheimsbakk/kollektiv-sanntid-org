@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.40.27] - 2026-06-24
+
+- **why:** Transport mode labels scrambled after language change
+- **model:** opencode/deepseek-v4-flash
+- **tags:** fix, i18n, ui, language-switcher
+
+### Fixed
+
+- Transport mode checkbox labels no longer scrambled when switching language — `updateTranslations` in `language-switcher.js` now reads each checkbox value for the translation key instead of using a hardcoded index array that didn't match the `MODE_GRID` layout order
+- Added `tests/transport-mode-labels.test.mjs` to verify grid layout and value-based label mapping
+
 ## [1.40.26] - 2026-04-24
 
 - **why:** Plain language improvements to README
