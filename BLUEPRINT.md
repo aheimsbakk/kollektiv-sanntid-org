@@ -1,255 +1,242 @@
 # Departure Board — BLUEPRINT
 
-Purpose
+## System Goals
 
-- Browser single‑page application that replicates the terminal departure board in `departure.sh`.
-- No external dependencies, no build step. All source lives under `src/` and uses native ES modules + modern browser APIs.
+A browser-based departure board that replicates the functionality of a terminal departure display. The application fetches real-time transit departure data from an external API, presents it in a compact list format, and allows users to select stations, filter by transport mode, and persist preferences locally.
 
-High-level constraints
+The application runs entirely in the browser with no server component. If the external API blocks cross-origin requests, the application displays an error state and retains previously fetched data.
 
-- No third‑party libraries or packages.
-- Files under `src/`.
-- Client-side only: no server component, no proxy, and no server instructions included in the repo.
-- The app must function fully in the browser. If Entur's API blocks cross-origin requests, the app shows a clear error state; no demo/offline fallback mode (removed in v1.x).
-- Keep accessibility and responsive design in mind.
-- Follow agents protocol before committing: create `docs/worklogs/YYYY-MM-DD-HH-mm-{short-desc}.md` and update `CONTEXT.md` (<=20 lines).
+Current version: 1.40.26
 
-User-facing features
+## High-Level Constraints
 
-- Station header (clickable) opens favorites dropdown (up to `NUM_FAVORITES` recent stations with saved settings). On first load with empty favorites, `getDefaultStation()` (decodes `DEFAULT_FAVORITE`) is used as the startup station — it is **not written** to the favorites list.
-- Favorite heart button is always enabled. Gray heart 🩶 = not in favorites (click to add, theme-neutral). Red heart ❤️ = already in favorites (click to remove). `handleFavoriteToggle` in `handlers.js` performs the toggle; `removeFromFavorites` in `station-dropdown.js` handles removal.
-- GPS compass button 🧭 (fixed top-left, same `.header-btn` style as top-right buttons). Click → requests browser geolocation → fetches up to `GPS_MAX_RESULTS` (10) nearest stops within `GPS_SEARCH_RADIUS_KM` (2 km) via Entur Geocoder reverse API → shows a temporary dropdown listing stops rendered from `GPS_STOP_LINE_TEMPLATE` (name + distance + mode emojis). Selecting a stop sets it as the current station and closes the dropdown. The heart button is then available to save to favorites.
-- OpenStreetMap button 🗺️ (fixed top-left, same `.header-btn` style, below compass button). Opens `https://www.openstreetmap.org/?mlat={lat}&mlon={lon}&zoom=16&layers=T` (Transport layer, zoom 16, pin marker) in a new tab for the current station's coordinates. Disabled (no action) when no coordinates are available, tooltip changes to `osmNoCoords` translation. Coordinates (`LAT`/`LON`) are stored in `DEFAULTS`, in favorites (as `lat`/`lon` fields), and in share URLs (5-element encoded array).
-- Up to N upcoming departures (configurable).
-- Departure line: destination, realtime indicator (● live / ○ scheduled / 🔴 delayed — red ● when realtime=true AND aimedDepartureISO < expectedDepartureISO), line number, transport emoji, platform symbol+code.
+- No third-party libraries or packages.
+- Client-side only: no server, no proxy, no server-side code in the repository.
+- The application must function fully in the browser.
+- PWA-capable: installable, offline-cacheable, auto-update capable.
+- Accessible and responsive design.
+- Supports 12 languages with in-place switching.
+
+## User-Facing Features
+
+- Station selection via text search with autocomplete.
+- Favorites list (up to 8 stations) with quick-access dropdown.
+- GPS-based nearby stop search using browser geolocation.
+- Configurable number of upcoming departures displayed.
+- Departure line shows: destination, line number, transport mode, realtime status, scheduled vs actual time, platform/quay, and active situations.
+- Realtime indicator: solid dot (live), hollow dot (scheduled), red dot (delayed beyond configurable threshold).
 - Cancelled departures shown with strikethrough and reduced opacity.
-- Live countdown (MM:SS), updates every second.
-- Platform/quay display with configurable symbol rules (bay ▣, gate ◆, platform ⚏, stop ▪, berth ⚓).
-- Auto-centering both horizontally and vertically.
-- Pull-to-load-more departures: user pulls up on the departure list (touch drag, mouse drag, or mouse wheel) to progressively load more departures following the Fibonacci-like sequence 1→2→3→5→8→13→21. Shows ▼ with "scroll for more" label (CSS bounce animation on arrow via transform, 2 s ease-in-out infinite); at max (21) switches to ● with temporary "for more change in ⚙️" hint. Temporary count resets on station change, settings apply, or app reload. No visual drag displacement — no marginTop manipulation, no snap-back animation, no ghost-click guard. Load fires on pointer/touch release at threshold (leading-edge debounce). When drag threshold is crossed, `.scroll-more-indicator--triggered` is applied: arrow turns accent color with fast bounce (0.5 s); removed on finger lift before load fires. On mouse wheel: load fires immediately at threshold. The temporary count persists across automatic fetch-loop refreshes.
-- Settings persisted to `localStorage` (`departure:settings`): station name, stop ID, N, modes, text size, fetch interval.
-- Language persisted to `localStorage` (`departure:language`): 12 supported languages.
-- Theme persisted to `localStorage` (`departure:theme`): light / auto / dark cycle.
-- Share button: encodes full board config as compact base64 URL (`?b=`), backward-compatible with `?board=` (legacy). GPS coordinates included as 5-element array `[name, stopId, modes, lat, lon]`.
-- PWA: installable via `manifest.webmanifest`, offline-capable via service worker (`sw.js`).
-- Auto-update flow: service worker detects new version, shows 5-second countdown toast, then reloads.
-- No external fonts required — use system fonts + CSS for visual effect.
+- Live countdown timer updating every second.
+- Pull-to-load-more gesture to progressively load additional departures.
+- Settings persisted to local storage: station, departure count, transport modes, text size, fetch interval.
+- Language and theme persisted to local storage.
+- Shareable board configuration encoded as a compact URL parameter.
+- Installable as a PWA with background update notifications.
 
-Architecture overview
+## Component Hierarchy
 
-- `src/index.html` — entry point, minimal markup, loads `src/app.js` as module
-- `src/app.js` — thin bootstrap: imports modules, wires DOMContentLoaded
-- `src/app/`
-  - `settings.js` — load/save localStorage settings; applyTextSize
-  - `url-import.js` — decode ?b= / ?board= shared-board params, clean URL
-  - `render.js` — renderDepartures (departure list clear + populate)
-  - `fetch-loop.js` — doRefresh, startRefreshLoop(listEl, statusEl), tickCountdowns; single unified 1-second interval drives both departure countdowns and the "update in" chip; fetch triggered when tick counter reaches 0; supports temporary numDepartures override via setNumDeparturesOverride()/getEffectiveNumDepartures() for scroll-more feature
-  - `handlers.js` — handleStationSelect, handleFavoriteToggle, onApplySettings, onLanguageChange; resets scroll-more on station change and settings apply
-  - `action-bar.js` — share + theme + settings buttons, global-gear container
-  - `scroll-more.js` — pull-to-load-more departures: Fibonacci progression (1→2→3→5→8→13→21), touch/mouse/wheel gesture detection, no visual drag displacement (no marginTop, no snap-back), load fires on pointer/touch release at threshold (leading-edge debounce via SCROLL_MORE.DEBOUNCE_MS), `.scroll-more-indicator--triggered` applied at threshold (accent arrow + fast bounce), ▼/"scroll for more" indicator → ●/"for more change in ⚙️" at max; resets on station change
-  - `sw-updater.js` — SW registration, update toast, controllerchange reload
-- `src/config.js` — all configurable constants: VERSION, DEFAULTS (includes NUM_FAVORITES, FETCH_INTERVAL, GITHUB_URL), DEFAULT_FAVORITE, ALL_TRANSPORT_MODES, REALTIME_INDICATORS, TRANSPORT_MODE_EMOJIS, UI_EMOJIS, CANCELLATION_WRAPPER, PLATFORM_SYMBOLS, PLATFORM_SYMBOL_RULES, DEPARTURE_LINE_TEMPLATE, STATION_LINE_TEMPLATE, STATION_DROPDOWN (ARROW_COLLAPSED, ARROW_EXPANDED), GPS_STOP_LINE_TEMPLATE, GPS_MAX_RESULTS, GPS_SEARCH_RADIUS_KM, SCROLL_MORE (includes DEBOUNCE_MS, SYMBOL_ARROW, SYMBOL_MAX)
-- `src/entur/` — Entur API client (split into focused modules)
-  - `index.js` — public re-export facade (drop-in for former entur.js)
-  - `modes.js` — CANONICAL_MODE_MAP, token→canonical mapping, raw mode detection
-  - `parser.js` — pure `parseEnturResponse` function (no I/O)
-  - `query.js` — `buildQuery` + `buildVariants` (GraphQL query construction)
-  - `http.js` — `getContentType`, `postAndParse` (network transport only)
-  - `departures.js` — `fetchDepartures` orchestration + client-side mode filter
-  - `geocoder.js` — `lookupStopId`, `searchStations` (Entur geocoder REST API)
-  - `gps-search.js` — `fetchNearbyStops`, `extractModes`, `CATEGORY_TO_MODE` (Geocoder reverse API, GPS nearby stops; `distance` field is km float → multiply × 1000 for metres; `mode` is array of single-key objects)
-- `src/time.js` — pure utilities: iso → epoch, format countdown
-- `src/i18n.js` — backward-compat shim → re-exports from `src/i18n/index.js`
-- `src/i18n/`
-  - `index.js` — public facade; re-exports all symbols from store.js
-  - `translations.js` — static string data only: 12-language keyed map
-  - `languages.js` — static metadata: code/flag/name list for language switcher UI
-  - `detect.js` — pure fn: detectBrowserLanguage() (reads navigator, no state)
-  - `store.js` — runtime state: currentLanguage, t(), setLanguage(), getLanguage(), initLanguage(), getLanguages()
-- `src/style.css` — CSS entry point (@import manifest only; no rules)
-- `src/icons.css` — CSS-only icon/badge helpers
-- `src/css/` — component stylesheets (one responsibility each):
-  - `tokens.css` — all CSS custom properties: colors, spacing, sizing, z-index, transitions
-  - `base.css` — browser reset (html, body, \* only)
-  - `buttons.css` — button system: base + .btn-icon/.header-btn + .btn-action/.share-url-close
-  - `layout.css` — page skeleton: .app-root, .board, body.options-open shift
-  - `utils.css` — generic a11y helpers (.visually-hidden)
-  - `header.css` — station header row, dropdown, status chip, favorite btn
-  - `toolbar.css` — fixed top-right .global-gear + fixed top-left .gps-bar action bars
-  - `departures.css` — departure list, destination, time, platform, text-size-\* utilities
-  - `scroll-more.css` — pull-to-load-more indicator: ▼ arrow with CSS bounce animation (transform-based, 2 s ease-in-out infinite), ● max state, loading dim; `.scroll-more-indicator--triggered` (accent color + fast 0.5 s bounce when threshold crossed); no drag displacement, no .board--pulling/.board--snapping classes
-  - `options-panel.css` — slide-in panel shell, .options-row, inputs, .options-actions
-  - `autocomplete.css` — station search autocomplete list
-  - `transport-modes.css`— mode filter checkbox grid
-  - `language-switcher.css` — flag button row
-  - `share-modal.css` — share URL full-screen overlay
-  - `toasts.css` — ephemeral notifications: .options-toast + #sw-update-toast
-  - `gps-dropdown.css` — GPS nearby-stops dropdown (compass button results list)
-  - `footer.css` — fixed bottom-left .app-footer
-  - `debug.css` — .debug-panel (dev-only, safe to strip)
-- `src/sw.js` — service worker: versioned cache, offline support, skip-waiting flow
-- PWA wake-up: `visibilitychange` listener in `fetch-loop.js` detects stale data after OS freeze (compares `Date.now()` vs `lastFetchAt`); `pageshow` with `event.persisted` in `app.js` handles BFCache cold-start via full reload.
-- `src/manifest.webmanifest` — PWA manifest (icons, theme color, display mode)
-- `src/icons/` — PWA icon assets
-- `src/ui/`
-  - `ui.js` — DOM helpers, board element factory (calls createFooter), render loop (minimize DOM thrash)
-  - `departure.js` — single departure component (template rendering, countdown update)
-  - `header.js` — station header toggle component
-  - `options.js` — re-export shim → `./options/index.js` (backward compat)
-  - `options/`
-    - `index.js` — orchestrator; assembles panel, wires sub-modules; same public API
-    - `settings-store.js` — localStorage load/save, validateOptions, diffOptions
-    - `transport-modes.js` — checkbox table, toggle-all, debounced apply
-    - `station-autocomplete.js` — debounced search, keyboard nav, candidate list DOM
-    - `language-switcher.js` — flag buttons, updateTranslations(refs)
-    - `panel-lifecycle.js` — open/close, focus trap, ESC handler, toast
-  - `share-button.js` — share button, URL encode/decode (base64 array format)
-  - `station-dropdown.js`— favorites/recent stations dropdown (up to NUM_FAVORITES, with saved settings); `getDefaultStation()` decodes `DEFAULT_FAVORITE` without writing to localStorage; `getRecentStations()` is a pure localStorage read
-  - `theme-toggle.js` — light/auto/dark theme cycle button
-  - `gps-dropdown.js` — compass button + GPS nearby-stops temporary dropdown
-- No transpilation. Use `type="module"` for the scripts.
+### Presentation Layer
 
-Data flow
+- **Board Container** — root element that holds all visual components.
+- **Header** — station name (clickable to open favorites dropdown), favorite toggle button, GPS compass button, OSM map button, status chip showing time until next refresh.
+- **Departure List** — scrollable list of departure items, each containing destination, line number, transport mode, realtime indicator, countdown, platform symbol, and situation alerts.
+- **Action Bar** — share button, theme toggle, settings button.
+- **Options Panel** — slide-in panel for configuring station search, transport modes, text size, fetch interval. Contains sub-components: station autocomplete, mode filter grid, language switcher, panel lifecycle controls.
+- **Footer** — fixed bottom element with attribution link.
+- **Share Button** — button that copies the shareable URL to clipboard, with a fallback URL display box when clipboard access fails.
+- **Status Messages** — ephemeral messages for settings confirmation and PWA update prompts. Implemented inline within the options panel lifecycle and the service worker updater.
+- **GPS Dropdown** — temporary dropdown listing nearby stops found via geolocation.
 
-- `app.js` reads persisted settings from `localStorage`, then checks URL params (`?b=` / `?board=`) for shared board import.
-- On start and every FETCH_INTERVAL seconds: call `entur.fetchDepartures(stopId, n, modes)`.
-- `entur.fetchDepartures` uses `fetch()` to POST to Entur GraphQL endpoint.
-- Parse response to normalized JS objects:
-  - `{ destination, lineNumber, transportMode, expectedDepartureISO, realtimeState, cancellation, quay: { publicCode } }`
-- UI layer keeps last successful dataset; on new data diff update DOM nodes; always update countdown labels every second.
-- On fetch failure show error state; keep previous data if available.
+### Application Logic Layer
 
-Entur API considerations
+- **Settings Persistence** — loads and saves application settings to local storage. Two modules manage the same storage key: one for global bootstrap state (`src/app/settings.js`) and one for the options panel (`src/ui/options/settings-store.js`). Applies text size to the root element.
+- **URL Import** — decodes shared board configuration from URL parameters, applies settings, and cleans the URL.
+- **Render Engine** — clears and populates the departure list. Maintains references to text nodes for efficient countdown updates.
+- **Fetch Loop** — unified interval that drives departure countdowns and triggers API refreshes. Tracks elapsed time to avoid drift. Handles page visibility changes to detect stale data after OS sleep.
+- **Handler Registry** — dispatches user actions: station selection, GPS station selection, favorite toggle, settings apply, language change. Resets progressive load state on station or settings change.
+- **Progressive Loader** — handles pull-to-load-more gesture detection, Fibonacci-based count progression, and threshold-based load triggering.
+- **Service Worker Updater** — registers the service worker, monitors for updates, displays countdown toast, triggers reload on update activation.
 
-- Stop lookup: `GET https://api.entur.io/geocoder/v1/autocomplete?text=...&lang=en&size=10` — filters to `StopPlace` venue type.
-- GPS nearby stops: `GET https://api.entur.io/geocoder/v1/reverse?point.lat=...&point.lon=...&size=<GPS_MAX_RESULTS>&layers=venue&boundary.country=NOR&boundary.circle.radius=<GPS_SEARCH_RADIUS_KM>` — returns GeoJSON FeatureCollection; `properties.distance` is a **km float** (multiply × 1000 for metres); `properties.mode` is an **array of single-key objects** (e.g. `[{bus:null}]`), extract via `Object.keys()`; `properties.category` used as fallback via `CATEGORY_TO_MODE` map.
-- Departures: GraphQL POST to `https://api.entur.io/journey-planner/v3/graphql`.
-- Query fields: `stopPlace(id) { estimatedCalls(numberOfDepartures, whiteListedModes) { expectedDepartureTime realtime cancellation serviceJourney { journeyPattern { line { publicCode transportMode } } } destinationDisplay { frontText } quays { publicCode } } }`
-- Headers: `ET-Client-Name: kollektiv-sanntid-org`.
-- CORS: The app calls Entur directly from the browser. On failure, shows a clear error state. No proxy or server code.
+### Data Access Layer
 
-Time and timezone
+- **API Client Facade** — public entry point for all external data operations.
+- **Mode Mapper** — canonicalizes transport mode tokens from raw API responses into a consistent internal representation. Uses recursive scan for nested mode fields.
+- **Response Parser** — transforms raw API response into normalized departure objects. Selects situation text by language priority.
+- **Query Builder** — constructs GraphQL queries with multiple variant forms for API compatibility. Tries variants in sequence until one succeeds.
+- **HTTP Transport** — handles network requests with content-type detection. Abort support is provided by the caller (geocoder) using AbortController, not at the transport layer.
+- **Departure Fetcher** — orchestrates the query, transport, and parsing pipeline. Applies client-side mode filtering with recursive raw scan fallback.
+- **Geocoder** — station search via autocomplete API with client-side relevance scoring. Filters results by venue type.
+- **GPS Search** — reverse geocoding to find nearby stops. Returns results sorted by distance.
 
-- Parse ISO times using `Date.parse()`; work in UTC epoch ms then compute diff with `Date.now()`.
-- Display "Now" for diff <= 0.
-- Formatting: `MM:SS` (hours suppressed for typical transit use).
-- Avoid heavy libraries: small helper functions in `src/time.js`.
+### Internationalisation Layer
 
-UI/UX & styling
+- **Translation Store** — runtime state holding the current language and a translation lookup function. Falls back to English for missing keys.
+- **Translation Strings** — static keyed string map for all 12 supported languages. Every key exists in every language.
+- **Language Metadata** — static list of supported languages with code, flag, and display name.
+- **Browser Detector** — reads the browser's language preference and maps it to a supported language code.
 
-- CSS entry point is `src/style.css` — an `@import` manifest only. All rules live in `src/css/*.css`.
-- Design tokens in `src/css/tokens.css`: `--bg`, `--text-primary`, `--accent`, `--danger`, `--mono`, `--large-scale`, button sizing vars, transition vars, z-index layer vars, plus theme overrides.
-- Three themes: light / auto (system) / dark — toggled via `.theme-light` on `<html>`, default follows `prefers-color-scheme`.
-- Five text sizes applied as class on `<html>`: `text-size-tiny` → `text-size-xlarge` (rules in `departures.css`).
-- Button system in `src/css/buttons.css`: `button` base → `.btn-icon`/`.header-btn` (icon toolbar) → `.btn-action`/`.share-url-close` (prominent actions). All three global toolbar buttons (share, theme, gear) carry `.header-btn` for uniform 26px emoji size. Button emojis sourced from `UI_EMOJIS` in `config.js`.
-- Departure line rendered from `DEPARTURE_LINE_TEMPLATE` (configurable in `config.js`).
-- Platform symbol selected by `PLATFORM_SYMBOL_RULES` (ordered rule list in `config.js`): water→berth, bus+alphanumeric→bay, bus+single-letter→gate, bus→stop, tram→stop, rail/metro→platform.
-- Realtime indicator: `●` (solid, live) / `○` (hollow, scheduled) / `◆` (black diamond, delayed) from `REALTIME_INDICATORS` in `config.js`. When `realtime === true` AND `aimedDepartureISO < expectedDepartureISO`, the indicator span gets class `.indicator--delayed` (CSS `color: var(--danger)` → red) and uses `REALTIME_INDICATORS.delayed`. Logic lives in `isDepartureDelayed()` exported from `src/ui/departure.js`.
-- Cancellation: wraps line in `.departure-cancelled` (strikethrough + reduced opacity) via `CANCELLATION_WRAPPER` in `config.js`.
-- Auto-centering: Flexbox column + `justify-content:center; align-items:center; min-height:100vh`.
-- Responsive: text sizes reduce on small screens; vertical centering maintained.
-- Accessibility: high contrast, ARIA labels, `role="status"` for countdown chip.
+### Time Utilities
 
-Internationalisation (i18n)
+- Pure functions for converting ISO timestamps to epoch milliseconds and formatting countdown durations (MM:SS or HH:MM:SS).
 
-- All UI strings live in `src/i18n.js` as a keyed map per language code.
-- `t(key)` returns the string for the current language (falls back to `en`).
-- Language persisted in `localStorage` key `departure:language`.
-- Supported: `en`, `no`, `de`, `es`, `it`, `el`, `fa`, `hi`, `is`, `uk`, `fr`, `pl`.
-- All 12 languages carry the full key set including GPS keys (`gpsTooltip`, `gpsLocating`, `gpsNoResults`, `gpsFetchError`, `gpsNotSupported`, `gpsPermissionDenied`, `gpsUnavailable`, `gpsMeters`), OSM keys (`osmTooltip`, `osmNoCoords`), and scroll-more keys (`scrollForMore`, `scrollMaxReached`).
-- Language switcher in options panel uses flag buttons; changing language updates all translatable strings in the open panel in-place (footer and tooltips refreshed via `onLanguageChange` callback — the panel is **not** recreated).
+### Configuration
 
-Share URL format
+- All configurable constants in a single module: version, app name, defaults (station, departure count, fetch interval, transport modes, client name, API URL, GitHub URL, coordinates), default favorite, all transport modes list, mode grid layout, realtime indicators, delay threshold, transport mode emojis, UI button emojis, cancellation wrapper, platform symbols and symbol selection rules, departure line template, GPS search parameters (max results, search radius), GPS dropdown item template, favorites dropdown item template, station dropdown arrow symbols, scroll-more tuning parameters (scroll steps, pull threshold, wheel threshold, debounce, symbols).
 
-- Encoding: compact JSON array `[stationName, stopId, modes[]]` (3 elements, legacy) or `[stationName, stopId, modes[], lat, lon]` (5 elements, v1.40.0+) → JSON.stringify → btoa (URL-safe: `+`→`-`, `/`→`_`, strip `=`).
-- URL param: `?b=<encoded>` (v1.24.0+). Legacy `?board=<encoded>` decoded for backward compat.
-- Decoding detects array vs object format automatically; supports legacy 7-element array `[name, stopId, modes, departures, interval, size, lang]` and legacy object format `{n, s, m, d, i, t, l}`.
-- Opening a shared link applies settings, saves to `localStorage`, sets as current station (does NOT add to favorites), then clears URL param.
-- Full spec: `docs/share_url_encoding.md`.
+## Data Flow
 
-PWA & Service Worker
+1. The application reads persisted settings from local storage, then checks URL parameters for a shared board configuration.
+2. On start and at each configured interval, the application calls the departure fetcher with the current station ID, count, and selected modes.
+3. The departure fetcher uses the query builder to construct a GraphQL query, sends it via the HTTP transport, and passes the response to the parser.
+4. The parser returns normalized departure objects. The fetcher applies client-side mode filtering.
+5. The render engine clears the departure list and builds new DOM nodes for each departure. A computeDiff utility exists in the codebase but is not used in the render path.
+6. A separate countdown ticker updates display values every second without re-fetching.
+7. On fetch failure, the application shows an error state and retains previously fetched data if available.
 
-- `src/manifest.webmanifest`: name, icons, `display: standalone`, theme color.
-- `src/sw.js`: versioned cache name (`kollektiv-v<VERSION>`), caches all app assets on install, serves from cache with network fallback.
-- Update flow: new SW detected → 5-second countdown toast shows old→new version → `skipWaiting` → `controllerchange` triggers hard reload with `?t=<timestamp>` cache-bust.
-- PWA wake-up on resume: `visibilitychange` in `fetch-loop.js` checks wall-clock elapsed time vs `FETCH_INTERVAL`; triggers immediate `doRefresh()` if stale. `pageshow` (event.persisted) in `app.js` forces full reload on BFCache cold-start.
-- VERSION in `src/config.js` and `src/sw.js` must stay in sync — use `scripts/bump-version.sh`. Current version: `1.40.0`.
+## State Management
 
-Performance & DOM update pattern
+### Application State
 
-- Render template once per departure item; keep references to text nodes for countdown and situation.
-- Only update the countdown text every second rather than re-paint full DOM.
-- On new fetch, diff the departure array by stable key (destination + expectedDepartureISO) and only add/remove or reorder DOM nodes as needed.
-- Single unified `setInterval(1000)` in `fetch-loop.js` drives both departure countdowns and the "update in" status chip. A tick counter (`ticksUntilRefresh`) decrements each second; when it reaches 0 `doRefresh()` is called and the counter resets. This guarantees zero drift between the countdown display and the actual fetch.
+- **Settings** — station name, station ID, departure count, selected transport modes, text size, fetch interval, latitude, longitude. Persisted to local storage.
+- **Language** — current locale code. Persisted to local storage.
+- **Theme** — light, auto (system preference), or dark. Persisted to local storage.
+- **Favorites** — ordered list of saved stations stored as a single unified list. Each entry has name, ID, modes, and coordinates. The list is ordered by recency and truncated to the configured maximum. Persisted to local storage.
+- **Departure Data** — last successfully fetched departure array. Used as fallback on network failure during the next fetch cycle.
+- **Progressive Load Count** — temporary count used by the pull-to-load-more feature. Resets on station change, settings change, or reload.
 
-Error handling & fallback UX
+### State Mutations
 
-- If station lookup fails: show error/empty state and keep previous data if available.
-- If network error: log warning, keep previous data, update status chip.
-- Header status chip shows countdown to next refresh ("Updating in Xs").
-- No demo mode or manual JSON upload (removed).
+- Settings, language, theme, and favorites are mutated through dedicated manager functions that validate input before writing.
+- Departure data is replaced atomically on successful fetch. Partial updates are not applied.
+- Progressive load count is incremented by the handler registry on successful progressive loads and reset on station or settings changes.
 
-Settings & persistence
+## Contracts
 
-- Settings stored in `localStorage` key `departure:settings` as JSON (mirrors DEFAULTS shape).
-- Language stored in `localStorage` key `departure:language`.
-- Theme stored in `localStorage` key `departure:theme`.
-- URL params for shared boards only: `?b=` (array base64) or legacy `?board=` (object base64).
+### Entry Points
 
-Testing & dev workflow (no deps)
+- The application entry point is the HTML document, which loads a single bootstrap module.
+- The bootstrap module initializes the language system, theme, DOM structure, and starts the fetch loop.
+- The service worker is the PWA entry point, handling cache installation and fetch routing.
 
-- Manual smoke tests:
-  - Load `src/index.html` via local server, confirm station lookup, departures, countdowns decrement.
-  - Simulate network failure using devtools offline.
+### Departure Payload Schema
 
-- Node-local unit tests:
-  - Place tests under `tests/` as ESM modules (e.g. `tests/time.test.mjs`). Run: `node tests/run.mjs` or `npm test`.
-  - Use Node's built-in `assert` API — no test framework.
-  - Keep tests hermetic: no DOM APIs or `fetch`.
-  - Tests with async top-level `await` (e.g. `gps-dropdown-click.test.mjs`) are statically imported by `run.mjs`; an `unhandledRejection` handler in `run.mjs` catches failures and exits with code 1.
-  - Regression tests: `tests/autocomplete-input-wipe.test.mjs` (station-autocomplete input-wipe guard), `tests/gps-dropdown-click.test.mjs` (GPS dropdown click delegation).
+Each normalized departure object contains:
 
-- Logging: minimal console logs only. `console.debug` is banned. Use `console.warn` for recoverable failures and `console.error` for unexpected errors. No empty `catch` blocks.
+- `destination` (string) — destination display name.
+- `publicCode` (string) — line or route number.
+- `expectedDepartureISO` (string, ISO 8601) — expected departure time.
+- `aimedDepartureISO` (string, ISO 8601) — scheduled departure time.
+- `actualDepartureISO` (string, ISO 8601 or null) — actual departure time if available.
+- `realtime` (boolean) — whether the departure time is based on live data.
+- `cancellation` (boolean) — whether the departure is cancelled.
+- `predictionInaccurate` (boolean) — whether the prediction should be treated as unreliable.
+- `mode` (string) — canonical transport mode identifier.
+- `quay` (object) — platform/quay information with `id` and `publicCode`.
+- `situations` (array) — list of active service situations.
+- `raw` (object) — the original API response fragment for debugging.
 
-Security & privacy
+### Situation Payload Schema
 
-- Never log tokens or secrets. Avoid embedding keys in the code.
-- Explain CORS fallback without suggesting public proxies for production.
+Each situation contains:
 
-Current file tree (implemented)
+- `summary` (object) — with `value` (string) and `language` (string).
+- `description` (object) — with `value` (string) and `language` (string).
 
-- `src/index.html`
-- `src/style.css` (import manifest)
-- `src/icons.css`
-- `src/css/` (tokens, base, buttons, layout, utils, header, toolbar, departures, scroll-more, options-panel, autocomplete, transport-modes, language-switcher, share-modal, toasts, footer, debug)
-- `src/app.js`
-- `src/app/` (settings.js, url-import.js, render.js, fetch-loop.js, handlers.js, action-bar.js, gps-bar.js, scroll-more.js, sw-updater.js)
-  - `gps-bar.js` — mounts `.gps-bar` fixed top-left container with compass button and OSM map button; returns `{ gpsContainer, osmBtn }`
-- `src/config.js`
-- `src/entur/` (index.js, modes.js, parser.js, query.js, http.js, departures.js, geocoder.js, gps-search.js)
-- `src/time.js`
-- `src/i18n.js` (shim)
-- `src/i18n/` (translations.js, languages.js, detect.js, store.js, index.js)
-- `src/sw.js`
-- `src/manifest.webmanifest`
-- `src/icons/`
-- `src/ui/ui.js`
-- `src/ui/footer.js` — footer DOM factory (`createFooter`) and `updateFooterTranslations`; imported by ui.js
-- `src/ui/departure.js`
-- `src/ui/header.js`
-- `src/ui/options.js` (shim)
-- `src/ui/options/` (index.js, settings-store.js, transport-modes.js, station-autocomplete.js, language-switcher.js, panel-lifecycle.js)
-- `src/ui/share-button.js`
-- `src/ui/station-dropdown.js`
-- `src/ui/theme-toggle.js`
-- `src/ui/osm-button.js` — `buildOsmUrl(lat, lon)` pure function + `createOsmButton(getCoords)` factory; opens OSM Transport layer at zoom=16 with pin marker; exposes `updateTooltip()` for i18n refresh
-- `src/ui/mode-utils.js` — shared helpers: `emojiForMode(mode)`, `labelForMode(mode)` (consolidated from departure.js, station-dropdown.js, transport-modes.js)
+### Error Boundaries
 
-Commit & agent protocol notes (required)
+- **Station lookup failure** — display empty/error state. Retain previous data if available.
+- **Network failure** — display error state. Retain previous data if available. Update status chip with retry countdown.
+- **API response parse failure** — treat as network failure. Do not crash the application.
+- **Geolocation permission denied** — display error message. Do not block other functionality.
+- **Service worker update failure** — log warning. Do not block application startup.
 
-- Before committing, create a worklog: `docs/worklogs/YYYY-MM-DD-HH-mm-{short-desc}.md` using the template in `agents/WORKLOG_TEMPLATE.md`.
-- Immediately update `CONTEXT.md` (under 20 lines) with Current Goal, Last 3 Changes, Next Steps.
-- Run `scripts/bump-version.sh [patch|minor|major]` to bump VERSION in `src/config.js` and `src/sw.js`. Mention new version in worklog body.
-- Commit message style: Conventional Commits — e.g., `feat(share): add base64 array URL encoding`.
+### Shared URL Contract
 
-End of blueprint.
+- Encoding: compact JSON array `[stationName, stopId, modes[], latitude, longitude]` (5 elements).
+- Encoding steps: JSON stringify, base64 encode, URL-safe character substitution.
+- URL parameter: `?b=<encoded>`. Legacy `?board=<encoded>` supported for backward compatibility.
+- Decoding detects array vs object format and supports legacy 7-element array and legacy object formats.
+- Opening a shared link applies settings, saves to local storage, sets as current station (does not add to favorites), then clears the URL parameter.
+
+### Geocoder Response Contract
+
+- Autocomplete returns a list of venue results. Each result has `name`, `id`, and `coordinates` (latitude, longitude). The full API response is available as `raw`.
+- GPS reverse search returns a list of nearby stops. Each result has `name`, `id`, `distance` (kilometers as float), `coordinates`, and `modes` (array of mode objects).
+
+## Persistence
+
+### Storage Schemas
+
+**Settings** — JSON object with keys: station name, station ID, departure count, transport modes (array), text size (enum), fetch interval (integer milliseconds), latitude (float or null), longitude (float or null).
+
+**Language** — string value matching a supported BCP-47 language code.
+
+**Theme** — string value: `light`, `auto`, or `dark`.
+
+**Favorites** — JSON array of station objects stored as a single unified list. Each object contains: name, ID, modes (array), latitude (float), longitude (float), departure count, text size, fetch interval. Ordered by recency. Truncated to the configured maximum (8).
+
+### Storage Keys
+
+Each schema is stored under a key in persistent client storage:
+
+| Key                  | Schema                               |
+| -------------------- | ------------------------------------ |
+| `departure:settings` | Settings JSON object                 |
+| `departure:language` | Language string (BCP-47)             |
+| `kollektiv-theme`    | Theme string (`light`/`auto`/`dark`) |
+| `recent-stations`    | Favorites JSON array                 |
+
+## External Dependencies
+
+### Entur API
+
+- **Station Autocomplete** — GET request to the geocoder autocomplete endpoint. Query parameter: search text. Response: list of venue results. CORS supported from the application domain.
+- **GPS Nearby Stops** — GET request to the geocoder reverse endpoint. Query parameters: latitude, longitude, result count, search radius, layer filter, country filter. Response: GeoJSON FeatureCollection of nearby stops.
+- **Departures** — POST request to the GraphQL endpoint. Body: GraphQL query with stop place ID, number of departures, and whitelisted modes. Response: departure data with realtime predictions, platform info, and service situations.
+- **Headers** — client name header set to the application identifier.
+
+### OpenStreetMap
+
+- External link opened in a new tab. Uses the current station's coordinates. No API key required. No data stored.
+
+### Browser APIs
+
+- **Geolocation** — optional. Requested only when the user activates the GPS search feature. Permission denied or unavailable results in an error message.
+- **Service Worker** — required for PWA functionality (offline cache, push updates). Registration failure is non-fatal; the application continues as a standard web page.
+- **Local Storage** — required for settings persistence. If unavailable, the application displays a warning and operates without persistence.
+- **Media Query Listener** — used for automatic theme detection based on system preference.
+
+### No External Dependencies
+
+- No third-party libraries, frameworks, fonts, or icon packs.
+- No analytics, tracking, or advertising services.
+
+## Time Handling
+
+- All timestamps are stored and compared as UTC epoch milliseconds.
+- ISO 8601 strings from the API are parsed to epoch milliseconds.
+- Countdown display is computed as the difference between current time and departure time.
+- Display format: MM:SS for departures within 60 minutes, HH:MM:SS for longer departures.
+- Past departures display as "Now".
+
+## Styling Architecture
+
+- A single entry stylesheet acts as an import manifest. All rules live in separate component files.
+- Design tokens (colors, spacing, z-index, transitions) are defined as variables in a dedicated file.
+- Theme support is implemented via variable overrides applied to the root element.
+- Text sizes are applied as class names on the root element, with component styles scaling accordingly.
+- Each component has a dedicated stylesheet following the Single Responsibility Principle.
+
+## Security & Privacy
+
+- No secrets, tokens, or API keys are embedded in the code.
+- No user data is logged. Console output uses `warn` for recoverable failures and `error` for unexpected errors.
+- All external API calls use the browser's native fetch with abort support.
+- Shared URLs contain only station identifiers and user-selected settings. No personal data is encoded.
+
+## Testing Strategy
+
+- Unit tests run in a headless environment using a built-in assertion library.
+- Tests are placed in a dedicated test directory.
+- Tests are hermetic: no DOM APIs, no network calls. External dependencies are injected as test doubles.
+- A single test runner imports all test modules and reports pass/fail.
