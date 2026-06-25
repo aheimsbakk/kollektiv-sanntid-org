@@ -1,3 +1,4 @@
+import './transport-mode-labels.test.mjs';
 import './time.test.mjs';
 import './entur.parse.test.mjs';
 import './entur.fetch.test.mjs';
