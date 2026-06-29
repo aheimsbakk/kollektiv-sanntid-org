@@ -1,5 +1,23 @@
 # Changelog
 
+## [1.40.28] - 2026-06-29
+
+- **why:** Add security headers to harden the application against XSS, clickjacking, and MIME-sniffing attacks
+- **model:** qwen-3.6-think-coding
+- **tags:** security, csp, headers, meta-tags
+
+### Added
+
+- Content-Security-Policy meta tag restricting resource loading to `'self'`, blocking framing and plugins, upgrading HTTP to HTTPS
+- X-Frame-Options: DENY meta tag to prevent clickjacking
+- X-Content-Type-Options: nosniff meta tag to prevent MIME-sniffing
+- Hoisted `var metas` declaration to top of IIFE to satisfy linter
+
+### Security
+
+- CSP `frame-ancestors 'none'` combined with X-Frame-Options provides defense-in-depth against framing attacks
+- CSP `object-src 'none'` and `upgrade-insecure-requests` block plugin loading and mixed content
+
 ## [1.40.27] - 2026-06-24
 
 - **why:** Transport mode labels scrambled after language change
