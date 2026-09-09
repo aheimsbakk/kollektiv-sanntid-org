@@ -473,9 +473,9 @@ src/entur/index.js
 
 ## Version Tracking
 
-| File            | Key          | Current Value   |
-| --------------- | ------------ | --------------- |
-| `src/config.js` | `VERSION`    | `'1.40.26'`     |
-| `src/sw.js`     | `VERSION`    | `'1.40.26'`     |
-| `package.json`  | `version`    | `'1.40.26'`     |
-| `CHANGELOG.md`  | latest entry | version history |
+| File            | Key          | Current Value                                   |
+| --------------- | ------------ | ----------------------------------------------- |
+| `src/config.js` | `VERSION`    | bumped per release by `scripts/bump-version.sh` |
+| `src/sw.js`     | `VERSION`    | bumped per release by `scripts/bump-version.sh` |
+| `package.json`  | `version`    | bumped per release by `scripts/bump-version.sh` |
+| `CHANGELOG.md`  | latest entry | version history                                 |
