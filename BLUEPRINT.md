@@ -6,8 +6,6 @@ A browser-based departure board that replicates the functionality of a terminal 
 
 The application runs entirely in the browser with no server component. If the external API blocks cross-origin requests, the application displays an error state and retains previously fetched data.
 
-Current version: 1.40.26
-
 ## High-Level Constraints
 
 - No third-party libraries or packages.
@@ -61,7 +59,7 @@ Current version: 1.40.26
 
 - **API Client Facade** — public entry point for all external data operations.
 - **Mode Mapper** — canonicalizes transport mode tokens from raw API responses into a consistent internal representation. Uses recursive scan for nested mode fields.
-- **Response Parser** — transforms raw API response into normalized departure objects. Selects situation text by language priority.
+- **Response Parser** — transforms raw API response into normalized departure objects. Selects situation text by language priority and merges each situation into a single display string.
 - **Query Builder** — constructs GraphQL queries with multiple variant forms for API compatibility. Tries variants in sequence until one succeeds.
 - **HTTP Transport** — handles network requests with content-type detection. Abort support is provided by the caller (geocoder) using AbortController, not at the transport layer.
 - **Departure Fetcher** — orchestrates the query, transport, and parsing pipeline. Applies client-side mode filtering with recursive raw scan fallback.
@@ -137,10 +135,17 @@ Each normalized departure object contains:
 
 ### Situation Payload Schema
 
-Each situation contains:
+Each situation in the API contains:
 
-- `summary` (object) — with `value` (string) and `language` (string).
-- `description` (object) — with `value` (string) and `language` (string).
+- `summary` (object) — with `value` (string) and `language` (string). Acts as the situation heading.
+- `description` (object) — with `value` (string) and `language` (string). The descriptive detail text.
+
+Each situation is rendered as a single string:
+
+- Summary first, as the opening sentence. If the trimmed summary does not end with `.`, a `.` is appended.
+- Then one space and the description.
+- If summary and description are identical (after trimming), the text renders once.
+- If only one of the two exists, that text is used alone.
 
 ### Error Boundaries
 

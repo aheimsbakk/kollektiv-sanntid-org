@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.40.29] - 2026-09-09
+
+- **why:** The API provides both a summary heading and a description for each service situation, but the board showed only the description, leaving departures without context for the disruption
+- **model:** z-ai/glm-5.3-flash
+- **tags:** fix, entur, situations, parser
+
+### Changed
+
+- Each situation now renders as one string: the summary heading first (a `.` is appended when missing after trimming), then a space and the description detail; identical summary and description render once (`buildSituationText` in `src/entur/parser.js`)
+- `BLUEPRINT.md` Situation Payload Schema documents the single-string rendering rule
+
+### Fixed
+
+- Situation alerts no longer drop the API summary heading — Blindern's live "Buss for T-bane 4B" incident previously showed only "Gjelder linje 1 og 4."
+
 ## [1.40.28] - 2026-06-29
 
 - **why:** Add security headers to harden the application against XSS, clickjacking, and MIME-sniffing attacks
