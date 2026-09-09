@@ -24,6 +24,28 @@ function pickLocalised(entries, lang) {
 }
 
 /**
+ * Build the display string for one service situation.
+ *
+ * The summary is the situation's heading; the description is the detail
+ * text. They render as one string: summary as the opening sentence
+ * (terminated with '.' if missing), then a space and the description.
+ * Identical texts render once; a missing part renders the other alone.
+ *
+ * @param {Object} s    - Raw situation object with `summary`/`description` arrays
+ * @param {string} lang - UI language code
+ * @returns {string} Merged situation text, or '' when both texts are empty
+ */
+function buildSituationText(s, lang) {
+  const summary = (pickLocalised(s?.summary, lang) || '').trim();
+  const description = (pickLocalised(s?.description, lang) || '').trim();
+  const withPeriod = (text) => (text.endsWith('.') ? text : text + '.');
+  if (summary && description) {
+    return summary === description ? summary : `${withPeriod(summary)} ${description}`;
+  }
+  return summary ? withPeriod(summary) : description;
+}
+
+/**
  * Parse a raw Entur GraphQL response into an array of normalised departure
  * objects.
  *
@@ -38,7 +60,8 @@ function pickLocalised(entries, lang) {
  *   predictionInaccurate {boolean}        — true when prediction confidence is low
  *   mode                 {string|null}    — canonical transport mode ('bus', 'rail', …)
  *   quay                 {Object|null}    — { id, publicCode } or null
- *   situations           {string[]}       — human-readable service disruption texts
+ *   situations           {string[]}       — merged situation texts: summary as opening
+ *                                           sentence followed by the description detail
  *   raw                  {Object}         — original call object (kept for downstream filtering)
  *
  * @param {Object} json        - Parsed JSON from the GraphQL endpoint
@@ -69,17 +92,12 @@ export function parseEnturResponse(json, lang = 'en') {
       : null;
 
     // --- Service disruption texts ---
-    // Priority: UI language → English → first available entry.
+    // One merged string per situation (summary heading + description detail),
+    // selected by language priority: UI language → English → first entry.
     const situations = [];
     if (Array.isArray(call.situations)) {
       for (const s of call.situations) {
-        // Prefer description (more detailed) over summary.
-        const source = Array.isArray(s?.description)
-          ? s.description
-          : Array.isArray(s?.summary)
-            ? s.summary
-            : null;
-        const text = pickLocalised(source, lang);
+        const text = buildSituationText(s, lang);
         if (text) situations.push(text);
       }
     }
