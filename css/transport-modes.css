@@ -47,7 +47,7 @@
   text-shadow: var(--text-shadow-light);
 }
 
-.mode-checkbox-label input[type=checkbox] {
+.mode-checkbox-label input[type='checkbox'] {
   margin-left: 4px;
   width: 14px;
   height: 14px;

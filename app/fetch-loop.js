@@ -182,11 +182,14 @@ export function startRefreshLoop(listEl, statusEl) {
 export function tickCountdowns(listEl, statusEl) {
   const now = Date.now();
 
-  // Update all visible departure countdowns
+  // Update all visible departure countdowns. The time cell also holds static
+  // clock text, so only its .departure-countdown span is rewritten; rows
+  // without a span fall back to replacing the whole cell.
   listEl.querySelectorAll('.departure-time').forEach((el) => {
     const raw = el.dataset.epochMs;
     const epoch = raw == null || raw === '' ? NaN : Number(raw);
-    el.textContent = Number.isFinite(epoch) ? (formatCountdown(epoch, now, t) ?? '—') : '—';
+    const target = el.querySelector('.departure-countdown') || el;
+    target.textContent = Number.isFinite(epoch) ? (formatCountdown(epoch, now, t) ?? '—') : '—';
   });
 
   // Update the header status chip with the tick-accurate seconds until refresh.

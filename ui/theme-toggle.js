@@ -11,13 +11,13 @@ const THEMES = ['light', 'auto', 'dark'];
 const ICONS = {
   light: UI_EMOJIS.themeLight,
   auto: UI_EMOJIS.themeAuto,
-  dark: UI_EMOJIS.themeDark
+  dark: UI_EMOJIS.themeDark,
 };
 
 /** Background start colors matching tokens.css gradients */
 const THEME_COLORS = {
   light: '#f5f7fa',
-  dark:  '#0b0f1a',
+  dark: '#0b0f1a',
 };
 
 /**
@@ -129,19 +129,19 @@ export function createThemeToggle(onChange) {
   button.className = 'theme-toggle-btn header-btn';
   button.type = 'button';
   button.title = t('themeTooltip');
-  
+
   let currentTheme = getTheme();
-  
+
   // Update button icon based on current theme
   function updateButton() {
     button.textContent = ICONS[currentTheme];
     button.title = t('themeTooltip');
   }
-  
+
   // Initialize
   applyTheme(currentTheme);
   updateButton();
-  
+
   // Handle clicks
   button.addEventListener('click', () => {
     currentTheme = getNextTheme(currentTheme);
@@ -150,7 +150,7 @@ export function createThemeToggle(onChange) {
     updateButton();
     if (typeof onChange === 'function') onChange(currentTheme);
   });
-  
+
   // Listen for system preference changes when in auto mode.
   // Keep a named reference so the listener can be removed if the button is destroyed.
   const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');

@@ -31,7 +31,7 @@ export function createPanelLifecycle(panel, { onClose } = {}) {
   panel.appendChild(toast);
 
   // Track both the fade-start and fade-end timers so rapid calls never orphan either.
-  let _toastFadeId  = null;
+  let _toastFadeId = null;
   let _toastClearId = null;
 
   function showToast(msg) {
@@ -44,22 +44,34 @@ export function createPanelLifecycle(panel, { onClose } = {}) {
       clearTimeout(_toastClearId);
       _toastFadeId = setTimeout(() => {
         toast.style.opacity = '0';
-        _toastClearId = setTimeout(() => { toast.classList.remove('visible'); }, 300);
+        _toastClearId = setTimeout(() => {
+          toast.classList.remove('visible');
+        }, 300);
       }, 1400);
-    } catch (e) { /* ignore */ }
+    } catch (e) {
+      /* ignore */
+    }
   }
 
   // Focus trap
   function _trap(e) {
     if (e.key !== 'Tab') return;
-    const focusables = panel.querySelectorAll('input,button,select,a[href],textarea,[tabindex]:not([tabindex="-1"])');
+    const focusables = panel.querySelectorAll(
+      'input,button,select,a[href],textarea,[tabindex]:not([tabindex="-1"])'
+    );
     if (!focusables || focusables.length === 0) return;
     const first = focusables[0];
     const last = focusables[focusables.length - 1];
     if (e.shiftKey) {
-      if (document.activeElement === first) { e.preventDefault(); last.focus(); }
+      if (document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      }
     } else {
-      if (document.activeElement === last) { e.preventDefault(); first.focus(); }
+      if (document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
     }
   }
 
@@ -89,7 +101,9 @@ export function createPanelLifecycle(panel, { onClose } = {}) {
     panel.classList.remove('open');
     try {
       if (_prevFocus && typeof _prevFocus.focus === 'function') _prevFocus.focus();
-    } catch (e) { /* ignore */ }
+    } catch (e) {
+      /* ignore */
+    }
     document.removeEventListener('keydown', _trap);
     document.removeEventListener('keydown', _escClose);
     if (typeof onClose === 'function') onClose();
