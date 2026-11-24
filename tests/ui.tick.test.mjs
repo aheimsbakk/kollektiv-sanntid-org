@@ -1,5 +1,6 @@
 import assert from 'assert/strict';
-import { formatCountdown } from '../src/time.js';
+import { formatCountdown, formatClock } from '../src/time.js';
+import { DEPARTURE_TIME_TEMPLATE } from '../src/config.js';
 import { createDepartureNode, updateDepartureCountdown } from '../src/ui/departure.js';
 // provide a minimal DOM shim for Node test environment
 if (typeof document === 'undefined') {
@@ -37,18 +38,31 @@ const item = {
 };
 const node = createDepartureNode(item);
 
-// initial update
+// The time cell holds the static clock text built from the template.
+const clock = formatClock(epoch);
+const prefix = DEPARTURE_TIME_TEMPLATE.split('{countdown}')[0].replace('{time}', clock);
+assert.equal(node.time.textContent, prefix, 'time cell should hold static clock text');
+
+// The countdown lives in its own span and updates live.
+assert(node.countdown, 'countdown span should exist');
 updateDepartureCountdown(node, now, formatCountdown);
-assert(node.time && node.time.textContent, 'time text should be set after update');
-const first = node.time.textContent;
+assert(node.countdown.textContent, 'countdown text should be set after update');
+const first = node.countdown.textContent;
 
 // after 1 second should decrement
 updateDepartureCountdown(node, now + 1000, formatCountdown);
-const second = node.time.textContent;
-assert(first !== second, 'time should change between ticks');
+assert(node.countdown.textContent !== first, 'countdown should change between ticks');
+
+// ticks must not touch the static clock text
+assert.equal(node.time.textContent, prefix, 'clock text must survive ticks');
 
 // when epoch is in the past show Now
 updateDepartureCountdown(node, epoch + 1000, formatCountdown);
-assert(node.time.textContent === 'Now', 'time should be Now when target in past');
+assert.equal(node.countdown.textContent, 'Now', 'countdown should be Now when target in past');
+
+// An invalid departure time renders a dash and creates no countdown span.
+const broken = createDepartureNode({ destination: 'Broken', situations: [] });
+assert.equal(broken.time.textContent, '—', 'invalid time should render a dash');
+assert(!broken.countdown, 'invalid time should not create a countdown span');
 
 console.log('ui.tick.test.mjs OK');

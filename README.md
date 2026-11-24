@@ -64,7 +64,7 @@ The app displays upcoming departures with:
 - **Realtime indicators** — ● solid dot for live tracking, ○ hollow dot for scheduled times, ● red solit dot for delayed
 - **Delay indicator** — the indicator changes to a **red dot** (●) when a live-tracked departure is running **2 minutes or more late**. Only shown when realtime tracking is active and the expected departure is at least 120 seconds after the originally scheduled time. Small adjustments under 2 minutes are treated as normal tracking noise and do not trigger the delay symbol.
 - **Platform/gate information** — shows platforms (⚏10), gates (◆A), or stops (▪B) where available
-- **Countdown timer** showing minutes until departure
+- **Departure time and countdown** — the expected departure clock time (HH:MM) and a live countdown, shown together, for example `14:05 · 03:20`
 - **Transport icons** (🚌 🚋 🚇 🚅 🛳️ 🚍) to identify the vehicle type
 - **Cancellation notices** — cancelled departures appear with strikethrough and reduced opacity
 - **Automatic updates** every 60 seconds (configurable)

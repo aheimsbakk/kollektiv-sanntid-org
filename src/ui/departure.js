@@ -2,9 +2,11 @@ import {
   PLATFORM_SYMBOLS,
   PLATFORM_SYMBOL_RULES,
   DEPARTURE_LINE_TEMPLATE,
+  DEPARTURE_TIME_TEMPLATE,
   REALTIME_INDICATORS,
   DELAY_THRESHOLD_MS,
 } from '../config.js';
+import { formatClock } from '../time.js';
 import { emojiForMode, labelForMode } from './mode-utils.js';
 
 /**
@@ -42,8 +44,27 @@ export function createDepartureNode(item) {
 
   // compute epoch ms robustly; store as dataset string only when valid
   const epochMs = item && item.expectedDepartureISO ? Date.parse(item.expectedDepartureISO) : NaN;
+  // countdownEl is the live part of the time cell; the per-second ticker
+  // updates only this span so the static clock text survives ticks.
+  let countdownEl = null;
   if (Number.isFinite(epochMs)) {
     time.dataset.epochMs = String(epochMs);
+
+    // Split the time template around {countdown}: the prefix carries the
+    // clock text, the suffix (if any) is trailing literal text. Only the
+    // countdown placeholder becomes a live element.
+    const [prefix, suffix = ''] = DEPARTURE_TIME_TEMPLATE.split('{countdown}');
+    time.textContent = prefix.replace('{time}', formatClock(epochMs) ?? '');
+    countdownEl = document.createElement('span');
+    countdownEl.className = 'departure-countdown';
+    time.append(countdownEl);
+    if (suffix) {
+      // Trailing text goes in a span rather than a text node so the
+      // append-only DOM path also works under the minimal test DOM shim.
+      const tail = document.createElement('span');
+      tail.textContent = suffix;
+      time.append(tail);
+    }
   } else {
     time.dataset.epochMs = '';
     time.textContent = '—';
@@ -205,7 +226,14 @@ export function createDepartureNode(item) {
   // place situation between destination and countdown so alerts are read in context
   container.append(dest, situ, timeWrap);
   // store references for quick updates
-  return { container, dest, time, situ, epochMs: Number.isFinite(epochMs) ? epochMs : null };
+  return {
+    container,
+    dest,
+    time,
+    countdown: countdownEl,
+    situ,
+    epochMs: Number.isFinite(epochMs) ? epochMs : null,
+  };
 }
 
 export function updateDepartureCountdown(node, nowMs = Date.now(), formatFn, translator = null) {
@@ -217,5 +245,7 @@ export function updateDepartureCountdown(node, nowMs = Date.now(), formatFn, tra
     return;
   }
   const text = formatFn(epoch, nowMs, translator) || '—';
-  node.time.textContent = text;
+  // Write only the countdown span; the clock text lives on the parent cell.
+  // Fall back to the cell when a caller provides a node without a span.
+  (node.countdown || node.time).textContent = text;
 }
