@@ -32,7 +32,7 @@
 | CSS manifest   | `src/style.css`            | `@import` manifest; rules live in `src/css/*.css`                                          |
 | Service worker | `src/sw.js`                | Versioned cache, fetch routing, skipWaiting                                                |
 | PWA manifest   | `src/manifest.webmanifest` | Installable PWA config                                                                     |
-| Test runner    | `tests/run.mjs`            | Node ESM test runner (imports all `*.test.mjs` files)                                      |
+| Test runner    | `tests/run.mjs`            | Node ESM suite runner: awaits the suite list in order, reports failures                    |
 
 ## Directory Structure
 
@@ -41,31 +41,41 @@ work/
 ├── AGENTS.md                          # Master rules & workflow
 ├── BLUEPRINT.md                       # Architecture specification (language-agnostic)
 ├── CHANGELOG.md                       # Version history
-├── CONTEXT.md                         # Session context (<=20 lines)
+├── CONTRIBUTING.md                    # Developer setup, commands, scripts, workflow
 ├── CNAME                              # Domain: kollektiv.sanntid.org
-├── REPORT.md                          # Worklog retrospective report
 ├── README.md                          # User-facing documentation
 ├── opencode.json                      # OpenCode IDE configuration
 ├── package.json                       # npm manifest (dev deps: prettier)
 ├── package-lock.json                  # Locked dependency tree
 ├── .gitignore                         # Excluded paths
-├── .githooks/                         # Git hooks directory
+├── .prettierrc                        # Prettier style configuration
+├── .prettierignore                    # Paths Prettier must not format
+├── .githooks/                         # Git hooks (enable: git config core.hooksPath .githooks)
+│   └── pre-commit                     # Changelog format check + CODEBASE.md path check
+├── .github/workflows/                 # Hosting pipelines (see Deployment workflows)
+│   ├── static.yml                     # Publish src/ to the Pages branch on push to main
+│   ├── pr-preview.yml                 # Publish a per-pull-request preview site
+│   ├── pr-preview-cleanup.yml         # Delete that pull request's preview when it closes
+│   └── pr-preview-gc.yml              # Delete previews of long-closed pull requests
 ├── .opencode/                         # OpenCode configuration & skills
 │   ├── RULES.md                       # Project rules (conflict resolution, security, etc.)
-│   └── skills/                        # Skill definitions
+│   ├── agents/                        # Agent role definitions
+│   ├── skills/                        # Skill definitions
+│   └── update.sh                      # Pull shared agent config from the upstream template repo
 ├── departure.sh                       # Original terminal departure board (reference)
 ├── docs/                              # Documentation
 │   ├── entur-apis/                    # Entur API reference docs
 │   ├── openstreetmap/                 # OSM integration docs
 │   ├── pwa/                           # PWA/service worker docs
-│   ├── share_url_encoding.md          # Share URL base64 encoding spec
-│   ├── PROJECT_RULES.md               # Project-specific rules
-│   └── worklogs/                      # Per-session worklog files
+│   ├── memory/                        # Cross-session memory store
+│   │   ├── INDEX.md                   # Memory lookup table
+│   │   └── archive/                   # Dated memory entry files
+│   └── share_url_encoding.md          # Share URL base64 encoding spec
 ├── scripts/                           # Utility scripts
-│   ├── bump-version.sh                # Bump VERSION in config.js + sw.js
-│   ├── fix_worklogs.sh                # Worklog maintenance
-│   ├── serve-src.sh                   # Local dev server
-│   └── validate_worklogs.sh           # Worklog validation
+│   ├── bump-version.sh                # Bump VERSION in config.js, sw.js, package.json + sitemap lastmod
+│   ├── serve-src.sh                   # Local dev server for src/
+│   ├── validate-changelog.sh          # Newest CHANGELOG entry format check
+│   └── verify_codebase_sync.sh        # Two-way CODEBASE.md / repository sync check
 ├── src/                               # Application source
 │   ├── index.html                     # Entry point HTML
 │   ├── app.js                         # Bootstrap: imports, wires DOMContentLoaded, BFCache teardown
@@ -146,48 +156,46 @@ work/
 │           ├── station-autocomplete.js # createStationAutocomplete (debounced search, keyboard nav, blur auto-select, _explicitSelection)
 │           ├── language-switcher.js   # createLanguageSwitcher (flag buttons, updateTranslations)
 │           └── panel-lifecycle.js     # createPanelLifecycle (open/close, focus trap, ESC, toast)
-├── tests/                             # Unit tests (Node ESM, no DOM/fetch)
-│   ├── run.mjs                        # Test runner: imports all *.test.mjs, handles unhandledRejection
-│   ├── time.test.mjs                  # Time utility tests
-│   ├── fetch-loop.test.mjs            # Fetch loop tick tests
-│   ├── ui.tick.test.mjs               # Countdown tick tests
-│   ├── ui.diff.test.mjs               # computeDiff tests
-│   ├── ui.emoji.test.mjs              # Emoji mapping tests
-│   ├── ui.emoji.rawtest.mjs           # Raw emoji tests
-│   ├── i18n.test.mjs                  # i18n translation tests
-│   ├── share-button-reset.test.mjs    # Share button reset tests
-│   ├── share-link.test.mjs            # Share link encoding/decoding tests
-│   ├── share-gps.test.mjs             # Share link GPS coordinate tests
-│   ├── favorites.test.mjs             # Favorites CRUD tests
-│   ├── favorites-gps.test.mjs         # Favorites GPS coordinate tests
-│   ├── remove-favorites.test.mjs      # Remove favorites tests
-│   ├── station-dropdown.test.mjs      # Station dropdown tests
-│   ├── toggle-all.test.mjs            # Transport mode toggle-all tests
-│   ├── footer-link.test.mjs           # Footer link tests
-│   ├── osm-button.test.mjs            # OSM button tests
-│   ├── sw.test.mjs                    # Service worker tests
-│   ├── sw-api-caching.test.mjs        # SW API caching tests
-│   ├── sw-updater.test.mjs            # SW updater tests
-│   ├── entur.parse.test.mjs           # Entur response parser tests
-│   ├── entur.parse.mode.test.mjs      # Mode parsing tests
-│   ├── entur.modes.test.mjs           # Mode mapping tests
-│   ├── entur.query.line.test.mjs      # Query builder tests
-│   ├── entur.empty.test.mjs           # Empty response tests
-│   ├── entur.fetch.test.mjs           # Fetch orchestration tests
-│   ├── entur.lookup.test.mjs          # Stop ID lookup tests
-│   ├── entur.norwegian.chars.test.mjs # Norwegian character handling tests
-│   ├── entur.norwegian.real.test.mjs  # Real Norwegian data tests
-│   ├── entur.autocomplete.blindern.test.mjs # Blindern autocomplete tests
-│   ├── entur.storen.autocomplete.test.mjs # Storen autocomplete tests
-│   ├── entur.gps-nearby.test.mjs      # GPS nearby stops tests
-│   ├── autocomplete-blur-race.test.mjs # Autocomplete blur race condition tests
-│   ├── autocomplete-first-load.test.mjs # Autocomplete first load tests
-│   ├── autocomplete-input-wipe.test.mjs # Autocomplete input-wipe guard tests
-│   ├── departure-delay.test.mjs       # Departure delay detection tests
-│   ├── options-autocomplete.test.mjs  # Options panel autocomplete tests
-│   ├── search-filtering.test.mjs      # Station search filtering tests
-│   └── gps-dropdown-click.test.mjs    # GPS dropdown click delegation tests
-└── .github/                           # (No workflows per AGENTS.md constraints)
+└── tests/                             # Unit tests (Node ESM, no DOM/fetch)
+    ├── run.mjs                        # Suite runner: awaits the suite list in order
+    ├── transport-mode-labels.test.mjs # Mode label scramble regression tests
+    ├── time.test.mjs                  # Time utility tests
+    ├── fetch-loop.test.mjs            # Fetch loop tick tests
+    ├── ui.tick.test.mjs               # Countdown tick tests
+    ├── ui.diff.test.mjs               # computeDiff tests
+    ├── ui.emoji.test.mjs              # Mode emoji and label helper tests
+    ├── i18n.test.mjs                  # Browser language detection tests
+    ├── share-button-reset.test.mjs    # Share button reset tests
+    ├── share-link.test.mjs            # Share link encoding/decoding tests
+    ├── share-gps.test.mjs             # Share link GPS coordinate tests
+    ├── favorites.test.mjs             # Favorites CRUD tests
+    ├── favorites-gps.test.mjs         # Favorites GPS coordinate tests
+    ├── remove-favorites.test.mjs      # Remove favorites tests
+    ├── station-dropdown.test.mjs      # Station dropdown tests
+    ├── toggle-all.test.mjs            # Transport mode toggle-all tests
+    ├── footer-link.test.mjs           # Footer link tests
+    ├── osm-button.test.mjs            # OSM button tests
+    ├── sw.test.mjs                    # Service worker tests
+    ├── sw-api-caching.test.mjs        # SW API caching tests
+    ├── sw-updater.test.mjs            # SW updater tests
+    ├── entur.parse.test.mjs           # Entur response parser tests
+    ├── entur.parse.mode.test.mjs      # Mode parsing tests
+    ├── entur.modes.test.mjs           # Mode mapping tests
+    ├── entur.query.line.test.mjs      # Query builder tests
+    ├── entur.empty.test.mjs           # Empty response tests
+    ├── entur.fetch.test.mjs           # Fetch orchestration tests
+    ├── entur.lookup.test.mjs          # Stop ID lookup tests
+    ├── entur.norwegian.chars.test.mjs # Norwegian character handling tests
+    ├── entur.autocomplete.blindern.test.mjs # Blindern autocomplete stored-ID tests
+    ├── entur.gps-nearby.test.mjs      # GPS nearby stops tests
+    ├── autocomplete-input-wipe.test.mjs # Autocomplete input-wipe guard tests
+    ├── departure-delay.test.mjs       # Departure delay detection tests
+    ├── options-autocomplete.test.mjs  # Options panel autocomplete tests
+    ├── search-filtering.test.mjs      # Station search filtering tests
+    ├── gps-dropdown-click.test.mjs    # GPS dropdown click delegation tests
+    ├── codebase-sync.test.mjs          # CODEBASE.md sync-script tests
+    ├── entur.norwegian.real.test.mjs  # Live-API Norwegian character check (manual)
+    └── entur.storen.autocomplete.test.mjs # Live-API Storen ranking check (manual)
 ```
 
 ## Physical Path Mappings (Blueprint → Codebase)
@@ -301,16 +309,19 @@ work/
 
 ### Tests (`tests/`)
 
+Suite tests run through `tests/run.mjs`. They are hermetic: no network, no
+browser. DOM and `localStorage` are replaced by stubs inside each suite.
+
 | Blueprint Component               | Physical Path                                |
 | --------------------------------- | -------------------------------------------- |
 | Test runner                       | `tests/run.mjs`                              |
+| Mode label regression tests       | `tests/transport-mode-labels.test.mjs`       |
 | Time tests                        | `tests/time.test.mjs`                        |
 | Fetch loop tests                  | `tests/fetch-loop.test.mjs`                  |
 | UI tick tests                     | `tests/ui.tick.test.mjs`                     |
 | UI diff tests                     | `tests/ui.diff.test.mjs`                     |
-| UI emoji tests                    | `tests/ui.emoji.test.mjs`                    |
-| UI emoji raw tests                | `tests/ui.emoji.rawtest.mjs`                 |
-| i18n tests                        | `tests/i18n.test.mjs`                        |
+| Mode emoji and label tests        | `tests/ui.emoji.test.mjs`                    |
+| Language detection tests          | `tests/i18n.test.mjs`                        |
 | Share button tests                | `tests/share-button-reset.test.mjs`          |
 | Share link tests                  | `tests/share-link.test.mjs`                  |
 | Share GPS tests                   | `tests/share-gps.test.mjs`                   |
@@ -332,26 +343,31 @@ work/
 | Entur fetch tests                 | `tests/entur.fetch.test.mjs`                 |
 | Entur lookup tests                | `tests/entur.lookup.test.mjs`                |
 | Entur Norwegian chars tests       | `tests/entur.norwegian.chars.test.mjs`       |
-| Entur Norwegian real tests        | `tests/entur.norwegian.real.test.mjs`        |
 | Entur Blindern autocomplete tests | `tests/entur.autocomplete.blindern.test.mjs` |
-| Entur Storen autocomplete tests   | `tests/entur.storen.autocomplete.test.mjs`   |
 | Entur GPS nearby tests            | `tests/entur.gps-nearby.test.mjs`            |
-| Autocomplete blur race tests      | `tests/autocomplete-blur-race.test.mjs`      |
-| Autocomplete first load tests     | `tests/autocomplete-first-load.test.mjs`     |
 | Autocomplete input-wipe tests     | `tests/autocomplete-input-wipe.test.mjs`     |
 | Departure delay tests             | `tests/departure-delay.test.mjs`             |
 | Options autocomplete tests        | `tests/options-autocomplete.test.mjs`        |
 | Search filtering tests            | `tests/search-filtering.test.mjs`            |
 | GPS dropdown click tests          | `tests/gps-dropdown-click.test.mjs`          |
+| Codebase sync script tests        | `tests/codebase-sync.test.mjs`               |
+
+Manual checks hit the live Entur API and are not imported by `tests/run.mjs`.
+Run them by hand with `node tests/<file>`.
+
+| Blueprint Component       | Physical Path                              |
+| ------------------------- | ------------------------------------------ |
+| Norwegian live-API check  | `tests/entur.norwegian.real.test.mjs`      |
+| Storen ranking live check | `tests/entur.storen.autocomplete.test.mjs` |
 
 ### Scripts (`scripts/`)
 
-| Blueprint Component | Physical Path                  |
-| ------------------- | ------------------------------ |
-| Version bump        | `scripts/bump-version.sh`      |
-| Fix worklogs        | `scripts/fix_worklogs.sh`      |
-| Serve source        | `scripts/serve-src.sh`         |
-| Validate worklogs   | `scripts/validate_worklogs.sh` |
+| Blueprint Component  | Physical Path                     |
+| -------------------- | --------------------------------- |
+| Version bump         | `scripts/bump-version.sh`         |
+| Serve source         | `scripts/serve-src.sh`            |
+| Validate changelog   | `scripts/validate-changelog.sh`   |
+| Verify codebase sync | `scripts/verify_codebase_sync.sh` |
 
 ### Documentation (`docs/`)
 
@@ -361,8 +377,32 @@ work/
 | OSM docs            | `docs/openstreetmap/`        |
 | PWA docs            | `docs/pwa/`                  |
 | Share URL encoding  | `docs/share_url_encoding.md` |
-| Project rules       | `docs/PROJECT_RULES.md`      |
-| Worklogs            | `docs/worklogs/`             |
+| Memory store        | `docs/memory/`               |
+
+Folder entries above are mapped as a whole: their individual files are reference
+material (`docs/entur-apis/`, `docs/openstreetmap/`, `docs/pwa/`) or dated
+entries that grow without a code change (`docs/memory/archive/`).
+
+### Hosting workflows (`.github/workflows/`)
+
+| Blueprint Component              | Physical Path                              |
+| -------------------------------- | ------------------------------------------ |
+| Production publish               | `.github/workflows/static.yml`             |
+| Pull-request preview publish     | `.github/workflows/pr-preview.yml`         |
+| Pull-request preview removal     | `.github/workflows/pr-preview-cleanup.yml` |
+| Stale preview garbage collection | `.github/workflows/pr-preview-gc.yml`      |
+
+### Repository documentation
+
+| Blueprint Component        | Physical Path        |
+| -------------------------- | -------------------- |
+| User documentation         | `README.md`          |
+| Developer documentation    | `CONTRIBUTING.md`    |
+| Architecture specification | `BLUEPRINT.md`       |
+| File-to-component mapping  | `CODEBASE.md`        |
+| Version history            | `CHANGELOG.md`       |
+| Agent workflow rules       | `AGENTS.md`          |
+| Project constraints        | `.opencode/RULES.md` |
 
 ## Dependency Graph (Module Imports)
 

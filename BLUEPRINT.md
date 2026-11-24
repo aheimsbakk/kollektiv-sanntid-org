@@ -239,9 +239,20 @@ Each schema is stored under a key in persistent client storage:
 - All external API calls use the browser's native fetch with abort support.
 - Shared URLs contain only station identifiers and user-selected settings. No personal data is encoded.
 
+## Hosting and Publication
+
+- The application is published as static files with no server-side code and no build artifacts.
+- A publish step runs on each accepted change to the main line and replaces the public copy.
+- Each open change gets an isolated preview copy; the preview is rebuilt when the change is updated and removed when the change is closed.
+- A periodic sweep removes preview copies whose change has long been closed.
+- Preview copies are disposable and never share storage with the public copy.
+
 ## Testing Strategy
 
 - Unit tests run in a headless environment using a built-in assertion library.
 - Tests are placed in a dedicated test directory.
 - Tests are hermetic: no DOM APIs, no network calls. External dependencies are injected as test doubles.
-- A single test runner imports all test modules and reports pass/fail.
+- A single runner loads a registered list of suites one at a time, because suites install global test doubles that must not overlap, and reports pass/fail per suite.
+- A suite must signal failure through the process exit code, never by terminating the process, or later suites are skipped without a report.
+- Live-API probes exist but stay outside the registered list and run only on demand.
+- The consistency check between the file-to-component map and the repository runs in both directions, and that check is itself exercised by a suite against fixture documents.

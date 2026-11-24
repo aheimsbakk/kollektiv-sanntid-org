@@ -126,20 +126,11 @@ Your theme choice is saved automatically.
 
 Reload the web page. When a new version is available, you'll see a notification counting down from 5 seconds. The app will automatically reload with the latest features. All your settings and favorites are preserved.
 
-## Run Locally
+## Run It Yourself
 
-This app has no build step. To run it:
-
-1. Clone the repository.
-2. Serve the files with any local HTTP server (service workers require HTTP, not `file://`).
-
-```sh
-npx serve .
-# or
-python3 -m http.server
-```
-
-3. Open `http://localhost:3000` (or the port your server reports) in your browser.
+The app has no build step and no runtime dependencies. For local setup, the dev
+server command, test commands, and release steps, see
+[CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Technical Details
 
@@ -159,7 +150,9 @@ Modern browsers with service worker support (Chrome 102+, Firefox 112+, Safari 1
 
 ## Contributing
 
-Bug reports and suggestions are welcome — [open an issue](../../issues) on GitHub.
+Bug reports and suggestions are welcome — [open an issue](../../issues) on
+GitHub. For development setup, commands, and release steps, see
+[CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## License
 
