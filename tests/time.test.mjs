@@ -9,7 +9,10 @@ assert(typeof epoch === 'number' && epoch > now, 'isoToEpochMs should return epo
 
 const formatted = formatCountdown(epoch, now);
 // Accept either MM:SS or HH:MM:SS when hours = 0 we'll expect MM:SS
-assert(/^[0-9]{2}:[0-9]{2}$/.test(formatted) || formatted === 'Now', 'format should produce MM:SS or Now');
+assert(
+  /^[0-9]{2}:[0-9]{2}$/.test(formatted) || formatted === 'Now',
+  'format should produce MM:SS or Now'
+);
 
 console.log('time.test.mjs OK');
 

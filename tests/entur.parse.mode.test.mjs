@@ -12,20 +12,20 @@ const fakeResponse = {
           destinationDisplay: { frontText: 'Central' },
           situations: [],
           serviceJourney: {
-            journeyPattern: { line: { transportMode: 'BUS', publicCode: '31' } }
-          }
+            journeyPattern: { line: { transportMode: 'BUS', publicCode: '31' } },
+          },
         },
         {
           expectedDepartureTime: '2026-02-15T01:05:00Z',
           destinationDisplay: { frontText: 'Harbor' },
           situations: [],
           serviceJourney: {
-            journeyPattern: { line: { transportMode: 'TRAM', publicCode: '12' } }
-          }
-        }
-      ]
-    }
-  }
+            journeyPattern: { line: { transportMode: 'TRAM', publicCode: '12' } },
+          },
+        },
+      ],
+    },
+  },
 };
 
 const parsed = parseEnturResponse(fakeResponse);

@@ -13,7 +13,9 @@ console.log('Running fetch-loop.test.mjs');
 
 // ── minimal stubs ──────────────────────────────────────────────────────────
 let fetchCallCount = 0;
-const stubbedDoRefresh = async () => { fetchCallCount++; };
+const stubbedDoRefresh = async () => {
+  fetchCallCount++;
+};
 
 // Simulate the unified tick counter logic extracted from fetch-loop.js
 // (mirrors the real implementation so this test is meaningful)
@@ -47,11 +49,26 @@ function makeLoop(fetchInterval) {
 {
   let fetched = false;
   const loop = makeLoop(5);
-  loop.tick(() => { fetched = true; }); assert(!fetched, 'No fetch at tick 1');
-  loop.tick(() => { fetched = true; }); assert(!fetched, 'No fetch at tick 2');
-  loop.tick(() => { fetched = true; }); assert(!fetched, 'No fetch at tick 3');
-  loop.tick(() => { fetched = true; }); assert(!fetched, 'No fetch at tick 4');
-  loop.tick(() => { fetched = true; }); assert(fetched, 'Fetch MUST fire at tick 5 (interval=5)');
+  loop.tick(() => {
+    fetched = true;
+  });
+  assert(!fetched, 'No fetch at tick 1');
+  loop.tick(() => {
+    fetched = true;
+  });
+  assert(!fetched, 'No fetch at tick 2');
+  loop.tick(() => {
+    fetched = true;
+  });
+  assert(!fetched, 'No fetch at tick 3');
+  loop.tick(() => {
+    fetched = true;
+  });
+  assert(!fetched, 'No fetch at tick 4');
+  loop.tick(() => {
+    fetched = true;
+  });
+  assert(fetched, 'Fetch MUST fire at tick 5 (interval=5)');
 }
 
 // ── Test 3: counter resets to FETCH_INTERVAL right after the fetch ─────────
@@ -82,7 +99,10 @@ function makeLoop(fetchInterval) {
   const INTERVAL = 2;
   let count = 0;
   const loop = makeLoop(INTERVAL);
-  for (let i = 0; i < 6; i++) loop.tick(() => { count++; });
+  for (let i = 0; i < 6; i++)
+    loop.tick(() => {
+      count++;
+    });
   assert.equal(count, 3, 'Fetch must fire 3 times in 6 ticks of a 2-tick interval');
 }
 

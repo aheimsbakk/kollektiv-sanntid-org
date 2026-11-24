@@ -34,21 +34,25 @@ export async function postAndParse(apiUrl, clientName, fetchFn, query, variables
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'ET-Client-Name': clientName
+      'ET-Client-Name': clientName,
     },
-    body: JSON.stringify(payload)
+    body: JSON.stringify(payload),
   });
 
   if (!resp) throw new Error('Empty response from fetch');
 
   if (typeof resp.ok !== 'undefined' && resp.ok === false) {
-    const txt = typeof resp.text === 'function' ? await resp.text().catch(() => '<no body>') : '<no body>';
-    throw new Error(`Network error: ${resp.status ?? 'unknown'} ${resp.statusText ?? ''} — ${String(txt).slice(0, 200)}`);
+    const txt =
+      typeof resp.text === 'function' ? await resp.text().catch(() => '<no body>') : '<no body>';
+    throw new Error(
+      `Network error: ${resp.status ?? 'unknown'} ${resp.statusText ?? ''} — ${String(txt).slice(0, 200)}`
+    );
   }
 
   const contentType = getContentType(resp);
   if (contentType && !/application\/json/i.test(contentType)) {
-    const txt = typeof resp.text === 'function' ? await resp.text().catch(() => '<no body>') : '<no body>';
+    const txt =
+      typeof resp.text === 'function' ? await resp.text().catch(() => '<no body>') : '<no body>';
     throw new SyntaxError(`Non-JSON response: ${String(txt).slice(0, 200)}`);
   }
 

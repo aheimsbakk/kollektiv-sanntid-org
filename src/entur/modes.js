@@ -11,25 +11,25 @@
  * @type {Map<string, string>}
  */
 export const CANONICAL_MODE_MAP = new Map([
-  ['bus',        'bus'],
-  ['buss',       'bus'],
-  ['coach',      'coach'],
-  ['tram',       'tram'],
-  ['trikk',      'tram'],
-  ['metro',      'metro'],
-  ['t-bane',     'metro'],
-  ['tbane',      'metro'],
-  ['subway',     'metro'],
-  ['underground','metro'],
-  ['rail',       'rail'],
-  ['train',      'rail'],
-  ['tog',        'rail'],
-  ['s-tog',      'rail'],
-  ['water',      'water'],
-  ['ferry',      'water'],
-  ['ferje',      'water'],
-  ['boat',       'water'],
-  ['ship',       'water']
+  ['bus', 'bus'],
+  ['buss', 'bus'],
+  ['coach', 'coach'],
+  ['tram', 'tram'],
+  ['trikk', 'tram'],
+  ['metro', 'metro'],
+  ['t-bane', 'metro'],
+  ['tbane', 'metro'],
+  ['subway', 'metro'],
+  ['underground', 'metro'],
+  ['rail', 'rail'],
+  ['train', 'rail'],
+  ['tog', 'rail'],
+  ['s-tog', 'rail'],
+  ['water', 'water'],
+  ['ferry', 'water'],
+  ['ferje', 'water'],
+  ['boat', 'water'],
+  ['ship', 'water'],
 ]);
 
 /**
@@ -58,8 +58,8 @@ export function extractString(v) {
   if (typeof v === 'string') return v;
   if (typeof v === 'object') {
     if (typeof v.value === 'string') return v.value;
-    if (typeof v.id    === 'string') return v.id;
-    if (typeof v.name  === 'string') return v.name;
+    if (typeof v.id === 'string') return v.id;
+    if (typeof v.name === 'string') return v.name;
   }
   return null;
 }
@@ -81,7 +81,15 @@ export function detectModeFromRaw(raw) {
   const tokens = Array.from(CANONICAL_MODE_MAP.keys());
 
   // Check a small set of well-known shallow fields first (fast path)
-  const shallowKeys = ['transportMode', 'mode', 'serviceType', 'product', 'transportSubmode', 'vehicleMode', 'type'];
+  const shallowKeys = [
+    'transportMode',
+    'mode',
+    'serviceType',
+    'product',
+    'transportSubmode',
+    'vehicleMode',
+    'type',
+  ];
   for (const k of shallowKeys) {
     const s = extractString(raw[k]);
     if (s) {

@@ -39,9 +39,15 @@ function makeOldLogic(countdownStart) {
   return {
     tick,
     fireTimeout,
-    get lastToast() { return toastTexts[toastTexts.length - 1]; },
-    get skipWaitingCalled() { return skipWaitingCalled; },
-    get intervalCleared() { return intervalId.cleared; },
+    get lastToast() {
+      return toastTexts[toastTexts.length - 1];
+    },
+    get skipWaitingCalled() {
+      return skipWaitingCalled;
+    },
+    get intervalCleared() {
+      return intervalId.cleared;
+    },
   };
 }
 
@@ -64,19 +70,31 @@ function makeNewLogic(countdownStart) {
 
   return {
     tick,
-    sendSkipWaiting: () => { skipWaitingCalled = true; },
-    triggerReload:   () => { reloadCalled = true; },
-    get lastToast() { return toastTexts[toastTexts.length - 1]; },
-    get skipWaitingCalled() { return skipWaitingCalled; },
-    get reloadCalled() { return reloadCalled; },
-    get countdown() { return countdown; },
+    sendSkipWaiting: () => {
+      skipWaitingCalled = true;
+    },
+    triggerReload: () => {
+      reloadCalled = true;
+    },
+    get lastToast() {
+      return toastTexts[toastTexts.length - 1];
+    },
+    get skipWaitingCalled() {
+      return skipWaitingCalled;
+    },
+    get reloadCalled() {
+      return reloadCalled;
+    },
+    get countdown() {
+      return countdown;
+    },
   };
 }
 
 // ── Test 1 (bug reproduction): old logic — toast freezes at 1s ────────────
 {
   const old = makeOldLogic(5);
-  for (let i = 0; i < 5; i++) old.tick();   // simulate 5 ticks
+  for (let i = 0; i < 5; i++) old.tick(); // simulate 5 ticks
   // Old: after 5 ticks countdown==0, interval cleared, last toast update was at countdown==1
   assert.equal(old.lastToast, '1s', 'OLD BUG: last toast shown is "1s", never "0s"');
   assert(!old.skipWaitingCalled, 'OLD BUG: skipWaiting not called by the interval');
@@ -113,7 +131,13 @@ function makeNewLogic(countdownStart) {
   let skipSent = false;
 
   // Simulate: waiting becomes available after 1 tick
-  setTimeout(() => { reg.waiting = { postMessage: () => { skipSent = true; } }; }, 0);
+  setTimeout(() => {
+    reg.waiting = {
+      postMessage: () => {
+        skipSent = true;
+      },
+    };
+  }, 0);
 
   const n = makeNewLogic(1);
   // Tick fires synchronously (before setTimeout), re-queries reg.waiting at trigger time

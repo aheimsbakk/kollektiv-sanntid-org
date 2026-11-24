@@ -21,26 +21,30 @@
  */
 export function buildQuery(stopId, numDepartures, opts = {}) {
   const {
-    includeModes     = false,
-    modesLiteral     = '',
-    useVariables     = false,
-    variableValues   = null,
-    includeModeFields = false
+    includeModes = false,
+    modesLiteral = '',
+    useVariables = false,
+    variableValues = null,
+    includeModeFields = false,
   } = opts;
 
-  const varSig     = (useVariables && includeModes) ? '($modes: [TransportMode!])' : '';
-  const modesPart  = includeModes
-    ? (useVariables ? ', whiteListedModes: $modes' : `, whiteListedModes: [${modesLiteral}]`)
+  const varSig = useVariables && includeModes ? '($modes: [TransportMode!])' : '';
+  const modesPart = includeModes
+    ? useVariables
+      ? ', whiteListedModes: $modes'
+      : `, whiteListedModes: [${modesLiteral}]`
     : '';
 
   // Optionally request service-journey/line fields for richer mode detection
-  const modeFields = includeModeFields ? `
+  const modeFields = includeModeFields
+    ? `
         serviceJourney {
           transportSubmode
           journeyPattern {
             line { publicCode transportMode transportSubmode }
           }
-        }` : '';
+        }`
+    : '';
 
   const query = `query ${varSig} {
     stopPlace(id: "${stopId}") {
@@ -66,7 +70,7 @@ export function buildQuery(stopId, numDepartures, opts = {}) {
     }
   }`;
 
-  const variables = (useVariables && variableValues) ? { modes: variableValues } : null;
+  const variables = useVariables && variableValues ? { modes: variableValues } : null;
   return { query, variables };
 }
 
@@ -86,40 +90,52 @@ export function buildQuery(stopId, numDepartures, opts = {}) {
  * @returns {Array<{ name: string, opts: Object }>}
  */
 export function buildVariants(modes) {
-  const modesLower  = modes.map(m => String(m).toLowerCase());
-  const modesUpper  = modes.map(m => String(m).toUpperCase());
-  const singleLit   = `"${modes.join(', ')}"`;
-  const quotedArr   = modes.map(m => `"${m}"`).join(',');
-  const enumLower   = modesLower.join(',');
-  const enumUpper   = modesUpper.join(',');
+  const modesLower = modes.map((m) => String(m).toLowerCase());
+  const modesUpper = modes.map((m) => String(m).toUpperCase());
+  const singleLit = `"${modes.join(', ')}"`;
+  const quotedArr = modes.map((m) => `"${m}"`).join(',');
+  const enumLower = modesLower.join(',');
+  const enumUpper = modesUpper.join(',');
 
   const hasModes = Array.isArray(modes) && modes.length > 0;
 
   // Core variant list (without extended-mode-fields flag)
   const base = hasModes
     ? [
-        { name: 'vars-lower',       opts: { includeModes: true, useVariables: true,  variableValues: modesLower } },
-        { name: 'vars-upper',       opts: { includeModes: true, useVariables: true,  variableValues: modesUpper } },
-        { name: 'single-string',    opts: { includeModes: true, modesLiteral: singleLit } },
-        { name: 'quoted-array',     opts: { includeModes: true, modesLiteral: quotedArr } },
+        {
+          name: 'vars-lower',
+          opts: { includeModes: true, useVariables: true, variableValues: modesLower },
+        },
+        {
+          name: 'vars-upper',
+          opts: { includeModes: true, useVariables: true, variableValues: modesUpper },
+        },
+        { name: 'single-string', opts: { includeModes: true, modesLiteral: singleLit } },
+        { name: 'quoted-array', opts: { includeModes: true, modesLiteral: quotedArr } },
         { name: 'enum-array-lower', opts: { includeModes: true, modesLiteral: enumLower } },
         { name: 'enum-array-upper', opts: { includeModes: true, modesLiteral: enumUpper } },
-        { name: 'no-filter',        opts: { includeModes: false } }
+        { name: 'no-filter', opts: { includeModes: false } },
       ]
     : [
-        { name: 'no-filter',        opts: { includeModes: false } },
-        { name: 'vars-lower',       opts: { includeModes: true, useVariables: true,  variableValues: modesLower } },
-        { name: 'vars-upper',       opts: { includeModes: true, useVariables: true,  variableValues: modesUpper } },
-        { name: 'single-string',    opts: { includeModes: true, modesLiteral: singleLit } },
-        { name: 'quoted-array',     opts: { includeModes: true, modesLiteral: quotedArr } },
+        { name: 'no-filter', opts: { includeModes: false } },
+        {
+          name: 'vars-lower',
+          opts: { includeModes: true, useVariables: true, variableValues: modesLower },
+        },
+        {
+          name: 'vars-upper',
+          opts: { includeModes: true, useVariables: true, variableValues: modesUpper },
+        },
+        { name: 'single-string', opts: { includeModes: true, modesLiteral: singleLit } },
+        { name: 'quoted-array', opts: { includeModes: true, modesLiteral: quotedArr } },
         { name: 'enum-array-lower', opts: { includeModes: true, modesLiteral: enumLower } },
-        { name: 'enum-array-upper', opts: { includeModes: true, modesLiteral: enumUpper } }
+        { name: 'enum-array-upper', opts: { includeModes: true, modesLiteral: enumUpper } },
       ];
 
   // Prepend extended variants (request serviceJourney/line fields for richer mode info)
-  const extended = base.map(v => ({
+  const extended = base.map((v) => ({
     name: 'ext-' + v.name,
-    opts: { ...v.opts, includeModeFields: true }
+    opts: { ...v.opts, includeModeFields: true },
   }));
 
   return [...extended, ...base];

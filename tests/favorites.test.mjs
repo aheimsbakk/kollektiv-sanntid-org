@@ -11,51 +11,86 @@ console.log('Running favorites.test.mjs');
 
 // Mock localStorage for Node.js environment
 class LocalStorageMock {
-  constructor() { this.store = {}; }
-  getItem(key) { return this.store[key] || null; }
-  setItem(key, value) { this.store[key] = String(value); }
-  clear() { this.store = {}; }
+  constructor() {
+    this.store = {};
+  }
+  getItem(key) {
+    return this.store[key] || null;
+  }
+  setItem(key, value) {
+    this.store[key] = String(value);
+  }
+  clear() {
+    this.store = {};
+  }
 }
 global.localStorage = new LocalStorageMock();
 
 // Minimal mock for window.matchMedia (needed by updateFavoriteButton theme logic)
 global.window = {
   matchMedia: (query) => ({
-    matches: query === '(prefers-color-scheme: light)'
-  })
+    matches: query === '(prefers-color-scheme: light)',
+  }),
 };
 
 // Minimal mock for document.createElement etc. needed by module imports
 global.document = {
   createElement: (tag) => ({
     tagName: tag.toUpperCase(),
-    className: '', textContent: '', title: '', type: '',
-    disabled: false, checked: false, indeterminate: false,
-    style: {}, dataset: {}, children: [],
+    className: '',
+    textContent: '',
+    title: '',
+    type: '',
+    disabled: false,
+    checked: false,
+    indeterminate: false,
+    style: {},
+    dataset: {},
+    children: [],
     childNodes: [],
-    setAttribute: function() {},
-    getAttribute: function() { return null; },
-    addEventListener: function() {},
-    removeEventListener: function() {},
-    appendChild: function(child) { this.children.push(child); return child; },
-    removeChild: function() {},
-    append: function(...args) { this.children.push(...args); },
-    replaceChild: function() {},
-    querySelector: function() { return null; },
-    querySelectorAll: function() { return []; },
-    classList: { add(){}, remove(){}, contains(){ return false; } },
-    scrollIntoView: function() {},
-    focus: function() {},
-    select: function() {},
-    contains: function() { return false; }
+    setAttribute: function () {},
+    getAttribute: function () {
+      return null;
+    },
+    addEventListener: function () {},
+    removeEventListener: function () {},
+    appendChild: function (child) {
+      this.children.push(child);
+      return child;
+    },
+    removeChild: function () {},
+    append: function (...args) {
+      this.children.push(...args);
+    },
+    replaceChild: function () {},
+    querySelector: function () {
+      return null;
+    },
+    querySelectorAll: function () {
+      return [];
+    },
+    classList: {
+      add() {},
+      remove() {},
+      contains() {
+        return false;
+      },
+    },
+    scrollIntoView: function () {},
+    focus: function () {},
+    select: function () {},
+    contains: function () {
+      return false;
+    },
   }),
-  addEventListener: function() {},
-  removeEventListener: function() {},
+  addEventListener: function () {},
+  removeEventListener: function () {},
   activeElement: null,
-  body: { classList: { add(){}, remove(){} } }
+  body: { classList: { add() {}, remove() {} } },
 };
 
-const { getRecentStations, addRecentStation, isStationInFavorites, getDefaultStation } = await import('../src/ui/station-dropdown.js');
+const { getRecentStations, addRecentStation, isStationInFavorites, getDefaultStation } =
+  await import('../src/ui/station-dropdown.js');
 const { updateFavoriteButton } = await import('../src/ui/ui.js');
 const { UI_EMOJIS, DEFAULT_FAVORITE } = await import('../src/config.js');
 
@@ -91,21 +126,33 @@ const { UI_EMOJIS, DEFAULT_FAVORITE } = await import('../src/config.js');
 // Test 1: Empty favorites returns false
 {
   localStorage.clear();
-  assert.equal(isStationInFavorites('NSR:StopPlace:59872', ['bus']), false, 'Empty favorites should return false');
+  assert.equal(
+    isStationInFavorites('NSR:StopPlace:59872', ['bus']),
+    false,
+    'Empty favorites should return false'
+  );
 }
 
 // Test 2: Station + matching modes in favorites returns true
 {
   localStorage.clear();
   addRecentStation('Oslo S', 'NSR:StopPlace:59872', ['bus']);
-  assert.equal(isStationInFavorites('NSR:StopPlace:59872', ['bus']), true, 'Should find station with matching modes');
+  assert.equal(
+    isStationInFavorites('NSR:StopPlace:59872', ['bus']),
+    true,
+    'Should find station with matching modes'
+  );
 }
 
 // Test 3: Station not in favorites returns false
 {
   localStorage.clear();
   addRecentStation('Oslo S', 'NSR:StopPlace:59872', ['bus']);
-  assert.equal(isStationInFavorites('NSR:StopPlace:99999', ['bus']), false, 'Should not find missing station');
+  assert.equal(
+    isStationInFavorites('NSR:StopPlace:99999', ['bus']),
+    false,
+    'Should not find missing station'
+  );
 }
 
 // Test 4: Null/undefined stopId returns false
@@ -113,7 +160,11 @@ const { UI_EMOJIS, DEFAULT_FAVORITE } = await import('../src/config.js');
   localStorage.clear();
   addRecentStation('Oslo S', 'NSR:StopPlace:59872', ['bus']);
   assert.equal(isStationInFavorites(null, ['bus']), false, 'Null stopId should return false');
-  assert.equal(isStationInFavorites(undefined, ['bus']), false, 'Undefined stopId should return false');
+  assert.equal(
+    isStationInFavorites(undefined, ['bus']),
+    false,
+    'Undefined stopId should return false'
+  );
   assert.equal(isStationInFavorites('', ['bus']), false, 'Empty string stopId should return false');
 }
 
@@ -121,18 +172,27 @@ const { UI_EMOJIS, DEFAULT_FAVORITE } = await import('../src/config.js');
 {
   localStorage.clear();
   addRecentStation('Oslo S', 'NSR:StopPlace:59872', ['bus']);
-  assert.equal(isStationInFavorites('NSR:StopPlace:59872', ['metro']), false,
-    'Same stopId but different modes should NOT match');
-  assert.equal(isStationInFavorites('NSR:StopPlace:59872', ['bus', 'metro']), false,
-    'Same stopId but superset modes should NOT match');
+  assert.equal(
+    isStationInFavorites('NSR:StopPlace:59872', ['metro']),
+    false,
+    'Same stopId but different modes should NOT match'
+  );
+  assert.equal(
+    isStationInFavorites('NSR:StopPlace:59872', ['bus', 'metro']),
+    false,
+    'Same stopId but superset modes should NOT match'
+  );
 }
 
 // Test 6: Same station with same modes (different order) → found
 {
   localStorage.clear();
   addRecentStation('Oslo S', 'NSR:StopPlace:59872', ['bus', 'metro']);
-  assert.equal(isStationInFavorites('NSR:StopPlace:59872', ['metro', 'bus']), true,
-    'Same modes in different order should match');
+  assert.equal(
+    isStationInFavorites('NSR:StopPlace:59872', ['metro', 'bus']),
+    true,
+    'Same modes in different order should match'
+  );
 }
 
 // Test 7: Multiple favorites with different modes, each matches independently
@@ -140,9 +200,21 @@ const { UI_EMOJIS, DEFAULT_FAVORITE } = await import('../src/config.js');
   localStorage.clear();
   addRecentStation('Oslo S', 'NSR:StopPlace:59872', ['bus']);
   addRecentStation('Oslo S', 'NSR:StopPlace:59872', ['metro']);
-  assert.equal(isStationInFavorites('NSR:StopPlace:59872', ['bus']), true, 'Should find bus variant');
-  assert.equal(isStationInFavorites('NSR:StopPlace:59872', ['metro']), true, 'Should find metro variant');
-  assert.equal(isStationInFavorites('NSR:StopPlace:59872', ['tram']), false, 'Should not find tram variant');
+  assert.equal(
+    isStationInFavorites('NSR:StopPlace:59872', ['bus']),
+    true,
+    'Should find bus variant'
+  );
+  assert.equal(
+    isStationInFavorites('NSR:StopPlace:59872', ['metro']),
+    true,
+    'Should find metro variant'
+  );
+  assert.equal(
+    isStationInFavorites('NSR:StopPlace:59872', ['tram']),
+    false,
+    'Should not find tram variant'
+  );
 }
 
 // --- updateFavoriteButton tests ---
@@ -155,7 +227,9 @@ function mockBtn() {
     disabled: false,
     title: '',
     _ariaLabel: '',
-    setAttribute(key, val) { if (key === 'aria-label') this._ariaLabel = val; }
+    setAttribute(key, val) {
+      if (key === 'aria-label') this._ariaLabel = val;
+    },
   };
 }
 
@@ -164,7 +238,11 @@ function mockBtn() {
   localStorage.clear();
   const btn = mockBtn();
   updateFavoriteButton(btn, 'NSR:StopPlace:99999', ['bus']);
-  assert.equal(btn.textContent, UI_EMOJIS.heartSave, 'Should show gray heart when not in favorites');
+  assert.equal(
+    btn.textContent,
+    UI_EMOJIS.heartSave,
+    'Should show gray heart when not in favorites'
+  );
   assert.equal(btn.disabled, false, 'Should be enabled when not in favorites');
 }
 
