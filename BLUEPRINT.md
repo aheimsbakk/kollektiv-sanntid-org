@@ -24,6 +24,7 @@ The application runs entirely in the browser with no server component. If the ex
 - Departure line shows: destination, line number, transport mode, realtime status, scheduled vs actual time, platform/quay, and active situations.
 - Realtime indicator: solid dot (live), hollow dot (scheduled), red dot (delayed beyond configurable threshold).
 - Cancelled departures shown with strikethrough and reduced opacity.
+- Departure display time (HH:MM, from the API expected departure time, shown in the browser's local timezone) and a live countdown, combined through a configurable time-cell template (default: `time · countdown`).
 - Live countdown timer updating every second.
 - Pull-to-load-more gesture to progressively load additional departures.
 - Settings persisted to local storage: station, departure count, transport modes, text size, fetch interval.
@@ -79,7 +80,7 @@ The application runs entirely in the browser with no server component. If the ex
 
 ### Configuration
 
-- All configurable constants in a single module: version, app name, defaults (station, departure count, fetch interval, transport modes, client name, API URL, GitHub URL, coordinates), default favorite, all transport modes list, mode grid layout, realtime indicators, delay threshold, transport mode emojis, UI button emojis, cancellation wrapper, platform symbols and symbol selection rules, departure line template, GPS search parameters (max results, search radius), GPS dropdown item template, favorites dropdown item template, station dropdown arrow symbols, scroll-more tuning parameters (scroll steps, pull threshold, wheel threshold, debounce, symbols).
+- All configurable constants in a single module: version, app name, defaults (station, departure count, fetch interval, transport modes, client name, API URL, GitHub URL, coordinates), default favorite, all transport modes list, mode grid layout, realtime indicators, delay threshold, transport mode emojis, UI button emojis, cancellation wrapper, platform symbols and symbol selection rules, departure line template, departure time cell template (time and countdown placeholders with a literal separator), GPS search parameters (max results, search radius), GPS dropdown item template, favorites dropdown item template, station dropdown arrow symbols, scroll-more tuning parameters (scroll steps, pull threshold, wheel threshold, debounce, symbols).
 
 ## Data Flow
 
@@ -88,7 +89,7 @@ The application runs entirely in the browser with no server component. If the ex
 3. The departure fetcher uses the query builder to construct a GraphQL query, sends it via the HTTP transport, and passes the response to the parser.
 4. The parser returns normalized departure objects. The fetcher applies client-side mode filtering.
 5. The render engine clears the departure list and builds new DOM nodes for each departure. A computeDiff utility exists in the codebase but is not used in the render path.
-6. A separate countdown ticker updates display values every second without re-fetching.
+6. A separate countdown ticker updates only the countdown part of the time cell every second without re-fetching. The clock part is written once at render time from the departure's expected time and stays static between fetches.
 7. On fetch failure, the application shows an error state and retains previously fetched data if available.
 
 ## State Management

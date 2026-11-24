@@ -79,8 +79,8 @@ work/
 ├── src/                               # Application source
 │   ├── index.html                     # Entry point HTML
 │   ├── app.js                         # Bootstrap: imports, wires DOMContentLoaded, BFCache teardown
-│   ├── config.js                      # All constants: VERSION, DEFAULTS, MODE_GRID, REALTIME_INDICATORS, DELAY_THRESHOLD_MS, TRANSPORT_MODE_EMOJIS, UI_EMOJIS, PLATFORM_SYMBOLS, PLATFORM_SYMBOL_RULES, DEPARTURE_LINE_TEMPLATE, GPS_MAX_RESULTS, SCROLL_MORE, etc.
-│   ├── time.js                        # Pure utilities: isoToEpochMs, formatCountdown
+│   ├── config.js                      # All constants: VERSION, DEFAULTS, MODE_GRID, REALTIME_INDICATORS, DELAY_THRESHOLD_MS, TRANSPORT_MODE_EMOJIS, UI_EMOJIS, PLATFORM_SYMBOLS, PLATFORM_SYMBOL_RULES, DEPARTURE_LINE_TEMPLATE, DEPARTURE_TIME_TEMPLATE, GPS_MAX_RESULTS, SCROLL_MORE, etc.
+│   ├── time.js                        # Pure utilities: isoToEpochMs, formatCountdown, formatClock
 │   ├── i18n.js                        # Backward-compat shim → re-exports from i18n/index.js
 │   ├── style.css                      # CSS @import manifest (no rules)
 │   ├── icons.css                      # CSS-only icon/badge helpers
