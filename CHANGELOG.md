@@ -1,5 +1,35 @@
 # Changelog
 
+## [1.40.30] - 2026-11-24
+
+- **why:** Documentation, tests, and helper scripts drifted after the module restructure: the runner skipped eight suites, several assertions still described removed behaviour, and `CODEBASE.md` listed deleted files
+- **model:** kompis/qwen3.8-flash-next-iq3_s
+- **tags:** tests, docs, tooling, formatting, maintenance
+
+### Added
+
+- `CONTRIBUTING.md` with setup, commands, script usage, git hooks, test rules, changelog format, release checklist, and the deployment workflow table; `README.md` links to it
+- `tests/codebase-sync.test.mjs` runs the sync script against this repository and against fixture folders (8 tests)
+- `.githooks/pre-commit` runs `scripts/validate-changelog.sh` when `CHANGELOG.md` is staged and `scripts/verify_codebase_sync.sh` on every commit
+
+### Changed
+
+- `tests/run.mjs` keeps an explicit suite list and awaits one dynamic import per suite, so one broken suite no longer hides the state of the rest
+- `scripts/verify_codebase_sync.sh` checks both directions: every documented path exists, and every repository file is documented. It also reads the annotated directory tree
+- `AGENTS.md` allows GitHub Actions workflows in `.github/workflows/`
+- Prettier reformatted 29 files. `buildQuery` output and CSS values were checked and are unchanged
+
+### Fixed
+
+- Six wired tests asserted removed behaviour: the favourites cap now reads `DEFAULTS.NUM_FAVORITES`, hearts use `UI_EMOJIS.heartSaved` and `heartSave`, share links use the compact five-element format, and geocoder mocks set `layer: 'venue'`
+- `src/i18n/detect.js` returns `en` when the browser reports no language instead of throwing
+- `tests/entur.query.line.test.mjs` matches the GraphQL selection regardless of line breaks
+
+### Removed
+
+- `scripts/fix_worklogs.sh`, `scripts/validate_worklogs.sh`, and the pre-commit references to them
+- `docs/worklog-retrospective-report.md` and three placeholder test files
+
 ## [1.40.29] - 2026-09-09
 
 - **why:** The API provides both a summary heading and a description for each service situation, but the board showed only the description, leaving departures without context for the disruption
