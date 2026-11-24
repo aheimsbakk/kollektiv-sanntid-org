@@ -1,5 +1,21 @@
 # Changelog
 
+## [1.41.0] - 2026-11-24
+
+- **why:** The board showed only a countdown, so reading a departure's actual clock time meant mental arithmetic
+- **model:** kompis/qwen3.8-flash-next-iq3_s
+- **tags:** departures, display, template, time
+
+### Added
+
+- `DEPARTURE_TIME_TEMPLATE` in `src/config.js` composes the time cell from `{time}` and `{countdown}` with a literal separator (`·`), so the separator can change without code edits
+- `formatClock` in `src/time.js` renders epoch milliseconds as `HH:MM` in the browser's timezone
+- Each departure now shows its expected clock time next to the countdown, for example `14:05 · 03:20`; past departures show `14:05 · Now`
+
+### Changed
+
+- The per-second ticker rewrites only the `.departure-countdown` span (`tickCountdowns` in `src/app/fetch-loop.js`, `updateDepartureCountdown` in `src/ui/departure.js`); the clock text stays static between fetches
+
 ## [1.40.30] - 2026-11-24
 
 - **why:** Documentation, tests, and helper scripts drifted after the module restructure: the runner skipped eight suites, several assertions still described removed behaviour, and `CODEBASE.md` listed deleted files
