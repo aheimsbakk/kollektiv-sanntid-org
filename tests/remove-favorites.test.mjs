@@ -11,46 +11,80 @@ console.log('Running remove-favorites.test.mjs');
 
 // Mock localStorage
 class LocalStorageMock {
-  constructor() { this.store = {}; }
-  getItem(key) { return this.store[key] || null; }
-  setItem(key, value) { this.store[key] = String(value); }
-  clear() { this.store = {}; }
+  constructor() {
+    this.store = {};
+  }
+  getItem(key) {
+    return this.store[key] || null;
+  }
+  setItem(key, value) {
+    this.store[key] = String(value);
+  }
+  clear() {
+    this.store = {};
+  }
 }
 global.localStorage = new LocalStorageMock();
 
 // Minimal matchMedia mock (light theme preference)
 global.window = {
-  matchMedia: (query) => ({ matches: query === '(prefers-color-scheme: light)' })
+  matchMedia: (query) => ({ matches: query === '(prefers-color-scheme: light)' }),
 };
 
 // Minimal document mock for module imports
 global.document = {
   createElement: (tag) => ({
     tagName: tag.toUpperCase(),
-    className: '', textContent: '', title: '', type: '',
-    disabled: false, checked: false, indeterminate: false,
-    style: {}, dataset: {}, children: [],
+    className: '',
+    textContent: '',
+    title: '',
+    type: '',
+    disabled: false,
+    checked: false,
+    indeterminate: false,
+    style: {},
+    dataset: {},
+    children: [],
     childNodes: [],
-    setAttribute: function() {},
-    getAttribute: function() { return null; },
-    addEventListener: function() {},
-    removeEventListener: function() {},
-    appendChild: function(child) { this.children.push(child); return child; },
-    removeChild: function() {},
-    append: function(...args) { this.children.push(...args); },
-    replaceChild: function() {},
-    querySelector: function() { return null; },
-    querySelectorAll: function() { return []; },
-    classList: { add(){}, remove(){}, contains(){ return false; } },
-    scrollIntoView: function() {},
-    focus: function() {},
-    select: function() {},
-    contains: function() { return false; }
+    setAttribute: function () {},
+    getAttribute: function () {
+      return null;
+    },
+    addEventListener: function () {},
+    removeEventListener: function () {},
+    appendChild: function (child) {
+      this.children.push(child);
+      return child;
+    },
+    removeChild: function () {},
+    append: function (...args) {
+      this.children.push(...args);
+    },
+    replaceChild: function () {},
+    querySelector: function () {
+      return null;
+    },
+    querySelectorAll: function () {
+      return [];
+    },
+    classList: {
+      add() {},
+      remove() {},
+      contains() {
+        return false;
+      },
+    },
+    scrollIntoView: function () {},
+    focus: function () {},
+    select: function () {},
+    contains: function () {
+      return false;
+    },
   }),
-  addEventListener: function() {},
-  removeEventListener: function() {},
+  addEventListener: function () {},
+  removeEventListener: function () {},
   activeElement: null,
-  body: { classList: { add(){}, remove(){} } }
+  body: { classList: { add() {}, remove() {} } },
 };
 
 const { getRecentStations, addRecentStation, isStationInFavorites, removeFromFavorites } =
@@ -70,7 +104,9 @@ function mockBtn() {
     disabled: false,
     title: '',
     _ariaLabel: '',
-    setAttribute(key, val) { if (key === 'aria-label') this._ariaLabel = val; }
+    setAttribute(key, val) {
+      if (key === 'aria-label') this._ariaLabel = val;
+    },
   };
 }
 
@@ -158,7 +194,7 @@ function mockBtn() {
   clearFavorites();
   addRecentStation('Oslo S', 'NSR:StopPlace:59872', ['bus']);
   const btn = mockBtn();
-  updateFavoriteButton(btn, 'NSR:StopPlace:59872', ['bus'], 'light');
+  updateFavoriteButton(btn, 'NSR:StopPlace:59872', ['bus']);
 
   assert.equal(btn.disabled, false, 'Button must be ENABLED when in favorites (to allow removal)');
   // Title should be 'Remove from favorites' (English translation)
@@ -166,26 +202,25 @@ function mockBtn() {
     btn.title.toLowerCase().includes('remove') || btn.title.length > 0,
     'Tooltip should reference removal when in favorites'
   );
-  // Should still show the saved heart (white or black depending on theme)
-  assert.equal(btn.textContent, UI_EMOJIS.heartSavedLight, 'Light theme in-favorites heart');
+  assert.equal(btn.textContent, UI_EMOJIS.heartSaved, 'Saved heart when already in favorites');
 }
 
-// Test 8: After removal, button goes back to red heart / 'Save to favorites'
+// Test 8: After removal, button goes back to the gray heart / 'Save to favorites'
 {
   clearFavorites();
   addRecentStation('Oslo S', 'NSR:StopPlace:59872', ['bus']);
 
   const btn = mockBtn();
   // Before removal
-  updateFavoriteButton(btn, 'NSR:StopPlace:59872', ['bus'], 'light');
-  assert.equal(btn.textContent, UI_EMOJIS.heartSavedLight, 'Before removal: saved heart');
+  updateFavoriteButton(btn, 'NSR:StopPlace:59872', ['bus']);
+  assert.equal(btn.textContent, UI_EMOJIS.heartSaved, 'Before removal: saved heart');
 
   // Remove
   removeFromFavorites('NSR:StopPlace:59872', ['bus']);
 
   // After removal
-  updateFavoriteButton(btn, 'NSR:StopPlace:59872', ['bus'], 'light');
-  assert.equal(btn.textContent, UI_EMOJIS.heartSave, 'After removal: red heart');
+  updateFavoriteButton(btn, 'NSR:StopPlace:59872', ['bus']);
+  assert.equal(btn.textContent, UI_EMOJIS.heartSave, 'After removal: gray save heart');
   assert.equal(btn.disabled, false, 'After removal: button enabled');
 }
 
@@ -194,19 +229,35 @@ function mockBtn() {
   clearFavorites();
 
   // isStationInFavorites should start false
-  assert.equal(isStationInFavorites('NSR:StopPlace:59872', ['bus']), false, 'Initially not in favorites');
+  assert.equal(
+    isStationInFavorites('NSR:StopPlace:59872', ['bus']),
+    false,
+    'Initially not in favorites'
+  );
 
   // Add
   addRecentStation('Oslo S', 'NSR:StopPlace:59872', ['bus']);
-  assert.equal(isStationInFavorites('NSR:StopPlace:59872', ['bus']), true, 'In favorites after add');
+  assert.equal(
+    isStationInFavorites('NSR:StopPlace:59872', ['bus']),
+    true,
+    'In favorites after add'
+  );
 
   // Remove
   removeFromFavorites('NSR:StopPlace:59872', ['bus']);
-  assert.equal(isStationInFavorites('NSR:StopPlace:59872', ['bus']), false, 'Not in favorites after remove');
+  assert.equal(
+    isStationInFavorites('NSR:StopPlace:59872', ['bus']),
+    false,
+    'Not in favorites after remove'
+  );
 
   // Re-add
   addRecentStation('Oslo S', 'NSR:StopPlace:59872', ['bus']);
-  assert.equal(isStationInFavorites('NSR:StopPlace:59872', ['bus']), true, 'In favorites after re-add');
+  assert.equal(
+    isStationInFavorites('NSR:StopPlace:59872', ['bus']),
+    true,
+    'In favorites after re-add'
+  );
 
   const recent = getRecentStations();
   assert.equal(recent.length, 1, 'Should have exactly one entry after add-remove-add cycle');
@@ -223,9 +274,18 @@ function mockBtn() {
 
   const recent = getRecentStations();
   assert.equal(recent.length, 2);
-  assert.ok(recent.every(s => s.stopId !== 'NSR:StopPlace:59872'), 'Oslo S should be gone');
-  assert.ok(recent.some(s => s.stopId === 'NSR:StopPlace:11111'), 'Bergen should remain');
-  assert.ok(recent.some(s => s.stopId === 'NSR:StopPlace:22222'), 'Trondheim should remain');
+  assert.ok(
+    recent.every((s) => s.stopId !== 'NSR:StopPlace:59872'),
+    'Oslo S should be gone'
+  );
+  assert.ok(
+    recent.some((s) => s.stopId === 'NSR:StopPlace:11111'),
+    'Bergen should remain'
+  );
+  assert.ok(
+    recent.some((s) => s.stopId === 'NSR:StopPlace:22222'),
+    'Trondheim should remain'
+  );
 }
 
 console.log('remove-favorites.test.mjs OK');

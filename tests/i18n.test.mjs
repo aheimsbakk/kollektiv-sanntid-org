@@ -1,66 +1,76 @@
-// Test language detection logic
-import assert from 'assert';
+/**
+ * i18n.test.mjs — browser language detection
+ *
+ * Exercises the real `detectBrowserLanguage` from src/i18n/detect.js.
+ * The module reads `navigator.language`, so the test installs a navigator
+ * stub before each case. Every supported language key in
+ * src/i18n/translations.js must resolve to itself; regional variants strip
+ * the region suffix; nb/nn collapse to 'no'; anything else falls back to 'en'.
+ */
+import { test, after } from 'node:test';
+import assert from 'node:assert/strict';
+import { detectBrowserLanguage } from '../src/i18n/detect.js';
+import { translations } from '../src/i18n/translations.js';
 
-// Simulate the detection logic from i18n.js
-const translations = {
-  en: {}, no: {}, de: {}, es: {}, it: {}, el: {}, fa: {}, hi: {}
-};
+// Node exposes a real `navigator`; restore it so later test modules in the
+// same process see the untouched global.
+const originalNavigator = Object.getOwnPropertyDescriptor(globalThis, 'navigator');
 
-function detectBrowserLanguage(mockNavigatorLang) {
-  const browserLang = mockNavigatorLang;
-  const langCode = browserLang.split('-')[0].toLowerCase();
-  
-  // Map Norwegian variants (nb/nn) to 'no'
-  if (langCode === 'nb' || langCode === 'nn') {
-    return 'no';
-  }
-  
-  // Check if we support this language
-  if (translations[langCode]) {
-    return langCode;
-  }
-  
-  // Default to English
-  return 'en';
-}
-
-// Test cases
-const tests = [
-  { input: 'en-US', expected: 'en', desc: 'English US' },
-  { input: 'en-GB', expected: 'en', desc: 'English GB' },
-  { input: 'nb-NO', expected: 'no', desc: 'Norwegian Bokmål' },
-  { input: 'nn-NO', expected: 'no', desc: 'Norwegian Nynorsk' },
-  { input: 'no', expected: 'no', desc: 'Norwegian generic' },
-  { input: 'de-DE', expected: 'de', desc: 'German' },
-  { input: 'es-ES', expected: 'es', desc: 'Spanish' },
-  { input: 'it-IT', expected: 'it', desc: 'Italian' },
-  { input: 'el-GR', expected: 'el', desc: 'Greek' },
-  { input: 'fa-IR', expected: 'fa', desc: 'Farsi' },
-  { input: 'hi-IN', expected: 'hi', desc: 'Hindi' },
-  { input: 'fr-FR', expected: 'en', desc: 'French (unsupported, fallback to en)' },
-  { input: 'sv-SE', expected: 'en', desc: 'Swedish (unsupported, fallback to en)' }
-];
-
-console.log('Testing language detection...');
-let passed = 0;
-let failed = 0;
-
-tests.forEach(test => {
-  const result = detectBrowserLanguage(test.input);
-  try {
-    assert.strictEqual(result, test.expected, `${test.desc}: expected ${test.expected}, got ${result}`);
-    console.log(`✓ ${test.desc}: ${test.input} → ${result}`);
-    passed++;
-  } catch (e) {
-    console.error(`✗ ${test.desc}: ${e.message}`);
-    failed++;
+after(() => {
+  if (originalNavigator) {
+    Object.defineProperty(globalThis, 'navigator', originalNavigator);
   }
 });
 
-console.log(`\nResults: ${passed} passed, ${failed} failed`);
-
-if (failed > 0) {
-  process.exit(1);
+/**
+ * Install a minimal navigator stub for one detection call.
+ *
+ * @param {string|undefined} language value exposed as navigator.language
+ */
+function withNavigator(language) {
+  Object.defineProperty(globalThis, 'navigator', {
+    configurable: true,
+    value: { language },
+  });
 }
 
-console.log('i18n.test.mjs OK');
+test('regional variants resolve to their base language', () => {
+  const cases = [
+    ['en-US', 'en'],
+    ['en-GB', 'en'],
+    ['de-DE', 'de'],
+    ['fr-FR', 'fr'],
+    ['pl-PL', 'pl'],
+    ['is-IS', 'is'],
+    ['uk-UA', 'uk'],
+    ['fa-IR', 'fa'],
+    ['hi-IN', 'hi'],
+    ['el-GR', 'el'],
+  ];
+  for (const [input, expected] of cases) {
+    withNavigator(input);
+    assert.equal(detectBrowserLanguage(), expected, `${input} should detect as ${expected}`);
+  }
+});
+
+test('Norwegian written standards both map to no', () => {
+  for (const input of ['nb-NO', 'nn-NO', 'nb', 'nn']) {
+    withNavigator(input);
+    assert.equal(detectBrowserLanguage(), 'no', `${input} should detect as no`);
+  }
+});
+
+test('unsupported and missing languages fall back to en', () => {
+  for (const input of ['sv-SE', 'pt-BR', 'zh-Hans', '', undefined]) {
+    withNavigator(input);
+    assert.equal(detectBrowserLanguage(), 'en', `${String(input)} should fall back to en`);
+  }
+});
+
+test('every supported translation key is detected as itself', () => {
+  for (const code of Object.keys(translations)) {
+    if (code === 'no') continue; // 'no' only arrives through nb/nn mapping
+    withNavigator(code);
+    assert.equal(detectBrowserLanguage(), code, `${code} should detect as ${code}`);
+  }
+});

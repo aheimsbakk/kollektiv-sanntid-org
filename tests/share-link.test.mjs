@@ -32,36 +32,64 @@ const { encodeSettings, decodeSettings } = await import('../src/ui/share-button.
 const { getRecentStations, addRecentStation } = await import('../src/ui/station-dropdown.js');
 
 // Test 1: Encode and decode settings round-trip
+// The compact share format carries only station, stop id, modes and
+// coordinates (BLUEPRINT "Shared URL Contract"). Departure count, interval,
+// text size and language are deliberately not encoded, so they decode as null
+// and must not overwrite stored settings.
 {
   const originalSettings = {
     STATION_NAME: 'Oslo S',
     STOP_ID: 'NSR:StopPlace:59872',
     TRANSPORT_MODES: ['bus', 'metro'],
+    LAT: 59.910357,
+    LON: 10.753051,
     NUM_DEPARTURES: 15,
     FETCH_INTERVAL: 45, // in seconds
     TEXT_SIZE: 'medium',
-    language: 'no'
+    language: 'no',
   };
-  
+
   const encoded = encodeSettings(originalSettings);
   assert.ok(encoded, 'Should produce encoded string');
   assert.equal(typeof encoded, 'string');
-  
+
   const decoded = decodeSettings(encoded);
   assert.ok(decoded, 'Should decode successfully');
   assert.equal(decoded.stationName, originalSettings.STATION_NAME);
   assert.equal(decoded.stopId, originalSettings.STOP_ID);
   assert.deepEqual(decoded.transportModes, originalSettings.TRANSPORT_MODES);
-  assert.equal(decoded.numDepartures, originalSettings.NUM_DEPARTURES);
-  assert.equal(decoded.fetchInterval, originalSettings.FETCH_INTERVAL);
-  assert.equal(decoded.textSize, originalSettings.TEXT_SIZE);
-  assert.equal(decoded.language, originalSettings.language);
+  assert.equal(decoded.lat, originalSettings.LAT);
+  assert.equal(decoded.lon, originalSettings.LON);
+  assert.equal(decoded.numDepartures, null, 'Departure count is not carried by the compact format');
+  assert.equal(decoded.fetchInterval, null, 'Fetch interval is not carried by the compact format');
+  assert.equal(decoded.textSize, null, 'Text size is not carried by the compact format');
+  assert.equal(decoded.language, null, 'Language is not carried by the compact format');
+}
+
+// Test 1b: Legacy 7-element links still decode, so old shared URLs keep working
+{
+  const legacy = ['Oslo S', 'NSR:StopPlace:59872', ['bus'], 12, 90, 'large', 'no'];
+  const json = JSON.stringify(legacy);
+  let binary = '';
+  for (const b of new TextEncoder().encode(json)) binary += String.fromCharCode(b);
+  const encoded = btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+
+  const decoded = decodeSettings(encoded);
+  assert.ok(decoded, 'Legacy link should decode');
+  assert.equal(decoded.stationName, 'Oslo S');
+  assert.equal(decoded.stopId, 'NSR:StopPlace:59872');
+  assert.deepEqual(decoded.transportModes, ['bus']);
+  assert.equal(decoded.numDepartures, 12);
+  assert.equal(decoded.fetchInterval, 90);
+  assert.equal(decoded.textSize, 'large');
+  assert.equal(decoded.language, 'no');
+  assert.equal(decoded.lat, null, 'Legacy links carry no coordinates');
 }
 
 // Test 2: Import shared station should add to favorites
 {
   localStorage.clear();
-  
+
   // Simulate importing a shared link
   const sharedSettings = {
     stationName: 'Nationaltheatret',
@@ -70,17 +98,22 @@ const { getRecentStations, addRecentStation } = await import('../src/ui/station-
     numDepartures: 10,
     fetchInterval: 30, // seconds
     textSize: 'large',
-    language: 'en'
+    language: 'en',
   };
-  
+
   // This is what app.js does when importing a share link
-  addRecentStation(sharedSettings.stationName, sharedSettings.stopId, sharedSettings.transportModes, {
-    numDepartures: sharedSettings.numDepartures,
-    fetchInterval: sharedSettings.fetchInterval,
-    textSize: sharedSettings.textSize,
-    language: sharedSettings.language
-  });
-  
+  addRecentStation(
+    sharedSettings.stationName,
+    sharedSettings.stopId,
+    sharedSettings.transportModes,
+    {
+      numDepartures: sharedSettings.numDepartures,
+      fetchInterval: sharedSettings.fetchInterval,
+      textSize: sharedSettings.textSize,
+      language: sharedSettings.language,
+    }
+  );
+
   const recent = getRecentStations();
   assert.equal(recent.length, 1, 'Should have 1 favorite');
   assert.equal(recent[0].name, 'Nationaltheatret');
@@ -95,15 +128,15 @@ const { getRecentStations, addRecentStation } = await import('../src/ui/station-
 // Test 3: Import shared link should add to TOP of existing favorites
 {
   localStorage.clear();
-  
+
   // Add existing favorites
   addRecentStation('Oslo S', 'NSR:StopPlace:59872', ['bus'], { numDepartures: 20 });
   addRecentStation('Majorstuen', 'NSR:StopPlace:58278', ['metro'], { numDepartures: 15 });
-  
+
   let recent = getRecentStations();
   assert.equal(recent.length, 2);
   assert.equal(recent[0].name, 'Majorstuen');
-  
+
   // Import shared link
   const sharedSettings = {
     stationName: 'Storo',
@@ -112,16 +145,21 @@ const { getRecentStations, addRecentStation } = await import('../src/ui/station-
     numDepartures: 25,
     fetchInterval: 60, // seconds
     textSize: 'xlarge',
-    language: 'no'
+    language: 'no',
   };
-  
-  addRecentStation(sharedSettings.stationName, sharedSettings.stopId, sharedSettings.transportModes, {
-    numDepartures: sharedSettings.numDepartures,
-    fetchInterval: sharedSettings.fetchInterval,
-    textSize: sharedSettings.textSize,
-    language: sharedSettings.language
-  });
-  
+
+  addRecentStation(
+    sharedSettings.stationName,
+    sharedSettings.stopId,
+    sharedSettings.transportModes,
+    {
+      numDepartures: sharedSettings.numDepartures,
+      fetchInterval: sharedSettings.fetchInterval,
+      textSize: sharedSettings.textSize,
+      language: sharedSettings.language,
+    }
+  );
+
   recent = getRecentStations();
   assert.equal(recent.length, 3, 'Should have 3 favorites');
   assert.equal(recent[0].name, 'Storo', 'Imported station should be at top');
@@ -133,17 +171,17 @@ const { getRecentStations, addRecentStation } = await import('../src/ui/station-
 // Test 4: Import same station+modes should update existing favorite
 {
   localStorage.clear();
-  
+
   // Add existing favorite
   addRecentStation('Oslo S', 'NSR:StopPlace:59872', ['bus', 'metro'], {
     numDepartures: 10,
     fetchInterval: 30, // seconds
     textSize: 'small',
-    language: 'en'
+    language: 'en',
   });
-  
+
   addRecentStation('Majorstuen', 'NSR:StopPlace:58278', ['tram'], { numDepartures: 15 });
-  
+
   // Import shared link with same station+modes but different settings
   const sharedSettings = {
     stationName: 'Oslo S',
@@ -152,16 +190,21 @@ const { getRecentStations, addRecentStation } = await import('../src/ui/station-
     numDepartures: 25,
     fetchInterval: 60, // seconds
     textSize: 'xlarge',
-    language: 'no'
+    language: 'no',
   };
-  
-  addRecentStation(sharedSettings.stationName, sharedSettings.stopId, sharedSettings.transportModes, {
-    numDepartures: sharedSettings.numDepartures,
-    fetchInterval: sharedSettings.fetchInterval,
-    textSize: sharedSettings.textSize,
-    language: sharedSettings.language
-  });
-  
+
+  addRecentStation(
+    sharedSettings.stationName,
+    sharedSettings.stopId,
+    sharedSettings.transportModes,
+    {
+      numDepartures: sharedSettings.numDepartures,
+      fetchInterval: sharedSettings.fetchInterval,
+      textSize: sharedSettings.textSize,
+      language: sharedSettings.language,
+    }
+  );
+
   const recent = getRecentStations();
   assert.equal(recent.length, 2, 'Should still have 2 favorites (no duplicate)');
   assert.equal(recent[0].name, 'Oslo S', 'Oslo S should be at top');
@@ -181,12 +224,12 @@ const { getRecentStations, addRecentStation } = await import('../src/ui/station-
     NUM_DEPARTURES: 10,
     FETCH_INTERVAL: 30, // seconds
     TEXT_SIZE: 'large',
-    language: 'en'
+    language: 'en',
   };
-  
+
   const encoded = encodeSettings(minimalSettings);
   const decoded = decodeSettings(encoded);
-  
+
   assert.equal(decoded.stationName, 'Test');
   assert.equal(decoded.stopId, 'ID-1');
   // Empty modes defaults to all modes
@@ -198,11 +241,11 @@ const { getRecentStations, addRecentStation } = await import('../src/ui/station-
   // Suppress expected error
   const originalError = console.error;
   console.error = () => {};
-  
+
   const decoded = decodeSettings('invalid-base64-data!!!');
-  
+
   console.error = originalError;
-  
+
   assert.equal(decoded, null, 'Should return null for invalid data');
 }
 
@@ -215,11 +258,11 @@ const { getRecentStations, addRecentStation } = await import('../src/ui/station-
     NUM_DEPARTURES: 20,
     FETCH_INTERVAL: 45, // seconds
     TEXT_SIZE: 'medium',
-    language: 'no'
+    language: 'no',
   };
-  
+
   const encoded = encodeSettings(settings);
-  
+
   // URL-safe base64 should not contain +, /, or =
   assert.ok(!encoded.includes('+'), 'Should not contain +');
   assert.ok(!encoded.includes('/'), 'Should not contain /');

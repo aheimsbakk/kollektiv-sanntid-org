@@ -75,4 +75,5 @@ test('footer.js uses UI_EMOJIS.footerLink for the Entur data link emoji', () => 
 });
 
 console.log(`\nfooter-link: ${passed} passed, ${failed} failed`);
-if (failed > 0) process.exit(1);
+// Exit code, not process.exit(): later suites in the run.mjs graph must still run.
+if (failed > 0) process.exitCode = 1;
