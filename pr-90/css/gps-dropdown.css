@@ -1,0 +1,94 @@
+/* ======================================================================\n   GPS DROPDOWN\n   Compass button and nearby-stops temporary dropdown.\n   Mirrors: src/ui/gps-dropdown.js, src/app/gps-bar.js\n   ====================================================================== */
+
+/* Container is position:relative so the absolute menu aligns to the button */
+.gps-dropdown-container {
+  position: relative;
+  display: inline-block;
+}
+
+/* ── Dropdown menu shell ───────────────────────────────────────────── */
+.gps-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  background: var(--overlay-medium);
+  border-radius: var(--btn-border-radius);
+  padding: 6px;
+  width: max-content;
+  /* Clamp width so the menu never overflows past the right-edge buttons (18px gutter each side). */
+  max-width: calc(100vw - 36px);
+  max-height: 420px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  box-shadow: 0 6px 18px var(--shadow-color);
+  z-index: var(--z-dropdown);
+  display: none;
+}
+
+.gps-dropdown-menu.open {
+  display: grid;
+  grid-auto-rows: min-content;
+  gap: var(--dropdown-item-gap);
+}
+
+/* ── Stop items ────────────────────────────────────────────────────── */
+.gps-dropdown-item {
+  display: block;
+  width: 100%;
+  padding: 8px;
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  text-align: left;
+  cursor: pointer;
+  border-radius: 4px;
+  transition:
+    background var(--transition-fast),
+    color var(--transition-fast);
+  white-space: nowrap;
+}
+
+.gps-dropdown-item:hover:not(:disabled),
+.gps-dropdown-item.highlighted,
+.gps-dropdown-item:focus-visible {
+  background: var(--highlight-bg);
+  color: var(--highlight-fg);
+  outline: none;
+}
+
+/* ── Status / error messages ───────────────────────────────────────── */
+.gps-dropdown-status {
+  padding: 8px;
+  color: var(--text-secondary);
+  font-style: italic;
+  white-space: normal;
+  word-break: break-word;
+}
+
+.gps-dropdown-error {
+  color: var(--danger);
+  font-style: normal;
+}
+
+/* OSM button "no coordinates" status — absolutely positioned below the button.
+   Shell mirrors .gps-dropdown-menu (bg, padding, shadow).
+   Inner text uses .gps-dropdown-status + .gps-dropdown-error (already defined above). */
+.osm-status {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  display: none;
+  background: var(--overlay-medium);
+  border-radius: var(--btn-border-radius);
+  padding: 6px;
+  /* Grow to fit text naturally; clamp to the viewport edge; never collapse to a thin column. */
+  width: max-content;
+  min-width: 160px;
+  max-width: calc(100vw - 36px);
+  box-shadow: 0 6px 18px var(--shadow-color);
+  z-index: var(--z-dropdown);
+}
+
+.osm-status.visible {
+  display: block;
+}
