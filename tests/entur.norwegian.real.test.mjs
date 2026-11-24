@@ -1,30 +1,40 @@
-// Integration test to check if Norwegian characters work with real Entur API
-// This test makes real API calls to verify encoding works correctly
+/**
+ * Manual integration test: Norwegian characters against the live Entur API.
+ * Not imported by tests/run.mjs — the suite stays hermetic. Run by hand with
+ * `node tests/entur.norwegian.real.test.mjs` to confirm the geocoder and
+ * journey planner still accept æøå queries.
+ */
 import { searchStations, lookupStopId, fetchDepartures } from '../src/entur/index.js';
 
 const TEST_NAME = 'entur.norwegian.real.test.mjs';
 
+// Live calls need a deadline. `fetchDepartures` has no signal option, so the
+// timeout is attached at the fetch layer instead of per call.
+const LIVE_TIMEOUT_MS = 15000;
+const fetchWithTimeout = (url, opts = {}) =>
+  fetch(url, { ...opts, signal: AbortSignal.timeout(LIVE_TIMEOUT_MS) });
+
 async function runTest() {
   console.log(`Running ${TEST_NAME} (uses real Entur API)`);
-  
+
   const clientName = 'test-norwegian-chars';
-  
+
   // Test 1: Search for "Støren" using real API
   console.log('\n1. Searching for "Støren" (real API call)');
   try {
-    const candidates = await searchStations({ 
+    const candidates = await searchStations({
       text: 'Støren',
       limit: 3,
       clientName,
-      fetchFn: fetch
+      fetchFn: fetchWithTimeout,
     });
-    
+
     console.log(`   Found ${candidates.length} candidates`);
     if (candidates.length > 0) {
       console.log('   First candidate:', candidates[0].title);
       console.log('   Stop ID:', candidates[0].id);
       console.log('   ✓ Search succeeded');
-      
+
       // Test 2: Try to fetch departures for the first result
       if (candidates[0].id) {
         console.log('\n2. Fetching departures for', candidates[0].title);
@@ -34,7 +44,7 @@ async function runTest() {
             numDepartures: 2,
             modes: ['rail', 'bus'],
             clientName,
-            fetchFn: fetch
+            fetchFn: fetchWithTimeout,
           });
           console.log(`   Found ${departures.length} departures`);
           if (departures.length > 0) {
@@ -53,16 +63,16 @@ async function runTest() {
     console.error('   ✗ Search failed:', err.message);
     throw err;
   }
-  
+
   // Test 3: Test lookupStopId with "Støren"
   console.log('\n3. Looking up stopId for "Støren" (real API call)');
   try {
     const stopId = await lookupStopId({
       stationName: 'Støren',
       clientName,
-      fetchFn: fetch
+      fetchFn: fetchWithTimeout,
     });
-    
+
     if (stopId) {
       console.log('   Stop ID:', stopId);
       console.log('   ✓ Lookup succeeded');
@@ -73,11 +83,11 @@ async function runTest() {
     console.error('   ✗ Lookup failed:', err.message);
     throw err;
   }
-  
+
   // Test 4: Test with other Norwegian characters
   console.log('\n4. Testing other Norwegian characters');
   const testStations = ['Tøyen', 'Bjølsen', 'Åsane'];
-  
+
   for (const station of testStations) {
     console.log(`   Searching for "${station}"...`);
     try {
@@ -85,14 +95,14 @@ async function runTest() {
         text: station,
         limit: 1,
         clientName,
-        fetchFn: fetch
+        fetchFn: fetchWithTimeout,
       });
       console.log(`     ${results.length > 0 ? '✓' : '⚠'} ${results.length} result(s)`);
     } catch (err) {
       console.error(`     ✗ Failed: ${err.message}`);
     }
   }
-  
+
   console.log(`\n${TEST_NAME} OK`);
 }
 
@@ -101,7 +111,7 @@ if (typeof fetch === 'undefined') {
   console.log(`${TEST_NAME} SKIPPED: fetch not available`);
   process.exit(0);
 } else {
-  runTest().catch(err => {
+  runTest().catch((err) => {
     console.error(`${TEST_NAME} FAILED:`, err.message);
     console.error(err.stack);
     process.exit(1);

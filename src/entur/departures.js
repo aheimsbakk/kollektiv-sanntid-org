@@ -66,19 +66,19 @@ function rawMatchesModes(rawObj, lowerModes) {
 export async function fetchDepartures({
   stopId,
   numDepartures = 2,
-  modes         = ['bus'],
-  lang          = 'en',
-  apiUrl        = 'https://api.entur.io/journey-planner/v3/graphql',
-  clientName    = 'personal-js-app',
-  fetchFn       = fetch
+  modes = ['bus'],
+  lang = 'en',
+  apiUrl = 'https://api.entur.io/journey-planner/v3/graphql',
+  clientName = 'personal-js-app',
+  fetchFn = fetch,
 }) {
-  if (!stopId)  throw new Error('stopId required');
-  if (!apiUrl)  throw new Error('apiUrl required');
+  if (!stopId) throw new Error('stopId required');
+  if (!apiUrl) throw new Error('apiUrl required');
 
   const variants = buildVariants(modes);
 
-  let json        = null;
-  let resp        = null;
+  let json = null;
+  let resp = null;
   let usedVariant = null;
 
   // Try each variant; stop as soon as one returns a valid (error-free) payload.
@@ -111,8 +111,11 @@ export async function fetchDepartures({
   // Verify the final response is healthy (guard against variants that set resp
   // but produced a non-OK status we hadn't checked yet).
   if (typeof resp.ok !== 'undefined' && resp.ok === false) {
-    const txt = typeof resp.text === 'function' ? await resp.text().catch(() => '<no body>') : '<no body>';
-    throw new Error(`Network error: ${resp.status ?? 'unknown'} ${resp.statusText ?? ''} — ${String(txt).slice(0, 200)}`);
+    const txt =
+      typeof resp.text === 'function' ? await resp.text().catch(() => '<no body>') : '<no body>';
+    throw new Error(
+      `Network error: ${resp.status ?? 'unknown'} ${resp.statusText ?? ''} — ${String(txt).slice(0, 200)}`
+    );
   }
 
   let parsed = parseEnturResponse(json, lang);
@@ -120,8 +123,8 @@ export async function fetchDepartures({
   // When we fell back to the no-filter server query, apply client-side filtering
   // to honour the caller's mode selection (the server returned unfiltered data).
   if (Array.isArray(modes) && modes.length > 0 && usedVariant === 'no-filter') {
-    const lowerModes = modes.map(m => String(m).toLowerCase());
-    parsed = parsed.filter(p => rawMatchesModes(p.raw, lowerModes));
+    const lowerModes = modes.map((m) => String(m).toLowerCase());
+    parsed = parsed.filter((p) => rawMatchesModes(p.raw, lowerModes));
   }
 
   if (Array.isArray(parsed) && parsed.length === 0) {

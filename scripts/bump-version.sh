@@ -68,7 +68,8 @@ fi
 # Update package.json
 "${SED_INPLACE[@]}" "s/\"version\": \"[0-9.]*\"/\"version\": \"$NEW_VERSION\"/" "$PKG_FILE"
 
-# Update sitemap.xml <lastmod> to today's date (docs/PROJECT_RULES.md §1)
+# Update sitemap.xml <lastmod> to today's date (see the sitemap rule in
+# docs/memory/INDEX.md and CONTRIBUTING.md "Release checklist")
 TODAY=$(date +%Y-%m-%d)
 "${SED_INPLACE[@]}" "s|<lastmod>.*</lastmod>|<lastmod>${TODAY}</lastmod>|g" "$SITEMAP_FILE"
 

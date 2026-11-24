@@ -13,7 +13,7 @@ const languages = [
   { code: 'it', flag: '🇮🇹', name: 'Italiano' },
   { code: 'fa', flag: '🇮🇷', name: 'فارسی' },
   { code: 'pl', flag: '🇵🇱', name: 'Polski' },
-  { code: 'uk', flag: '🇺🇦', name: 'Українська' }
+  { code: 'uk', flag: '🇺🇦', name: 'Українська' },
 ];
 
 export { languages };

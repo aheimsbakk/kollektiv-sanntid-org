@@ -1,6 +1,6 @@
 // Version is defined here and in src/sw.js (service worker)
 // Both must be kept in sync - use scripts/bump-version.sh to update both
-export const VERSION = '1.40.29';
+export const VERSION = '1.41.0';
 
 // Brand name used in the options panel title and HTML <title>.
 // Intentionally not translated — this is a proper name.
@@ -152,6 +152,23 @@ export const PLATFORM_SYMBOL_RULES = [
 //
 // Note: {platform} is automatically empty if no platform info is available
 export const DEPARTURE_LINE_TEMPLATE = '{destination} {indicator} {lineNumber} {emoji} {platform}';
+
+// Departure time cell display template
+// Available placeholders:
+//   {time}      - Display clock time, HH:MM in the browser's local timezone,
+//                 from the expected departure time (empty when unavailable)
+//   {countdown} - Live countdown to departure (MM:SS, HH:MM:SS, or "Now")
+//
+// The separator is literal template text, so it can later become an arrow or
+// another indicator without code changes. {countdown} stays a live element;
+// everything else is static text written once at render time.
+//
+// Template examples:
+//   '{time} · {countdown}'  — default: "14:05 · 03:20"
+//   '{time} / {countdown}'  — slash separator
+//   '{time} → {countdown}'  — arrow separator
+//   '{countdown}'           — countdown only (previous behavior)
+export const DEPARTURE_TIME_TEMPLATE = '{time} · {countdown}';
 
 // GPS nearby-stop search settings
 export const GPS_MAX_RESULTS = 8; // maximum stop places returned in the dropdown

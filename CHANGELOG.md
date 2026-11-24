@@ -1,5 +1,51 @@
 # Changelog
 
+## [1.41.0] - 2026-11-24
+
+- **why:** The board showed only a countdown, so reading a departure's actual clock time meant mental arithmetic
+- **model:** kompis/qwen3.8-flash-next-iq3_s
+- **tags:** departures, display, template, time
+
+### Added
+
+- `DEPARTURE_TIME_TEMPLATE` in `src/config.js` composes the time cell from `{time}` and `{countdown}` with a literal separator (`·`), so the separator can change without code edits
+- `formatClock` in `src/time.js` renders epoch milliseconds as `HH:MM` in the browser's timezone
+- Each departure now shows its expected clock time next to the countdown, for example `14:05 · 03:20`; past departures show `14:05 · Now`
+
+### Changed
+
+- The per-second ticker rewrites only the `.departure-countdown` span (`tickCountdowns` in `src/app/fetch-loop.js`, `updateDepartureCountdown` in `src/ui/departure.js`); the clock text stays static between fetches
+
+## [1.40.30] - 2026-11-24
+
+- **why:** Documentation, tests, and helper scripts drifted after the module restructure: the runner skipped eight suites, several assertions still described removed behaviour, and `CODEBASE.md` listed deleted files
+- **model:** kompis/qwen3.8-flash-next-iq3_s
+- **tags:** tests, docs, tooling, formatting, maintenance
+
+### Added
+
+- `CONTRIBUTING.md` with setup, commands, script usage, git hooks, test rules, changelog format, release checklist, and the deployment workflow table; `README.md` links to it
+- `tests/codebase-sync.test.mjs` runs the sync script against this repository and against fixture folders (8 tests)
+- `.githooks/pre-commit` runs `scripts/validate-changelog.sh` when `CHANGELOG.md` is staged and `scripts/verify_codebase_sync.sh` on every commit
+
+### Changed
+
+- `tests/run.mjs` keeps an explicit suite list and awaits one dynamic import per suite, so one broken suite no longer hides the state of the rest
+- `scripts/verify_codebase_sync.sh` checks both directions: every documented path exists, and every repository file is documented. It also reads the annotated directory tree
+- `AGENTS.md` allows GitHub Actions workflows in `.github/workflows/`
+- Prettier reformatted 29 files. `buildQuery` output and CSS values were checked and are unchanged
+
+### Fixed
+
+- Six wired tests asserted removed behaviour: the favourites cap now reads `DEFAULTS.NUM_FAVORITES`, hearts use `UI_EMOJIS.heartSaved` and `heartSave`, share links use the compact five-element format, and geocoder mocks set `layer: 'venue'`
+- `src/i18n/detect.js` returns `en` when the browser reports no language instead of throwing
+- `tests/entur.query.line.test.mjs` matches the GraphQL selection regardless of line breaks
+
+### Removed
+
+- `scripts/fix_worklogs.sh`, `scripts/validate_worklogs.sh`, and the pre-commit references to them
+- `docs/worklog-retrospective-report.md` and three placeholder test files
+
 ## [1.40.29] - 2026-09-09
 
 - **why:** The API provides both a summary heading and a description for each service situation, but the board showed only the description, leaving departures without context for the disruption

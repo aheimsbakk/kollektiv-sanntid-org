@@ -23,3 +23,5 @@ tmp/
 
 # Temporary workflow/task spec files
 TASK.md
+todo.txt
+done.txt

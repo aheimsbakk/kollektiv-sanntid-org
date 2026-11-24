@@ -1,20 +1,71 @@
-import { createDepartureNode } from '../src/ui/departure.js';
+/**
+ * ui.emoji.test.mjs — transport mode display helpers
+ *
+ * Tests the pure functions in src/ui/mode-utils.js. The older version of this
+ * file asserted against DOM nodes returned by createDepartureNode, which needs
+ * a browser. These helpers are the single source of truth for the emoji and
+ * label that the departure row shows, so testing them directly keeps the
+ * coverage hermetic.
+ */
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import { emojiForMode, labelForMode } from '../src/ui/mode-utils.js';
+import { TRANSPORT_MODE_EMOJIS } from '../src/config.js';
 
-function assertEqual(a,b,msg){ if(a!==b) throw new Error(msg || `assertEqual failed: ${a} !== ${b}`); }
+test('emojiForMode maps canonical modes to their emoji', () => {
+  const cases = [
+    ['bus', TRANSPORT_MODE_EMOJIS.bus],
+    ['tram', TRANSPORT_MODE_EMOJIS.tram],
+    ['metro', TRANSPORT_MODE_EMOJIS.metro],
+    ['rail', TRANSPORT_MODE_EMOJIS.rail],
+    ['water', TRANSPORT_MODE_EMOJIS.water],
+    ['coach', TRANSPORT_MODE_EMOJIS.coach],
+  ];
+  for (const [mode, emoji] of cases) {
+    assert.equal(emojiForMode(mode), emoji, `${mode} should map to its emoji`);
+  }
+});
 
-// bus -> 🚌
-const busItem = { destination: 'Stop A', expectedDepartureISO: new Date(Date.now()+60000).toISOString(), transportMode: 'bus' };
-const node1 = createDepartureNode(busItem);
-assertEqual(node1.container.querySelector('.departure-destination').textContent.trim().startsWith('🚌'), true, 'bus emoji');
+test('emojiForMode accepts localised Norwegian aliases', () => {
+  const cases = [
+    ['trikk', TRANSPORT_MODE_EMOJIS.tram],
+    ['t-bane', TRANSPORT_MODE_EMOJIS.metro],
+    ['tbane', TRANSPORT_MODE_EMOJIS.metro],
+    ['tog', TRANSPORT_MODE_EMOJIS.rail],
+    ['ferje', TRANSPORT_MODE_EMOJIS.water],
+    ['båt', TRANSPORT_MODE_EMOJIS.default], // 'båt' is not an ASCII 'boat' match
+  ];
+  for (const [mode, emoji] of cases) {
+    assert.equal(emojiForMode(mode), emoji, `${mode} should map to the expected emoji`);
+  }
+});
 
-// tram -> 🚋 (we chose option 2)
-const tramItem = { destination: 'Stop B', expectedDepartureISO: new Date(Date.now()+120000).toISOString(), transportMode: 'tram' };
-const node2 = createDepartureNode(tramItem);
-assertEqual(node2.container.querySelector('.departure-destination').textContent.trim().startsWith('🚋'), true, 'tram emoji');
+test('emojiForMode falls back to the default emoji', () => {
+  for (const mode of [null, undefined, '', 'airplane', 'unknown-mode']) {
+    assert.equal(
+      emojiForMode(mode),
+      TRANSPORT_MODE_EMOJIS.default,
+      `${String(mode)} should fall back to the default emoji`
+    );
+  }
+});
 
-// missing mode -> fallback 🚆
-const emptyItem = { destination: 'Stop C', expectedDepartureISO: new Date(Date.now()+180000).toISOString() };
-const node3 = createDepartureNode(emptyItem);
-assertEqual(node3.container.querySelector('.departure-destination').textContent.trim().startsWith('🚆'), true, 'fallback emoji');
+test('labelForMode returns capitalised English labels', () => {
+  const cases = [
+    ['bus', 'Bus'],
+    ['trikk', 'Tram'],
+    ['tbane', 'Metro'],
+    ['train', 'Train'],
+    ['ferry', 'Ferry'],
+    ['coach', 'Coach'],
+  ];
+  for (const [mode, label] of cases) {
+    assert.equal(labelForMode(mode), label, `${mode} should label as ${label}`);
+  }
+});
 
-console.log('ui.emoji tests passed');
+test('labelForMode returns an empty string for unknown input', () => {
+  for (const mode of [null, undefined, '', 'airplane']) {
+    assert.equal(labelForMode(mode), '', `${String(mode)} should label as an empty string`);
+  }
+});

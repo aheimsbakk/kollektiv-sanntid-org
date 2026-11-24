@@ -70,13 +70,13 @@ function runTests() {
   test('Service worker caches required assets', () => {
     const requiredAssets = [
       'index.html',
-      'style.css', 
+      'style.css',
       'app.js',
-      'config.js',  // Contains VERSION displayed in footer
-      'i18n.js',    // Translation strings
-      'manifest.webmanifest'
+      'config.js', // Contains VERSION displayed in footer
+      'i18n.js', // Translation strings
+      'manifest.webmanifest',
     ];
-    requiredAssets.forEach(asset => {
+    requiredAssets.forEach((asset) => {
       if (!swContent.includes(`'./${asset}'`) && !swContent.includes(`"./${asset}"`)) {
         throw new Error(`Required asset not found in ASSETS: ${asset}`);
       }
@@ -109,20 +109,24 @@ function runTests() {
 
   test('VERSION in sw.js matches VERSION in config.js', () => {
     const swVersionMatch = swContent.match(/const VERSION = '([0-9]+\.[0-9]+\.[0-9]+)';/);
-    const configVersionMatch = configContent.match(/export const VERSION = '([0-9]+\.[0-9]+\.[0-9]+)';/);
-    
+    const configVersionMatch = configContent.match(
+      /export const VERSION = '([0-9]+\.[0-9]+\.[0-9]+)';/
+    );
+
     if (!swVersionMatch) {
       throw new Error('VERSION not found in sw.js');
     }
     if (!configVersionMatch) {
       throw new Error('VERSION not found in config.js');
     }
-    
+
     const swVersion = swVersionMatch[1];
     const configVersion = configVersionMatch[1];
-    
+
     if (swVersion !== configVersion) {
-      throw new Error(`Version mismatch: sw.js has '${swVersion}' but config.js has '${configVersion}'`);
+      throw new Error(
+        `Version mismatch: sw.js has '${swVersion}' but config.js has '${configVersion}'`
+      );
     }
   });
 
@@ -132,9 +136,12 @@ function runTests() {
     if (appContent.includes('sw-refresh-btn') || appContent.includes('sw-dismiss-btn')) {
       throw new Error('App still contains manual reload/dismiss buttons (old update mechanism)');
     }
-    
+
     // Verify the new auto-reload mechanism is present (may live in app.js or app/sw-updater.js)
-    if (!appContent.includes('showUpdateNotification') && !swUpdaterContent.includes('showUpdateNotification')) {
+    if (
+      !appContent.includes('showUpdateNotification') &&
+      !swUpdaterContent.includes('showUpdateNotification')
+    ) {
       throw new Error('Auto-reload notification function not found');
     }
   });
@@ -154,4 +161,7 @@ function runTests() {
 }
 
 const success = runTests();
-process.exit(success ? 0 : 1);
+// Set the exit code instead of calling process.exit(): run.mjs imports every
+// suite in one module graph, and process.exit() here would cut off the suites
+// imported after this one.
+if (!success) process.exitCode = 1;

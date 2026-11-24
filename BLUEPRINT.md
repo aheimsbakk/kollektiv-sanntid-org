@@ -24,6 +24,7 @@ The application runs entirely in the browser with no server component. If the ex
 - Departure line shows: destination, line number, transport mode, realtime status, scheduled vs actual time, platform/quay, and active situations.
 - Realtime indicator: solid dot (live), hollow dot (scheduled), red dot (delayed beyond configurable threshold).
 - Cancelled departures shown with strikethrough and reduced opacity.
+- Departure display time (HH:MM, from the API expected departure time, shown in the browser's local timezone) and a live countdown, combined through a configurable time-cell template (default: `time · countdown`).
 - Live countdown timer updating every second.
 - Pull-to-load-more gesture to progressively load additional departures.
 - Settings persisted to local storage: station, departure count, transport modes, text size, fetch interval.
@@ -79,7 +80,7 @@ The application runs entirely in the browser with no server component. If the ex
 
 ### Configuration
 
-- All configurable constants in a single module: version, app name, defaults (station, departure count, fetch interval, transport modes, client name, API URL, GitHub URL, coordinates), default favorite, all transport modes list, mode grid layout, realtime indicators, delay threshold, transport mode emojis, UI button emojis, cancellation wrapper, platform symbols and symbol selection rules, departure line template, GPS search parameters (max results, search radius), GPS dropdown item template, favorites dropdown item template, station dropdown arrow symbols, scroll-more tuning parameters (scroll steps, pull threshold, wheel threshold, debounce, symbols).
+- All configurable constants in a single module: version, app name, defaults (station, departure count, fetch interval, transport modes, client name, API URL, GitHub URL, coordinates), default favorite, all transport modes list, mode grid layout, realtime indicators, delay threshold, transport mode emojis, UI button emojis, cancellation wrapper, platform symbols and symbol selection rules, departure line template, departure time cell template (time and countdown placeholders with a literal separator), GPS search parameters (max results, search radius), GPS dropdown item template, favorites dropdown item template, station dropdown arrow symbols, scroll-more tuning parameters (scroll steps, pull threshold, wheel threshold, debounce, symbols).
 
 ## Data Flow
 
@@ -88,7 +89,7 @@ The application runs entirely in the browser with no server component. If the ex
 3. The departure fetcher uses the query builder to construct a GraphQL query, sends it via the HTTP transport, and passes the response to the parser.
 4. The parser returns normalized departure objects. The fetcher applies client-side mode filtering.
 5. The render engine clears the departure list and builds new DOM nodes for each departure. A computeDiff utility exists in the codebase but is not used in the render path.
-6. A separate countdown ticker updates display values every second without re-fetching.
+6. A separate countdown ticker updates only the countdown part of the time cell every second without re-fetching. The clock part is written once at render time from the departure's expected time and stays static between fetches.
 7. On fetch failure, the application shows an error state and retains previously fetched data if available.
 
 ## State Management
@@ -239,9 +240,20 @@ Each schema is stored under a key in persistent client storage:
 - All external API calls use the browser's native fetch with abort support.
 - Shared URLs contain only station identifiers and user-selected settings. No personal data is encoded.
 
+## Hosting and Publication
+
+- The application is published as static files with no server-side code and no build artifacts.
+- A publish step runs on each accepted change to the main line and replaces the public copy.
+- Each open change gets an isolated preview copy; the preview is rebuilt when the change is updated and removed when the change is closed.
+- A periodic sweep removes preview copies whose change has long been closed.
+- Preview copies are disposable and never share storage with the public copy.
+
 ## Testing Strategy
 
 - Unit tests run in a headless environment using a built-in assertion library.
 - Tests are placed in a dedicated test directory.
 - Tests are hermetic: no DOM APIs, no network calls. External dependencies are injected as test doubles.
-- A single test runner imports all test modules and reports pass/fail.
+- A single runner loads a registered list of suites one at a time, because suites install global test doubles that must not overlap, and reports pass/fail per suite.
+- A suite must signal failure through the process exit code, never by terminating the process, or later suites are skipped without a report.
+- Live-API probes exist but stay outside the registered list and run only on demand.
+- The consistency check between the file-to-component map and the repository runs in both directions, and that check is itself exercised by a suite against fixture documents.

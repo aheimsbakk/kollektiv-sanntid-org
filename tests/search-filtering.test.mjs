@@ -11,26 +11,26 @@ test('searchStations filters and scores results correctly', async () => {
           id: 'NSR:StopPlace:58366',
           name: 'Jernbanetorget',
           label: 'Jernbanetorget, Oslo',
-          layer: 'venue'
-        }
+          layer: 'venue',
+        },
       },
       {
         properties: {
           id: 'some-address-id',
           name: 'Berg street',
           label: 'Berg street, Oslo',
-          layer: 'address' // This should be filtered out
-        }
+          layer: 'address', // This should be filtered out
+        },
       },
       {
         properties: {
           id: 'NSR:StopPlace:12345',
           name: 'Bergkrystallen',
           label: 'Bergkrystallen, Oslo',
-          layer: 'venue'
-        }
-      }
-    ]
+          layer: 'venue',
+        },
+      },
+    ],
   };
 
   // Mock fetch function
@@ -39,9 +39,9 @@ test('searchStations filters and scores results correctly', async () => {
     return {
       ok: true,
       headers: {
-        get: (name) => name === 'content-type' ? 'application/json' : null
+        get: (name) => (name === 'content-type' ? 'application/json' : null),
       },
-      json: async () => mockApiResponse
+      json: async () => mockApiResponse,
     };
   };
 
@@ -49,19 +49,27 @@ test('searchStations filters and scores results correctly', async () => {
   const results = await searchStations({
     text: 'berg',
     limit: 5,
-    fetchFn: mockFetch
+    fetchFn: mockFetch,
   });
 
   console.log('Search results:', results);
 
   // Should only return venue layer results
   assert.equal(results.length, 2, 'Should return 2 venue results (filtered out address layer)');
-  
+
   // Should prioritize "Bergkrystallen" over "Jernbanetorget" because it starts with "berg"
-  assert.equal(results[0].title, 'Bergkrystallen, Oslo', 'First result should be Bergkrystallen (starts with query)');
+  assert.equal(
+    results[0].title,
+    'Bergkrystallen, Oslo',
+    'First result should be Bergkrystallen (starts with query)'
+  );
   assert.equal(results[0].id, 'NSR:StopPlace:12345');
-  
-  assert.equal(results[1].title, 'Jernbanetorget, Oslo', 'Second result should be Jernbanetorget (contains "erg")');
+
+  assert.equal(
+    results[1].title,
+    'Jernbanetorget, Oslo',
+    'Second result should be Jernbanetorget (contains "erg")'
+  );
   assert.equal(results[1].id, 'NSR:StopPlace:58366');
 });
 
@@ -73,30 +81,30 @@ test('searchStations handles exact match priority', async () => {
           id: 'NSR:StopPlace:1',
           name: 'Bergen sentrum',
           label: 'Bergen sentrum',
-          layer: 'venue'
-        }
+          layer: 'venue',
+        },
       },
       {
         properties: {
           id: 'NSR:StopPlace:2',
           name: 'Bergen',
           label: 'Bergen',
-          layer: 'venue'
-        }
-      }
-    ]
+          layer: 'venue',
+        },
+      },
+    ],
   };
 
   const mockFetch = async () => ({
     ok: true,
     headers: { get: () => 'application/json' },
-    json: async () => mockApiResponse
+    json: async () => mockApiResponse,
   });
 
   const results = await searchStations({
     text: 'bergen',
     limit: 5,
-    fetchFn: mockFetch
+    fetchFn: mockFetch,
   });
 
   // Exact match should come first
@@ -104,37 +112,32 @@ test('searchStations handles exact match priority', async () => {
   assert.equal(results[1].title, 'Bergen sentrum', 'Starts-with match should be second');
 });
 
-test('searchStations actual API call for "berg"', async () => {
-  // Real API call to see what we actually get for short query
-  const results = await searchStations({
-    text: 'berg',
-    limit: 5,
-    fetchFn: fetch
+test('searchStations keeps only venue-layer results', async () => {
+  // Replaces the two earlier probes that called the live geocoder with
+  // `fetchFn: fetch` and asserted nothing. The suite must stay hermetic;
+  // live-API checks live in tests/entur.storen.autocomplete.test.mjs and
+  // tests/entur.norwegian.real.test.mjs, which run.mjs does not import.
+  const mockApiResponse = {
+    features: [
+      { properties: { id: 'NSR:StopPlace:1', name: 'Berg', label: 'Berg, Oslo', layer: 'venue' } },
+      {
+        properties: {
+          id: 'addr:1',
+          name: 'Bergs gate',
+          label: 'Bergs gate, Oslo',
+          layer: 'address',
+        },
+      },
+    ],
+  };
+  const mockFetch = async () => ({
+    ok: true,
+    headers: { get: () => 'application/json' },
+    json: async () => mockApiResponse,
   });
 
-  console.log('\n=== REAL API RESULTS for "berg" ===');
-  console.log('Number of results:', results.length);
-  results.forEach((r, i) => {
-    console.log(`${i + 1}. ${r.title} (${r.id})`);
-  });
-  console.log('=====================================\n');
-});
+  const results = await searchStations({ text: 'berg', limit: 5, fetchFn: mockFetch });
 
-test('searchStations actual API call for "bergkry"', async () => {
-  // Real API call to see what we actually get
-  const results = await searchStations({
-    text: 'bergkry',
-    limit: 5,
-    fetchFn: fetch
-  });
-
-  console.log('\n=== REAL API RESULTS for "bergkry" ===');
-  console.log('Number of results:', results.length);
-  results.forEach((r, i) => {
-    console.log(`${i + 1}. ${r.title} (${r.id})`);
-  });
-  console.log('=====================================\n');
-
-  // This test just logs results, no assertions
-  // We'll see what the real API returns
+  assert.equal(results.length, 1, 'address-layer features must be dropped');
+  assert.equal(results[0].title, 'Berg, Oslo', 'the venue-layer feature must survive');
 });

@@ -28,12 +28,19 @@ class LocalStorageMock {
 global.localStorage = new LocalStorageMock();
 
 // Import module after setting up mocks
-const { getRecentStations, addRecentStation, modesEqual } = await import('../src/ui/station-dropdown.js');
+const { getRecentStations, addRecentStation, modesEqual } = await import(
+  '../src/ui/station-dropdown.js'
+);
+const { DEFAULTS } = await import('../src/config.js');
 
 // Test modesEqual function
 {
   assert.equal(modesEqual(['bus', 'metro'], ['bus', 'metro']), true, 'Same modes in same order');
-  assert.equal(modesEqual(['bus', 'metro'], ['metro', 'bus']), true, 'Same modes in different order');
+  assert.equal(
+    modesEqual(['bus', 'metro'], ['metro', 'bus']),
+    true,
+    'Same modes in different order'
+  );
   assert.equal(modesEqual(['bus'], ['metro']), false, 'Different modes');
   assert.equal(modesEqual(['bus', 'metro'], ['bus']), false, 'Different lengths');
   assert.equal(modesEqual([], []), true, 'Both empty');
@@ -65,7 +72,7 @@ const { getRecentStations, addRecentStation, modesEqual } = await import('../src
   localStorage.clear();
   addRecentStation('Oslo S', 'NSR:StopPlace:59872');
   addRecentStation('Nationaltheatret', 'NSR:StopPlace:58366');
-  
+
   const recent = getRecentStations();
   assert.equal(recent.length, 2);
   assert.equal(recent[0].name, 'Nationaltheatret');
@@ -78,10 +85,10 @@ const { getRecentStations, addRecentStation, modesEqual } = await import('../src
   addRecentStation('Oslo S', 'NSR:StopPlace:59872');
   addRecentStation('Nationaltheatret', 'NSR:StopPlace:58366');
   addRecentStation('Majorstuen', 'NSR:StopPlace:58278');
-  
+
   // Re-select Oslo S
   addRecentStation('Oslo S', 'NSR:StopPlace:59872');
-  
+
   const recent = getRecentStations();
   assert.equal(recent.length, 3);
   assert.equal(recent[0].name, 'Oslo S');
@@ -103,14 +110,17 @@ const { getRecentStations, addRecentStation, modesEqual } = await import('../src
   addRecentStation('Station 9', 'ID-9');
   addRecentStation('Station 10', 'ID-10');
   addRecentStation('Station 11', 'ID-11');
-  
+
   const recent = getRecentStations();
-  assert.equal(recent.length, 10);
+  // The cap comes from DEFAULTS.NUM_FAVORITES, so the expectation follows the
+  // config instead of a hardcoded count that goes stale when it changes.
+  const cap = DEFAULTS.NUM_FAVORITES;
+  assert.equal(recent.length, cap);
   assert.equal(recent[0].name, 'Station 11');
-  assert.equal(recent[9].name, 'Station 2');
-  
-  // Station 1 should be dropped
-  const hasStation1 = recent.some(s => s.name === 'Station 1');
+  assert.equal(recent[cap - 1].name, `Station ${12 - cap}`);
+
+  // Stations older than the cap should be dropped
+  const hasStation1 = recent.some((s) => s.name === 'Station 1');
   assert.equal(hasStation1, false);
 }
 
@@ -120,7 +130,7 @@ const { getRecentStations, addRecentStation, modesEqual } = await import('../src
   addRecentStation();
   addRecentStation('Oslo S');
   addRecentStation(null, 'NSR:StopPlace:59872');
-  
+
   const recent = getRecentStations();
   assert.equal(recent.length, 0);
 }
@@ -129,16 +139,16 @@ const { getRecentStations, addRecentStation, modesEqual } = await import('../src
 {
   localStorage.clear();
   localStorage.setItem('recent-stations', 'invalid-json');
-  
+
   // Temporarily suppress console.error for this test (we expect an error)
   const originalError = console.error;
   console.error = () => {};
-  
+
   const recent = getRecentStations();
-  
+
   // Restore console.error
   console.error = originalError;
-  
+
   assert.deepEqual(recent, []);
 }
 
@@ -147,7 +157,7 @@ const { getRecentStations, addRecentStation, modesEqual } = await import('../src
   localStorage.clear();
   addRecentStation('Oslo S', 'NSR:StopPlace:59872', ['bus']);
   addRecentStation('Oslo S', 'NSR:StopPlace:59872', ['metro']);
-  
+
   const recent = getRecentStations();
   assert.equal(recent.length, 2, 'Should have 2 entries');
   assert.equal(recent[0].name, 'Oslo S');
@@ -162,7 +172,7 @@ const { getRecentStations, addRecentStation, modesEqual } = await import('../src
   addRecentStation('Oslo S', 'NSR:StopPlace:59872', ['bus', 'metro'], { numDepartures: 10 });
   addRecentStation('Nationaltheatret', 'NSR:StopPlace:58366', ['tram']);
   addRecentStation('Oslo S', 'NSR:StopPlace:59872', ['metro', 'bus'], { numDepartures: 20 });
-  
+
   const recent = getRecentStations();
   assert.equal(recent.length, 2, 'Should have 2 entries, not 3');
   assert.equal(recent[0].name, 'Oslo S', 'Oslo S should be at top');
@@ -176,10 +186,10 @@ const { getRecentStations, addRecentStation, modesEqual } = await import('../src
   addRecentStation('Station 1', 'ID-1', ['bus'], { numDepartures: 10 });
   addRecentStation('Station 2', 'ID-2', ['metro'], { numDepartures: 15 });
   addRecentStation('Station 3', 'ID-3', ['tram'], { numDepartures: 20 });
-  
+
   // Click Station 1 again with new settings
   addRecentStation('Station 1', 'ID-1', ['bus'], { numDepartures: 25 });
-  
+
   const recent = getRecentStations();
   assert.equal(recent.length, 3, 'Should still have 3 entries');
   assert.equal(recent[0].name, 'Station 1', 'Station 1 should be at top');
@@ -191,9 +201,16 @@ const { getRecentStations, addRecentStation, modesEqual } = await import('../src
 // Test 11: Same station with all modes vs specific modes should be different
 {
   localStorage.clear();
-  addRecentStation('Oslo S', 'NSR:StopPlace:59872', ['bus', 'metro', 'tram', 'rail', 'water', 'coach']);
+  addRecentStation('Oslo S', 'NSR:StopPlace:59872', [
+    'bus',
+    'metro',
+    'tram',
+    'rail',
+    'water',
+    'coach',
+  ]);
   addRecentStation('Oslo S', 'NSR:StopPlace:59872', ['bus', 'metro']);
-  
+
   const recent = getRecentStations();
   assert.equal(recent.length, 2, 'Should have 2 separate entries');
   assert.deepEqual(recent[0].modes, ['bus', 'metro']);
@@ -206,18 +223,18 @@ const { getRecentStations, addRecentStation, modesEqual } = await import('../src
   // Initial state: User has Oslo S with bus only
   addRecentStation('Oslo S', 'NSR:StopPlace:59872', ['bus'], { numDepartures: 10 });
   addRecentStation('Nationaltheatret', 'NSR:StopPlace:58366', ['metro'], { numDepartures: 15 });
-  
+
   // User selects Oslo S from dropdown (should move to top)
   addRecentStation('Oslo S', 'NSR:StopPlace:59872', ['bus'], { numDepartures: 10 });
-  
+
   let recent = getRecentStations();
   assert.equal(recent.length, 2);
   assert.equal(recent[0].name, 'Oslo S');
-  
+
   // User changes modes to bus + metro and clicks Save
   // This should create a NEW entry because modes changed
   addRecentStation('Oslo S', 'NSR:StopPlace:59872', ['bus', 'metro'], { numDepartures: 10 });
-  
+
   recent = getRecentStations();
   assert.equal(recent.length, 3, 'Should have 3 entries now');
   assert.equal(recent[0].name, 'Oslo S');
@@ -235,9 +252,9 @@ const { getRecentStations, addRecentStation, modesEqual } = await import('../src
     numDepartures: 15,
     fetchInterval: 45000,
     textSize: 'medium',
-    language: 'no'
+    language: 'no',
   });
-  
+
   const recent = getRecentStations();
   assert.equal(recent.length, 1);
   assert.equal(recent[0].name, 'Oslo S');
@@ -256,23 +273,23 @@ const { getRecentStations, addRecentStation, modesEqual } = await import('../src
     numDepartures: 10,
     fetchInterval: 30000,
     textSize: 'small',
-    language: 'en'
+    language: 'en',
   });
   addRecentStation('Station 2', 'ID-2', ['metro'], {
     numDepartures: 20,
     fetchInterval: 60000,
     textSize: 'large',
-    language: 'no'
+    language: 'no',
   });
-  
+
   // Re-select Station 1 with DIFFERENT settings
   addRecentStation('Station 1', 'ID-1', ['bus'], {
     numDepartures: 25,
     fetchInterval: 45000,
     textSize: 'xlarge',
-    language: 'de'
+    language: 'de',
   });
-  
+
   const recent = getRecentStations();
   assert.equal(recent.length, 2);
   assert.equal(recent[0].name, 'Station 1', 'Station 1 should be at top');
@@ -293,9 +310,9 @@ const { getRecentStations, addRecentStation, modesEqual } = await import('../src
     numDepartures: undefined,
     fetchInterval: null,
     textSize: 'large',
-    language: 'en'
+    language: 'en',
   });
-  
+
   const recent = getRecentStations();
   assert.equal(recent[0].numDepartures, undefined, 'Should preserve undefined');
   assert.equal(recent[0].fetchInterval, null, 'Should preserve null');
@@ -306,7 +323,7 @@ const { getRecentStations, addRecentStation, modesEqual } = await import('../src
 {
   localStorage.clear();
   addRecentStation('Oslo S', 'NSR:StopPlace:59872', ['bus']);
-  
+
   const recent = getRecentStations();
   assert.equal(recent[0].numDepartures, undefined, 'Should be undefined when not provided');
   assert.equal(recent[0].fetchInterval, undefined);
@@ -322,14 +339,14 @@ const { getRecentStations, addRecentStation, modesEqual } = await import('../src
     numDepartures: 10,
     fetchInterval: 30000,
     textSize: 'small',
-    language: 'en'
+    language: 'en',
   });
-  
+
   // Verify settings are stored
   let recent = getRecentStations();
   assert.equal(recent[0].numDepartures, 10);
   assert.equal(recent[0].fetchInterval, 30000);
-  
+
   // Simulate clicking the favorite again (like selecting from dropdown)
   // This should move it to top but PRESERVE its original settings
   const savedStation = recent[0];
@@ -337,9 +354,9 @@ const { getRecentStations, addRecentStation, modesEqual } = await import('../src
     numDepartures: savedStation.numDepartures,
     fetchInterval: savedStation.fetchInterval,
     textSize: savedStation.textSize,
-    language: savedStation.language
+    language: savedStation.language,
   });
-  
+
   // Verify settings are preserved
   recent = getRecentStations();
   assert.equal(recent[0].numDepartures, 10, 'numDepartures should be preserved');

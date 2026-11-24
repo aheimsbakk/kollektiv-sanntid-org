@@ -4,10 +4,14 @@ import { lookupStopId } from '../src/entur/index.js';
 console.log('Running entur.lookup.test.mjs');
 
 let called = false;
-const mockFetch = async (url, opts)=>{
+const mockFetch = async (url, opts) => {
   called = true;
   // Respond with a small valid geocoder payload
-  return { ok: true, json: async ()=> ({ features: [ { properties: { id: 'NSR:StopPlace:58366' } } ] }), headers: { get: (k)=> 'application/json' } };
+  return {
+    ok: true,
+    json: async () => ({ features: [{ properties: { id: 'NSR:StopPlace:58366' } }] }),
+    headers: { get: (k) => 'application/json' },
+  };
 };
 
 const id = await lookupStopId({ stationName: 'Jernbanetorget', fetchFn: mockFetch });

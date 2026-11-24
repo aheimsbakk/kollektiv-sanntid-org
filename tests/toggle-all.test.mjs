@@ -101,14 +101,20 @@ function applyToggleAll(toggleAllChecked, count) {
 {
   const result = applyToggleAll(true, 6);
   assert.equal(result.length, 6);
-  assert.ok(result.every(v => v === true), 'All should be true');
+  assert.ok(
+    result.every((v) => v === true),
+    'All should be true'
+  );
 }
 
 // Test 10: Toggle all OFF → all false
 {
   const result = applyToggleAll(false, 6);
   assert.equal(result.length, 6);
-  assert.ok(result.every(v => v === false), 'All should be false');
+  assert.ok(
+    result.every((v) => v === false),
+    'All should be false'
+  );
 }
 
 // Test 11: Round-trip: toggle all ON, then compute state → checked
