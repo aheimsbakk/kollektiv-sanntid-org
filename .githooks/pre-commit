@@ -1,30 +1,21 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Pre-commit hook: validate worklogs before allowing a commit
-# This hook expects the repository to include scripts/validate_worklogs.sh
-# and will run it with no arguments (so it validates staged files in the index).
+# Pre-commit gate: the two repository checks that are cheap enough to run on
+# every commit. Both are read-only.
+#   - validate-changelog.sh: only when CHANGELOG.md is staged, so an
+#     unreleased work-in-progress commit is not blocked by entry format rules.
+#   - verify_codebase_sync.sh: every commit, because both a stale path in
+#     CODEBASE.md and an undocumented file stay invisible until someone
+#     follows the document or hunts for the file.
+#
+# Scripts are invoked through bash so a checkout that lost the executable bit
+# still runs them.
 
-echo "Running worklog auto-fixer and validator"
-# First, attempt to auto-fix any invalid worklogs staged for commit
-# Run scripts via the interpreter to avoid requiring the executable bit on
-# the script files (some checkouts may not preserve file mode).
-if [ -x ./scripts/fix_worklogs.sh ]; then
-  ./scripts/fix_worklogs.sh
-else
-  bash ./scripts/fix_worklogs.sh
+if git diff --cached --name-only | grep -qx 'CHANGELOG.md'; then
+  echo "Validating newest CHANGELOG.md entry"
+  bash ./scripts/validate-changelog.sh
 fi
 
-# Then run validator on staged files
-if [ -x ./scripts/validate_worklogs.sh ]; then
-  ./scripts/validate_worklogs.sh
-else
-  bash ./scripts/validate_worklogs.sh
-fi
-
-if [ $? -ne 0 ]; then
-  echo "Worklog validation failed and auto-fix could not repair all files. Abort commit." >&2
-  exit 1
-fi
-
-exit 0
+echo "Checking CODEBASE.md against the repository (both directions)"
+bash ./scripts/verify_codebase_sync.sh
