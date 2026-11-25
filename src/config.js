@@ -1,6 +1,6 @@
 // Version is defined here and in src/sw.js (service worker)
 // Both must be kept in sync - use scripts/bump-version.sh to update both
-export const VERSION = '1.41.0';
+export const VERSION = '1.42.0';
 
 // Brand name used in the options panel title and HTML <title>.
 // Intentionally not translated — this is a proper name.
@@ -159,16 +159,15 @@ export const DEPARTURE_LINE_TEMPLATE = '{destination} {indicator} {lineNumber} {
 //                 from the expected departure time (empty when unavailable)
 //   {countdown} - Live countdown to departure (MM:SS, HH:MM:SS, or "Now")
 //
-// The separator is literal template text, so it can later become an arrow or
-// another indicator without code changes. {countdown} stays a live element;
-// everything else is static text written once at render time.
+// Only {countdown} is a live element; everything else is static text written
+// once at render time. The clock may sit before or after the countdown; the
+// separator is literal template text and stays static either way.
 //
 // Template examples:
-//   '{time} · {countdown}'  — default: "14:05 · 03:20"
-//   '{time} / {countdown}'  — slash separator
-//   '{time} → {countdown}'  — arrow separator
-//   '{countdown}'           — countdown only (previous behavior)
-export const DEPARTURE_TIME_TEMPLATE = '{time} · {countdown}';
+//   '{countdown} → {time}'  — default: "03:20 → 14:05"
+//   '{time} · {countdown}'  — clock first with middle-dot separator
+//   '{countdown}'           — countdown only
+export const DEPARTURE_TIME_TEMPLATE = '{countdown} → {time}';
 
 // GPS nearby-stop search settings
 export const GPS_MAX_RESULTS = 8; // maximum stop places returned in the dropdown

@@ -50,11 +50,12 @@ export function createDepartureNode(item) {
   if (Number.isFinite(epochMs)) {
     time.dataset.epochMs = String(epochMs);
 
-    // Split the time template around {countdown}: the prefix carries the
-    // clock text, the suffix (if any) is trailing literal text. Only the
-    // countdown placeholder becomes a live element.
+    // Split the time template around {countdown}: the text on either side is
+    // static, with {time} replaced by the clock text. Only the countdown
+    // placeholder becomes a live element.
     const [prefix, suffix = ''] = DEPARTURE_TIME_TEMPLATE.split('{countdown}');
-    time.textContent = prefix.replace('{time}', formatClock(epochMs) ?? '');
+    const clockText = formatClock(epochMs) ?? '';
+    time.textContent = prefix.replace('{time}', clockText);
     countdownEl = document.createElement('span');
     countdownEl.className = 'departure-countdown';
     time.append(countdownEl);
@@ -62,7 +63,7 @@ export function createDepartureNode(item) {
       // Trailing text goes in a span rather than a text node so the
       // append-only DOM path also works under the minimal test DOM shim.
       const tail = document.createElement('span');
-      tail.textContent = suffix;
+      tail.textContent = suffix.replace('{time}', clockText);
       time.append(tail);
     }
   } else {

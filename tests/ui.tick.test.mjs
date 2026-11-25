@@ -38,10 +38,22 @@ const item = {
 };
 const node = createDepartureNode(item);
 
-// The time cell holds the static clock text built from the template.
+// The time cell holds static template text around the live countdown span.
+// With the default template the clock sits after the arrow, in a trailing span.
 const clock = formatClock(epoch);
-const prefix = DEPARTURE_TIME_TEMPLATE.split('{countdown}')[0].replace('{time}', clock);
-assert.equal(node.time.textContent, prefix, 'time cell should hold static clock text');
+const [prefix, suffix = ''] = DEPARTURE_TIME_TEMPLATE.split('{countdown}');
+assert.equal(
+  node.time.textContent,
+  prefix.replace('{time}', clock),
+  'time cell should hold the static leading template text'
+);
+const tailSpan = node.time.children.find((el) => el !== node.countdown);
+assert(tailSpan, 'trailing static span should exist');
+assert.equal(
+  tailSpan.textContent,
+  suffix.replace('{time}', clock),
+  'clock text should sit in the trailing span'
+);
 
 // The countdown lives in its own span and updates live.
 assert(node.countdown, 'countdown span should exist');
@@ -53,8 +65,13 @@ const first = node.countdown.textContent;
 updateDepartureCountdown(node, now + 1000, formatCountdown);
 assert(node.countdown.textContent !== first, 'countdown should change between ticks');
 
-// ticks must not touch the static clock text
-assert.equal(node.time.textContent, prefix, 'clock text must survive ticks');
+// ticks must not touch the static template text on either side of the span
+assert.equal(node.time.textContent, prefix, 'leading template text must survive ticks');
+assert.equal(
+  tailSpan.textContent,
+  suffix.replace('{time}', clock),
+  'clock text must survive ticks'
+);
 
 // when epoch is in the past show Now
 updateDepartureCountdown(node, epoch + 1000, formatCountdown);
