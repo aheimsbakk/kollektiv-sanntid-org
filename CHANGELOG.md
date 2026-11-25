@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.42.0] - 2026-11-25
+
+- **why:** Reading "when does it leave" first means the countdown; the clock time reads as the result the countdown points to
+- **model:** kompis/qwen3.8-flash-next-iq3_s
+- **tags:** departures, display, template, time
+
+### Changed
+
+- `DEPARTURE_TIME_TEMPLATE` in `src/config.js` defaults to `'{countdown} → {time}'`, so a time cell now reads `03:20 → 14:05` instead of `14:05 · 03:20`
+- `createDepartureNode` in `src/ui/departure.js` replaces `{time}` on both sides of the template, so the clock can sit before or after the live countdown span
+
 ## [1.41.0] - 2026-11-24
 
 - **why:** The board showed only a countdown, so reading a departure's actual clock time meant mental arithmetic

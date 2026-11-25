@@ -24,7 +24,7 @@ The application runs entirely in the browser with no server component. If the ex
 - Departure line shows: destination, line number, transport mode, realtime status, scheduled vs actual time, platform/quay, and active situations.
 - Realtime indicator: solid dot (live), hollow dot (scheduled), red dot (delayed beyond configurable threshold).
 - Cancelled departures shown with strikethrough and reduced opacity.
-- Departure display time (HH:MM, from the API expected departure time, shown in the browser's local timezone) and a live countdown, combined through a configurable time-cell template (default: `time · countdown`).
+- Departure display time (HH:MM, from the API expected departure time, shown in the browser's local timezone) and a live countdown, combined through a configurable time-cell template (default: `countdown → time`).
 - Live countdown timer updating every second.
 - Pull-to-load-more gesture to progressively load additional departures.
 - Settings persisted to local storage: station, departure count, transport modes, text size, fetch interval.
