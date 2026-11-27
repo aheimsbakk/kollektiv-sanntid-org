@@ -48,10 +48,10 @@ The application runs entirely in the browser with no server component. If the ex
 
 ### Application Logic Layer
 
-- **Settings Persistence** — loads and saves application settings to local storage. Two modules manage the same storage key: one for global bootstrap state (`src/app/settings.js`) and one for the options panel (`src/ui/options/settings-store.js`). Applies text size to the root element.
+- **Settings Persistence** — loads and saves application settings to local storage. One module (`src/app/settings.js`) owns the storage key, the numeric bounds, and the valid token lists; the options panel validator (`src/ui/options/settings-store.js`) delegates to the same rules. Applies text size to the root element.
 - **URL Import** — decodes shared board configuration from URL parameters, applies settings, and cleans the URL.
 - **Render Engine** — clears and populates the departure list. Maintains references to text nodes for efficient countdown updates.
-- **Fetch Loop** — unified interval that drives departure countdowns and triggers API refreshes. Tracks elapsed time to avoid drift. Handles page visibility changes to detect stale data after OS sleep.
+- **Fetch Loop** — unified interval that drives departure countdowns and triggers API refreshes. Tracks elapsed time to avoid drift. Handles page visibility changes to detect stale data after OS sleep. A generation counter discards any fetch response that was started before a station or settings change and queues exactly one follow-up refresh.
 - **Handler Registry** — dispatches user actions: station selection, GPS station selection, favorite toggle, settings apply, language change. Resets progressive load state on station or settings change.
 - **Progressive Loader** — handles pull-to-load-more gesture detection, Fibonacci-based count progression, and threshold-based load triggering.
 - **Service Worker Updater** — registers the service worker, monitors for updates, displays countdown toast, triggers reload on update activation.
@@ -62,7 +62,7 @@ The application runs entirely in the browser with no server component. If the ex
 - **Mode Mapper** — canonicalizes transport mode tokens from raw API responses into a consistent internal representation. Uses recursive scan for nested mode fields.
 - **Response Parser** — transforms raw API response into normalized departure objects. Selects situation text by language priority and merges each situation into a single display string.
 - **Query Builder** — constructs GraphQL queries with multiple variant forms for API compatibility. Tries variants in sequence until one succeeds.
-- **HTTP Transport** — handles network requests with content-type detection. Abort support is provided by the caller (geocoder) using AbortController, not at the transport layer.
+- **HTTP Transport** — handles network requests with content-type detection and a bounded timeout enforced at the transport layer via AbortController. Callers (geocoder) can chain their own cancellation signal onto the timeout signal.
 - **Departure Fetcher** — orchestrates the query, transport, and parsing pipeline. Applies client-side mode filtering with recursive raw scan fallback.
 - **Geocoder** — station search via autocomplete API with client-side relevance scoring. Filters results by venue type.
 - **GPS Search** — reverse geocoding to find nearby stops. Returns results sorted by distance.
@@ -80,7 +80,7 @@ The application runs entirely in the browser with no server component. If the ex
 
 ### Configuration
 
-- All configurable constants in a single module: version, app name, defaults (station, departure count, fetch interval, transport modes, client name, API URL, GitHub URL, coordinates), default favorite, all transport modes list, mode grid layout, realtime indicators, delay threshold, transport mode emojis, UI button emojis, cancellation wrapper, platform symbols and symbol selection rules, departure line template, departure time cell template (time and countdown placeholders with a literal separator), GPS search parameters (max results, search radius), GPS dropdown item template, favorites dropdown item template, station dropdown arrow symbols, scroll-more tuning parameters (scroll steps, pull threshold, wheel threshold, debounce, symbols).
+- All configurable constants in a single module: version, app name, defaults (station, departure count, fetch interval, transport modes, text size, client name, API URL, GitHub URL, coordinates), network timeout, default favorite, all transport modes list, mode grid layout, realtime indicators, delay threshold, transport mode emojis, UI button emojis, platform symbols and symbol selection rules, departure line template, departure time cell template (time and countdown placeholders with a literal separator), GPS search parameters (max results, search radius), GPS dropdown item template, favorites dropdown item template, station dropdown arrow symbols, scroll-more tuning parameters (scroll steps, pull threshold, wheel threshold, debounce, symbols).
 
 ## Data Flow
 
@@ -88,7 +88,7 @@ The application runs entirely in the browser with no server component. If the ex
 2. On start and at each configured interval, the application calls the departure fetcher with the current station ID, count, and selected modes.
 3. The departure fetcher uses the query builder to construct a GraphQL query, sends it via the HTTP transport, and passes the response to the parser.
 4. The parser returns normalized departure objects. The fetcher applies client-side mode filtering.
-5. The render engine clears the departure list and builds new DOM nodes for each departure. A computeDiff utility exists in the codebase but is not used in the render path.
+5. The render engine clears the departure list and builds new DOM nodes for each departure. If a station or settings change happens while a request is in flight, its response is dropped by the generation guard and exactly one follow-up refresh runs with current settings.
 6. A separate countdown ticker updates only the countdown part of the time cell every second without re-fetching. The clock part is written once at render time from the departure's expected time and stays static between fetches.
 7. On fetch failure, the application shows an error state and retains previously fetched data if available.
 
@@ -106,7 +106,7 @@ The application runs entirely in the browser with no server component. If the ex
 ### State Mutations
 
 - Settings, language, theme, and favorites are mutated through dedicated manager functions that validate input before writing.
-- Departure data is replaced atomically on successful fetch. Partial updates are not applied.
+- Departure data is replaced atomically on successful fetch. Partial updates are not applied. A response whose request started before the latest station or settings change is dropped (generation guard), and one follow-up refresh is queued to render the current context.
 - Progressive load count is incremented by the handler registry on successful progressive loads and reset on station or settings changes.
 
 ## Contracts
@@ -151,7 +151,7 @@ Each situation is rendered as a single string:
 ### Error Boundaries
 
 - **Station lookup failure** — display empty/error state. Retain previous data if available.
-- **Network failure** — display error state. Retain previous data if available. Update status chip with retry countdown.
+- **Network failure or timed-out request** — display error state. Retain previous data if available. Update status chip with retry countdown.
 - **API response parse failure** — treat as network failure. Do not crash the application.
 - **Geolocation permission denied** — display error message. Do not block other functionality.
 - **Service worker update failure** — log warning. Do not block application startup.
@@ -237,7 +237,7 @@ Each schema is stored under a key in persistent client storage:
 
 - No secrets, tokens, or API keys are embedded in the code.
 - No user data is logged. Console output uses `warn` for recoverable failures and `error` for unexpected errors.
-- All external API calls use the browser's native fetch with abort support.
+- All external API calls use the browser's native fetch with a bounded timeout and abort support.
 - Shared URLs contain only station identifiers and user-selected settings. No personal data is encoded.
 
 ## Hosting and Publication

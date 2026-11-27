@@ -156,7 +156,9 @@ bullets, and at least one category heading in the newest entry.
 1. Add the `CHANGELOG.md` entry and run `./scripts/validate-changelog.sh`.
 2. If you added, renamed, or deleted a file under `src/`, update the `ASSETS`
    array in `src/sw.js`. Missing entries mean the file is not cached offline.
-   `sw.js` itself and `sitemap.xml` are not listed in `ASSETS`.
+   `sw.js` itself and `sitemap.xml` are not listed in `ASSETS`. The test
+   `tests/sw-assets-sync.test.mjs` fails `npm test` if the list and the `src/`
+   tree drift apart in either direction.
 3. Bump the version: `./scripts/bump-version.sh patch|minor|major`. This also
    sets `<lastmod>` in `src/sitemap.xml` to the release date.
 4. Run `npm test`, `npm run format:check`, and `./scripts/verify_codebase_sync.sh`.
@@ -167,9 +169,10 @@ bullets, and at least one category heading in the newest entry.
 
 GitHub Actions workflows in `.github/workflows/`:
 
-| Workflow file            | Trigger                     | What it does                                         |
-| ------------------------ | --------------------------- | ---------------------------------------------------- |
-| `static.yml`             | Push to `main`, manual run  | Publishes the production site to the Pages branch    |
-| `pr-preview.yml`         | PR opened or updated        | Builds a per-pull-request preview of the site        |
-| `pr-preview-cleanup.yml` | PR closed                   | Removes that pull request's preview                  |
-| `pr-preview-gc.yml`      | Weekly schedule, manual run | Deletes stale previews older than their pull request |
+| Workflow file            | Trigger                           | What it does                                                         |
+| ------------------------ | --------------------------------- | -------------------------------------------------------------------- |
+| `ci.yml`                 | PR opened/updated, push to `main` | Runs `npm test`, `npm run format:check`, and the CODEBASE sync check |
+| `static.yml`             | Push to `main`, manual run        | Publishes the production site to the Pages branch                    |
+| `pr-preview.yml`         | PR opened or updated              | Builds a per-pull-request preview of the site                        |
+| `pr-preview-cleanup.yml` | PR closed                         | Removes that pull request's preview                                  |
+| `pr-preview-gc.yml`      | Weekly schedule, manual run       | Deletes stale previews older than their pull request                 |
