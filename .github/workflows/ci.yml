@@ -1,0 +1,36 @@
+# Run the test suite, format check, and docs sync check on every PR and main push.
+# Deployment workflows depend on this gate: a red pipeline must not ship.
+name: CI Checks
+
+on:
+  pull_request:
+  push:
+    branches: ['main']
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Unit tests
+        run: npm test
+
+      - name: Format check
+        run: npm run format:check
+
+      - name: CODEBASE.md sync check
+        run: ./scripts/verify_codebase_sync.sh

@@ -52,7 +52,8 @@ work/
 ├── .prettierignore                    # Paths Prettier must not format
 ├── .githooks/                         # Git hooks (enable: git config core.hooksPath .githooks)
 │   └── pre-commit                     # Changelog format check + CODEBASE.md path check
-├── .github/workflows/                 # Hosting pipelines (see Deployment workflows)
+├── .github/workflows/                 # CI and hosting pipelines (see Deployment workflows)
+│   ├── ci.yml                         # Tests, format check, and CODEBASE sync on PRs and main pushes
 │   ├── static.yml                     # Publish src/ to the Pages branch on push to main
 │   ├── pr-preview.yml                 # Publish a per-pull-request preview site
 │   ├── pr-preview-cleanup.yml         # Delete that pull request's preview when it closes
@@ -79,7 +80,7 @@ work/
 ├── src/                               # Application source
 │   ├── index.html                     # Entry point HTML
 │   ├── app.js                         # Bootstrap: imports, wires DOMContentLoaded, BFCache teardown
-│   ├── config.js                      # All constants: VERSION, DEFAULTS, MODE_GRID, REALTIME_INDICATORS, DELAY_THRESHOLD_MS, TRANSPORT_MODE_EMOJIS, UI_EMOJIS, PLATFORM_SYMBOLS, PLATFORM_SYMBOL_RULES, DEPARTURE_LINE_TEMPLATE, DEPARTURE_TIME_TEMPLATE, GPS_MAX_RESULTS, SCROLL_MORE, etc.
+│   ├── config.js                      # All constants: VERSION, DEFAULTS, NETWORK_TIMEOUT_MS, MODE_GRID, REALTIME_INDICATORS, DELAY_THRESHOLD_MS, TRANSPORT_MODE_EMOJIS, UI_EMOJIS, PLATFORM_SYMBOLS, PLATFORM_SYMBOL_RULES, DEPARTURE_LINE_TEMPLATE, DEPARTURE_TIME_TEMPLATE, GPS_MAX_RESULTS, SCROLL_MORE, etc.
 │   ├── time.js                        # Pure utilities: isoToEpochMs, formatCountdown, formatClock
 │   ├── i18n.js                        # Backward-compat shim → re-exports from i18n/index.js
 │   ├── style.css                      # CSS @import manifest (no rules)
@@ -88,21 +89,23 @@ work/
 │   ├── sw.js                          # Service worker: versioned cache, fetch routing, skipWaiting
 │   ├── manifest.webmanifest           # PWA manifest (icons, display, theme)
 │   ├── app/                           # Application logic modules
-│   │   ├── settings.js                # localStorage load/save, applyTextSize
+│   │   ├── settings.js                # localStorage load/save, shared validation bounds, applyTextSize
 │   │   ├── url-import.js              # Decode ?b=/ ?board= params, clean URL
 │   │   ├── render.js                  # renderDepartures (clear + populate list)
-│   │   ├── fetch-loop.js              # doRefresh, startRefreshLoop, tickCountdowns, visibilitychange wake-up
+│   │   ├── fetch-loop.js              # doRefresh, startRefreshLoop, tickCountdowns, generation guard, visibilitychange wake-up
 │   │   ├── handlers.js                # handleStationSelect, handleGpsStationSelect, handleFavoriteToggle, onApplySettings, onLanguageChange
 │   │   ├── action-bar.js              # Share + theme + settings buttons, settings-bar container
 │   │   ├── gps-bar.js                 # GPS bar builder: compass + OSM button, share button placement
-│   │   ├── scroll-more.js             # Pull-to-load-more: Fibonacci progression, gesture detection, debounce
+│   │   ├── scroll-more.js             # Pull-to-load-more: Fibonacci progression, indicator, load trigger
+│   │   ├── scroll-more-pointer.js     # Pull gesture detection (touch + mouse)
+│   │   ├── scroll-more-wheel.js       # Desktop wheel accumulation gesture
 │   │   └── sw-updater.js              # SW registration, update toast, controllerchange + fallback reload
 │   ├── entur/                         # Entur API client modules
 │   │   ├── index.js                   # Public facade: exports parseEnturResponse, fetchDepartures, lookupStopId, searchStations, fetchNearbyStops
 │   │   ├── modes.js                   # CANONICAL_MODE_MAP, mapTokenToCanonical, extractString, detectModeFromRaw
 │   │   ├── parser.js                  # parseEnturResponse (pure function, language-priority situation text)
 │   │   ├── query.js                   # buildQuery, buildVariants (14 GraphQL query variant forms)
-│   │   ├── http.js                    # getContentType, postAndParse (network transport)
+│   │   ├── http.js                    # getContentType, postAndParse, createTimeoutSignal (network transport + timeouts)
 │   │   ├── departures.js              # fetchDepartures orchestration + client-side mode filter
 │   │   ├── geocoder.js                # lookupStopId, searchStations (relevance scoring, AbortController)
 │   │   └── gps-search.js              # fetchNearbyStops, extractModes, CATEGORY_TO_MODE
@@ -138,12 +141,13 @@ work/
 │   │   ├── icon-512.svg               # PWA icon 512x512
 │   │   └── icon-512-maskable.svg      # PWA maskable icon 512x512
 │   └── ui/                            # UI component modules
-│       ├── ui.js                      # createBoardElements, updateFavoriteButton, clearList, findKey, computeDiff
+│       ├── ui.js                      # createBoardElements, updateFavoriteButton, clearList
 │       ├── departure.js               # isDepartureDelayed, createDepartureNode, updateDepartureCountdown
 │       ├── header.js                  # createHeaderToggle (minimal wrapper)
 │       ├── options.js                 # Re-export shim → ./options/index.js
 │       ├── share-button.js            # encodeSettings, decodeSettings, createShareButton
-│       ├── station-dropdown.js        # getRecentStations, getDefaultStation, addRecentStation, removeFromFavorites, isStationInFavorites, modesEqual, createStationDropdown
+│       ├── station-dropdown.js        # createStationDropdown (dropdown DOM + keyboard nav); re-exports favorites-store
+│       ├── favorites-store.js         # getRecentStations, getDefaultStation, addRecentStation, removeFromFavorites, isStationInFavorites, modesEqual
 │       ├── theme-toggle.js            # createThemeToggle, initTheme, getTheme (kollektiv-theme key)
 │       ├── osm-button.js              # buildOsmUrl (pure), createOsmButton
 │       ├── mode-utils.js              # emojiForMode, labelForMode (shared across modules)
@@ -151,8 +155,9 @@ work/
 │       ├── gps-dropdown.js            # createGpsButton (compass + dropdown, geolocation, destroy)
 │       └── options/                   # Options panel sub-modules
 │           ├── index.js               # createOptionsPanel orchestrator (assemble, change tracking)
-│           ├── settings-store.js      # loadSettings, saveSettings, validateOptions, diffOptions
+│           ├── settings-store.js      # loadSettings, saveSettings, validateOptions, diffOptions (bounds from app/settings.js)
 │           ├── transport-modes.js     # createModesSection (checkbox table, toggle-all, debounced apply)
+│           ├── autocomplete-list.js   # createCandidateList (listbox DOM, highlight state)
 │           ├── station-autocomplete.js # createStationAutocomplete (debounced search, keyboard nav, blur auto-select, _explicitSelection)
 │           ├── language-switcher.js   # createLanguageSwitcher (flag buttons, updateTranslations)
 │           └── panel-lifecycle.js     # createPanelLifecycle (open/close, focus trap, ESC, toast)
@@ -161,8 +166,8 @@ work/
     ├── transport-mode-labels.test.mjs # Mode label scramble regression tests
     ├── time.test.mjs                  # Time utility tests
     ├── fetch-loop.test.mjs            # Fetch loop tick tests
+    ├── fetch-loop.guard.test.mjs      # doRefresh generation guard tests
     ├── ui.tick.test.mjs               # Countdown tick tests
-    ├── ui.diff.test.mjs               # computeDiff tests
     ├── ui.emoji.test.mjs              # Mode emoji and label helper tests
     ├── i18n.test.mjs                  # Browser language detection tests
     ├── share-button-reset.test.mjs    # Share button reset tests
@@ -173,10 +178,12 @@ work/
     ├── remove-favorites.test.mjs      # Remove favorites tests
     ├── station-dropdown.test.mjs      # Station dropdown tests
     ├── toggle-all.test.mjs            # Transport mode toggle-all tests
+    ├── settings-validation.test.mjs   # Unified settings validation tests
     ├── footer-link.test.mjs           # Footer link tests
     ├── osm-button.test.mjs            # OSM button tests
     ├── sw.test.mjs                    # Service worker tests
     ├── sw-api-caching.test.mjs        # SW API caching tests
+    ├── sw-assets-sync.test.mjs        # SW ASSETS manifest vs src/ tree sync tests
     ├── sw-updater.test.mjs            # SW updater tests
     ├── entur.parse.test.mjs           # Entur response parser tests
     ├── entur.parse.mode.test.mjs      # Mode parsing tests
@@ -188,6 +195,7 @@ work/
     ├── entur.norwegian.chars.test.mjs # Norwegian character handling tests
     ├── entur.autocomplete.blindern.test.mjs # Blindern autocomplete stored-ID tests
     ├── entur.gps-nearby.test.mjs      # GPS nearby stops tests
+    ├── entur.timeout.test.mjs         # Network timeout tests
     ├── autocomplete-input-wipe.test.mjs # Autocomplete input-wipe guard tests
     ├── departure-delay.test.mjs       # Departure delay detection tests
     ├── options-autocomplete.test.mjs  # Options panel autocomplete tests
@@ -211,17 +219,19 @@ work/
 
 ### Application Logic (`src/app/`)
 
-| Blueprint Component        | Physical Path            |
-| -------------------------- | ------------------------ |
-| Settings persistence       | `src/app/settings.js`    |
-| URL import (share links)   | `src/app/url-import.js`  |
-| Departure rendering        | `src/app/render.js`      |
-| Fetch loop + countdown     | `src/app/fetch-loop.js`  |
-| User action handlers       | `src/app/handlers.js`    |
-| Global action bar          | `src/app/action-bar.js`  |
-| GPS action bar             | `src/app/gps-bar.js`     |
-| Scroll-more (pull-to-load) | `src/app/scroll-more.js` |
-| Service worker updater     | `src/app/sw-updater.js`  |
+| Blueprint Component        | Physical Path                    |
+| -------------------------- | -------------------------------- |
+| Settings persistence       | `src/app/settings.js`            |
+| URL import (share links)   | `src/app/url-import.js`          |
+| Departure rendering        | `src/app/render.js`              |
+| Fetch loop + countdown     | `src/app/fetch-loop.js`          |
+| User action handlers       | `src/app/handlers.js`            |
+| Global action bar          | `src/app/action-bar.js`          |
+| GPS action bar             | `src/app/gps-bar.js`             |
+| Scroll-more (pull-to-load) | `src/app/scroll-more.js`         |
+| Scroll-more pull gesture   | `src/app/scroll-more-pointer.js` |
+| Scroll-more wheel gesture  | `src/app/scroll-more-wheel.js`   |
+| Service worker updater     | `src/app/sw-updater.js`          |
 
 ### Entur API Client (`src/entur/`)
 
@@ -249,25 +259,27 @@ work/
 
 ### UI Components (`src/ui/`)
 
-| Blueprint Component       | Physical Path                            |
-| ------------------------- | ---------------------------------------- |
-| Board element factory     | `src/ui/ui.js`                           |
-| Departure component       | `src/ui/departure.js`                    |
-| Header controls           | `src/ui/header.js`                       |
-| Options panel shim        | `src/ui/options.js`                      |
-| Share button              | `src/ui/share-button.js`                 |
-| Station dropdown          | `src/ui/station-dropdown.js`             |
-| Theme toggle              | `src/ui/theme-toggle.js`                 |
-| OSM map button            | `src/ui/osm-button.js`                   |
-| Mode utilities            | `src/ui/mode-utils.js`                   |
-| Footer                    | `src/ui/footer.js`                       |
-| GPS dropdown              | `src/ui/gps-dropdown.js`                 |
-| Options orchestrator      | `src/ui/options/index.js`                |
-| Options settings store    | `src/ui/options/settings-store.js`       |
-| Options transport modes   | `src/ui/options/transport-modes.js`      |
-| Options autocomplete      | `src/ui/options/station-autocomplete.js` |
-| Options language switcher | `src/ui/options/language-switcher.js`    |
-| Options panel lifecycle   | `src/ui/options/panel-lifecycle.js`      |
+| Blueprint Component         | Physical Path                            |
+| --------------------------- | ---------------------------------------- |
+| Board element factory       | `src/ui/ui.js`                           |
+| Departure component         | `src/ui/departure.js`                    |
+| Header controls             | `src/ui/header.js`                       |
+| Options panel shim          | `src/ui/options.js`                      |
+| Share button                | `src/ui/share-button.js`                 |
+| Station dropdown            | `src/ui/station-dropdown.js`             |
+| Favorites store             | `src/ui/favorites-store.js`              |
+| Theme toggle                | `src/ui/theme-toggle.js`                 |
+| OSM map button              | `src/ui/osm-button.js`                   |
+| Mode utilities              | `src/ui/mode-utils.js`                   |
+| Footer                      | `src/ui/footer.js`                       |
+| GPS dropdown                | `src/ui/gps-dropdown.js`                 |
+| Options orchestrator        | `src/ui/options/index.js`                |
+| Options settings store      | `src/ui/options/settings-store.js`       |
+| Options transport modes     | `src/ui/options/transport-modes.js`      |
+| Options autocomplete        | `src/ui/options/station-autocomplete.js` |
+| Autocomplete candidate list | `src/ui/options/autocomplete-list.js`    |
+| Options language switcher   | `src/ui/options/language-switcher.js`    |
+| Options panel lifecycle     | `src/ui/options/panel-lifecycle.js`      |
 
 ### Styles (`src/css/`)
 
@@ -318,8 +330,8 @@ browser. DOM and `localStorage` are replaced by stubs inside each suite.
 | Mode label regression tests       | `tests/transport-mode-labels.test.mjs`       |
 | Time tests                        | `tests/time.test.mjs`                        |
 | Fetch loop tests                  | `tests/fetch-loop.test.mjs`                  |
+| Generation guard tests            | `tests/fetch-loop.guard.test.mjs`            |
 | UI tick tests                     | `tests/ui.tick.test.mjs`                     |
-| UI diff tests                     | `tests/ui.diff.test.mjs`                     |
 | Mode emoji and label tests        | `tests/ui.emoji.test.mjs`                    |
 | Language detection tests          | `tests/i18n.test.mjs`                        |
 | Share button tests                | `tests/share-button-reset.test.mjs`          |
@@ -334,6 +346,7 @@ browser. DOM and `localStorage` are replaced by stubs inside each suite.
 | OSM button tests                  | `tests/osm-button.test.mjs`                  |
 | SW tests                          | `tests/sw.test.mjs`                          |
 | SW API caching tests              | `tests/sw-api-caching.test.mjs`              |
+| SW ASSETS sync tests              | `tests/sw-assets-sync.test.mjs`              |
 | SW updater tests                  | `tests/sw-updater.test.mjs`                  |
 | Entur parser tests                | `tests/entur.parse.test.mjs`                 |
 | Entur parse mode tests            | `tests/entur.parse.mode.test.mjs`            |
@@ -345,6 +358,8 @@ browser. DOM and `localStorage` are replaced by stubs inside each suite.
 | Entur Norwegian chars tests       | `tests/entur.norwegian.chars.test.mjs`       |
 | Entur Blindern autocomplete tests | `tests/entur.autocomplete.blindern.test.mjs` |
 | Entur GPS nearby tests            | `tests/entur.gps-nearby.test.mjs`            |
+| Entur timeout tests               | `tests/entur.timeout.test.mjs`               |
+| Settings validation tests         | `tests/settings-validation.test.mjs`         |
 | Autocomplete input-wipe tests     | `tests/autocomplete-input-wipe.test.mjs`     |
 | Departure delay tests             | `tests/departure-delay.test.mjs`             |
 | Options autocomplete tests        | `tests/options-autocomplete.test.mjs`        |
@@ -387,6 +402,7 @@ entries that grow without a code change (`docs/memory/archive/`).
 
 | Blueprint Component              | Physical Path                              |
 | -------------------------------- | ------------------------------------------ |
+| CI checks                        | `.github/workflows/ci.yml`                 |
 | Production publish               | `.github/workflows/static.yml`             |
 | Pull-request preview publish     | `.github/workflows/pr-preview.yml`         |
 | Pull-request preview removal     | `.github/workflows/pr-preview-cleanup.yml` |
@@ -420,9 +436,11 @@ src/app.js
 │   ├── src/ui/station-dropdown.js
 │   │   ├── src/i18n.js
 │   │   ├── src/config.js
-│   │   ├── src/ui/share-button.js
-│   │   │   ├── src/i18n.js
-│   │   │   └── src/config.js
+│   │   ├── src/ui/favorites-store.js
+│   │   │   ├── src/config.js
+│   │   │   └── src/ui/share-button.js
+│   │   │       ├── src/i18n.js
+│   │   │       └── src/config.js
 │   │   └── src/ui/mode-utils.js
 │   │       └── src/config.js
 │   └── src/ui/footer.js
@@ -433,11 +451,15 @@ src/app.js
 │   ├── src/i18n.js
 │   ├── src/config.js
 │   ├── src/ui/options/settings-store.js
+│   │   ├── src/config.js
+│   │   └── src/app/settings.js
+│   │       └── src/config.js
 │   ├── src/ui/options/transport-modes.js
 │   │   ├── src/config.js
 │   │   └── src/ui/mode-utils.js
 │   ├── src/ui/options/station-autocomplete.js
-│   │   └── src/entur/index.js
+│   │   ├── src/entur/index.js
+│   │   └── src/ui/options/autocomplete-list.js
 │   ├── src/ui/options/language-switcher.js
 │   │   └── src/i18n.js
 │   └── src/ui/options/panel-lifecycle.js
@@ -487,7 +509,11 @@ src/app.js
 │   └── src/i18n.js
 └── src/app/scroll-more.js
     ├── src/config.js
-    └── src/i18n.js
+    ├── src/i18n.js
+    ├── src/app/scroll-more-pointer.js
+    │   └── src/config.js
+    └── src/app/scroll-more-wheel.js
+        └── src/config.js
 
 src/entur/index.js
 ├── src/entur/parser.js
@@ -495,21 +521,26 @@ src/entur/index.js
 ├── src/entur/departures.js
 │   ├── src/entur/query.js
 │   ├── src/entur/http.js
+│   │   └── src/config.js
 │   └── src/entur/parser.js
 ├── src/entur/geocoder.js
+│   ├── src/config.js
 │   └── src/entur/http.js
+│       └── src/config.js
 └── src/entur/gps-search.js
-    └── src/config.js
+    ├── src/config.js
+    └── src/entur/http.js
+        └── src/config.js
 ```
 
 ## LocalStorage Keys
 
-| Key                  | Value Type                     | Managed By                                                          |
-| -------------------- | ------------------------------ | ------------------------------------------------------------------- |
-| `departure:settings` | JSON object                    | `src/app/settings.js` (loadSettings/saveSettings)                   |
-| `departure:language` | string (BCP-47 code)           | `src/i18n/store.js` (setLanguage)                                   |
-| `kollektiv-theme`    | string (`light`/`auto`/`dark`) | `src/ui/theme-toggle.js`                                            |
-| `recent-stations`    | JSON array                     | `src/ui/station-dropdown.js` (addRecentStation/removeFromFavorites) |
+| Key                  | Value Type                     | Managed By                                                                                                                                         |
+| -------------------- | ------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `departure:settings` | JSON object                    | `src/app/settings.js` (owner: key, bounds, loadSettings/saveSettings); `src/ui/options/settings-store.js` (options-panel writes via shared bounds) |
+| `departure:language` | string (BCP-47 code)           | `src/i18n/store.js` (setLanguage)                                                                                                                  |
+| `kollektiv-theme`    | string (`light`/`auto`/`dark`) | `src/ui/theme-toggle.js`                                                                                                                           |
+| `recent-stations`    | JSON array                     | `src/ui/favorites-store.js` (addRecentStation/removeFromFavorites)                                                                                 |
 
 ## Version Tracking
 

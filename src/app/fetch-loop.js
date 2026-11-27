@@ -35,6 +35,21 @@ let _visibilityHandler = null;
 /** Guard: prevents a second concurrent fetch if the previous one is still running */
 let fetchInFlight = false;
 
+/**
+ * Set when doRefresh is called while a fetch is already running or when an
+ * in-flight response turned stale (generation mismatch). Queues exactly one
+ * follow-up refresh — bounded, so rapid station changes cannot pile up fetches.
+ */
+let pendingRefresh = false;
+
+/**
+ * Monotonic counter bumped on every station/settings change (via
+ * invalidateRender). doRefresh snapshots it before the first await and drops
+ * the response if it changed while in flight — a late response for the old
+ * station must never overwrite the new station's board.
+ */
+let renderGeneration = 0;
+
 /** Wall-clock timestamp (ms) of the last completed fetch attempt */
 let lastFetchAt = Date.now();
 
@@ -66,19 +81,33 @@ export function getEffectiveNumDepartures() {
 }
 
 /**
+ * Mark any in-flight fetch response as stale. Call before changing station or
+ * settings so a slow response from the previous context is discarded instead of
+ * rendered over the new one.
+ */
+export function invalidateRender() {
+  renderGeneration++;
+}
+
+/**
  * Fetch live departures and re-render the list.
  * On failure the error is logged and any previous data is left in place.
  * Resets ticksUntilRefresh to the current FETCH_INTERVAL when complete.
+ * Concurrent calls queue one follow-up refresh instead of being dropped.
  *
  * @param {HTMLElement} listEl - The departure list container
  */
 export async function doRefresh(listEl) {
-  if (fetchInFlight) return;
+  if (fetchInFlight) {
+    pendingRefresh = true;
+    return;
+  }
+  const gen = renderGeneration;
   fetchInFlight = true;
-  // Snapshot all DEFAULTS values before the first await to prevent a TOCTOU
-  // race: another module (e.g. the user changes station) can mutate DEFAULTS
-  // while an async geocoder lookup is in flight, causing the response to be
-  // rendered against the wrong station context.
+  // Snapshot all DEFAULTS values before the first await so the request itself
+  // uses one consistent set of parameters even if another module mutates
+  // DEFAULTS mid-flight. The generation check below then decides whether the
+  // response is still allowed to render.
   const stopId0 = DEFAULTS.STOP_ID;
   const stationName = DEFAULTS.STATION_NAME;
   const modes = DEFAULTS.TRANSPORT_MODES.slice();
@@ -104,6 +133,13 @@ export async function doRefresh(listEl) {
         })
       : [];
 
+    // Generation guard: if the station or settings changed while this request
+    // was in flight, discard the response and re-fetch with current values.
+    if (gen !== renderGeneration) {
+      pendingRefresh = true;
+      return;
+    }
+
     renderDepartures(listEl, fresh);
     data = fresh;
   } catch (err) {
@@ -114,6 +150,10 @@ export async function doRefresh(listEl) {
     ticksUntilRefresh = DEFAULTS.FETCH_INTERVAL;
     lastFetchAt = Date.now();
     fetchInFlight = false;
+    if (pendingRefresh) {
+      pendingRefresh = false;
+      doRefresh(listEl).catch((err) => console.warn('Queued refresh failed', err));
+    }
   }
 }
 

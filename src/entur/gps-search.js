@@ -8,7 +8,8 @@
  * `modes` array extracted from whichever Pelias property carries mode data.
  */
 
-import { ALL_TRANSPORT_MODES } from '../config.js';
+import { ALL_TRANSPORT_MODES, NETWORK_TIMEOUT_MS } from '../config.js';
+import { createTimeoutSignal } from './http.js';
 
 const GEOCODE_REVERSE_URL = 'https://api.entur.io/geocoder/v1/reverse';
 const VALID_MODES = new Set(ALL_TRANSPORT_MODES);
@@ -90,6 +91,7 @@ function extractModes(props) {
  * @param {string}   [opts.clientName]      - ET-Client-Name header value
  * @param {Function} [opts.fetchFn]         - Fetch implementation (injectable for tests)
  * @param {string}   [opts.geocodeUrl]      - Override reverse geocode endpoint
+ * @param {number}   [opts.timeoutMs=NETWORK_TIMEOUT_MS] - Abort the request after this many ms
  * @returns {Promise<Array<{ id: string, name: string, modes: string[], distance: number|null }>>}
  */
 export async function fetchNearbyStops({
@@ -100,6 +102,7 @@ export async function fetchNearbyStops({
   clientName = 'personal-js-app',
   fetchFn = fetch,
   geocodeUrl = GEOCODE_REVERSE_URL,
+  timeoutMs = NETWORK_TIMEOUT_MS,
 }) {
   if (lat == null || lon == null) throw new Error('lat and lon are required');
 
@@ -112,9 +115,11 @@ export async function fetchNearbyStops({
     'boundary.country': 'NOR',
   });
 
+  const timeout = createTimeoutSignal(timeoutMs);
   try {
     const r = await fetchFn(`${geocodeUrl}?${params}`, {
       headers: { 'ET-Client-Name': clientName },
+      signal: timeout.signal,
     });
 
     if (!r || (typeof r.ok !== 'undefined' && r.ok === false)) return [];
@@ -147,5 +152,7 @@ export async function fetchNearbyStops({
   } catch (err) {
     console.warn('[gps-search] fetchNearbyStops failed', err);
     return [];
+  } finally {
+    timeout.done();
   }
 }

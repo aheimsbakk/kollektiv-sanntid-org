@@ -1,45 +1,67 @@
-// settings-store.js — localStorage persistence, input validation, change detection
+// settings-store.js — options-panel persistence over the shared settings rules.
+// Validation bounds live in src/app/settings.js (single owner, RULES §15/§17);
+// this module only adapts raw form values to that shape and writes them.
 import { ALL_TRANSPORT_MODES } from '../../config.js';
-
-const STORAGE_KEY = 'departure:settings';
+import {
+  STORAGE_KEY,
+  SETTINGS_BOUNDS,
+  VALID_TEXT_SIZES,
+  DEFAULT_TEXT_SIZE,
+  clampNumber,
+} from '../../app/settings.js';
 
 /** Load persisted settings from localStorage. Returns null on failure. */
 export function loadSettings() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     return raw ? JSON.parse(raw) : null;
-  } catch (e) {
+  } catch (err) {
+    console.warn('[settings-store] Failed to read settings from localStorage', err);
     return null;
   }
 }
 
-/** Persist settings to localStorage. Silently ignores write errors. */
+/**
+ * Persist a validated options object to localStorage. Failures are logged,
+ * never silently swallowed — a broken write must be visible (RULES §11).
+ */
 export function saveSettings(opts) {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(opts));
-  } catch (e) {
-    /* ignore */
+  } catch (err) {
+    console.warn('[settings-store] Failed to save settings to localStorage', err);
   }
 }
 
 /**
  * Validate and normalise raw form values against defaults.
- * Enforces minimums and fills missing fields.
+ * Numeric fields are clamped to the shared SETTINGS_BOUNDS so out-of-range
+ * form input always persists as a value the bootstrap loader will accept.
  * @param {object} raw   — { STATION_NAME, STOP_ID, LAT, LON, NUM_DEPARTURES, FETCH_INTERVAL, TRANSPORT_MODES, TEXT_SIZE }
  * @param {object} defaults
  * @returns {object} normalised options object
  */
 export function validateOptions(raw, defaults) {
-  let numDepartures = Number(raw.NUM_DEPARTURES) || defaults.NUM_DEPARTURES;
-  if (numDepartures < 1) numDepartures = 1;
+  const numDepartures = clampNumber(
+    raw.NUM_DEPARTURES,
+    SETTINGS_BOUNDS.NUM_DEPARTURES,
+    defaults.NUM_DEPARTURES
+  );
 
-  let fetchInterval = Number(raw.FETCH_INTERVAL) || defaults.FETCH_INTERVAL;
-  if (fetchInterval < 20) fetchInterval = 20;
+  const fetchInterval = clampNumber(
+    raw.FETCH_INTERVAL,
+    SETTINGS_BOUNDS.FETCH_INTERVAL,
+    defaults.FETCH_INTERVAL
+  );
 
-  const modes =
-    Array.isArray(raw.TRANSPORT_MODES) && raw.TRANSPORT_MODES.length
-      ? raw.TRANSPORT_MODES
-      : ALL_TRANSPORT_MODES;
+  const modes = Array.isArray(raw.TRANSPORT_MODES)
+    ? raw.TRANSPORT_MODES.filter((m) => ALL_TRANSPORT_MODES.includes(m))
+    : [];
+
+  const textSize =
+    typeof raw.TEXT_SIZE === 'string' && VALID_TEXT_SIZES.includes(raw.TEXT_SIZE)
+      ? raw.TEXT_SIZE
+      : defaults.TEXT_SIZE || DEFAULT_TEXT_SIZE;
 
   return {
     STATION_NAME: raw.STATION_NAME || defaults.STATION_NAME,
@@ -48,8 +70,8 @@ export function validateOptions(raw, defaults) {
     LON: typeof raw.LON === 'number' ? raw.LON : null,
     NUM_DEPARTURES: numDepartures,
     FETCH_INTERVAL: fetchInterval,
-    TRANSPORT_MODES: modes,
-    TEXT_SIZE: raw.TEXT_SIZE || defaults.TEXT_SIZE || 'large',
+    TRANSPORT_MODES: modes.length ? modes : ALL_TRANSPORT_MODES.slice(),
+    TEXT_SIZE: textSize,
   };
 }
 

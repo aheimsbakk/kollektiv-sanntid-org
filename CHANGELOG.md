@@ -1,5 +1,36 @@
 # Changelog
 
+## [1.43.0] - 2026-11-27
+
+- **why:** An audit found hung API requests, a race that could render a stale station's data, two diverging settings validators, and three files past the 300-line limit
+- **model:** kompis/qwen3.8-flash-next-iq3_s
+- **tags:** network, timeout, race-condition, validation, refactor, tests
+
+### Added
+
+- `NETWORK_TIMEOUT_MS` (10 s) and `createTimeoutSignal` in `src/entur/http.js` — every GraphQL, autocomplete, and reverse-geocode request is now aborted on timeout, and the query variant loop stops on the first abort
+- Generation guard in `src/app/fetch-loop.js`: `invalidateRender()` drops in-flight responses after a station or settings change and queues exactly one follow-up refresh
+- One settings validator in `src/app/settings.js` (`SETTINGS_BOUNDS`, `VALID_TEXT_SIZES`, `clampNumber`); the options panel delegates to it — departures 1–50, interval 20–600 s
+- New modules from oversized-file splits: `src/ui/favorites-store.js`, `src/app/scroll-more-pointer.js`, `src/app/scroll-more-wheel.js`, `src/ui/options/autocomplete-list.js`
+- Test suites `entur.timeout`, `fetch-loop.guard`, `settings-validation`, `sw-assets-sync` (the last two guard the ASSETS manifest both ways)
+- CI workflow `.github/workflows/ci.yml` runs `npm test`, `npm run format:check`, and the CODEBASE sync check on pull requests and pushes to `main`
+
+### Changed
+
+- `src/app/url-import.js` persists a shared link's language through `setLanguage()` instead of writing the `departure:language` key directly
+- Favorites storage moved to `src/ui/favorites-store.js`; `src/ui/station-dropdown.js` keeps the dropdown DOM and re-exports the store API
+- `DEFAULTS` gained `TEXT_SIZE: 'medium'`, so the text-size default lives in one place
+
+### Fixed
+
+- Options-panel values outside the allowed range (for example a 5 s interval) were written to storage and then silently dropped on reload; both write paths now share one bound
+- A station change while a fetch was in flight was swallowed by the in-flight guard; the refresh is now queued and runs after the dropped response
+- Empty `catch` blocks in `src/ui/options/settings-store.js` and `src/app.js` now log their failures
+
+### Removed
+
+- Unused exports `findKey`, `computeDiff` (`src/ui/ui.js`) and `CANCELLATION_WRAPPER` (`src/config.js`), with `tests/ui.diff.test.mjs`
+
 ## [1.42.0] - 2026-11-25
 
 - **why:** Reading "when does it leave" first means the countdown; the clock time reads as the result the countdown points to

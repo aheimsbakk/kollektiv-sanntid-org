@@ -11,7 +11,7 @@
  */
 
 import { DEFAULTS } from '../config.js';
-import { initLanguage } from '../i18n.js';
+import { setLanguage } from '../i18n.js';
 import { decodeSettings } from '../ui/share-button.js';
 import { saveSettings } from './settings.js';
 
@@ -53,14 +53,10 @@ export function processUrlParams() {
     if (shared.lat != null) DEFAULTS.LAT = shared.lat;
     if (shared.lon != null) DEFAULTS.LON = shared.lon;
 
-    // Persist the imported language so it survives a reload
+    // Persist the imported language so it survives a reload. The i18n store
+    // owns the storage key and validates the code — never write the key here.
     if (shared.language) {
-      try {
-        localStorage.setItem('departure:language', shared.language);
-        initLanguage();
-      } catch (err) {
-        console.warn('[url-import] Failed to persist imported language', err);
-      }
+      setLanguage(shared.language);
     }
 
     // Persist to localStorage so settings survive after URL is cleaned

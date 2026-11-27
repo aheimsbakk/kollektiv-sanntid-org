@@ -1,12 +1,12 @@
 /**
- * scroll-more.js — Scroll/pull-to-load-more departures
+ * scroll-more.js — Scroll/pull-to-load-more departures (orchestrator)
  *
  * Responsibilities:
  *   - Track a temporary departure count that overrides DEFAULTS.NUM_DEPARTURES
  *   - Fibonacci-like progression: 1, 2, 3, 5, 8, 13, 21 (max)
- *   - Detect upward pull gesture (touch + mouse) and wheel scroll past bottom
- *   - Fire triggerLoadMore() on gesture release once threshold is met
- *   - Show ▼ "scroll for more" indicator; switches to ● at max
+ *   - Own the indicator element and the load-more trigger (debounced)
+ *   - Delegate raw gesture detection to scroll-more-pointer.js (touch/mouse
+ *     pull) and scroll-more-wheel.js (desktop wheel)
  *   - Reset temporary count on station change or app reload
  *
  * Design constraints:
@@ -20,9 +20,10 @@
 
 import { DEFAULTS, SCROLL_MORE } from '../config.js';
 import { t } from '../i18n.js';
+import { createPointerGesture } from './scroll-more-pointer.js';
+import { createWheelGesture } from './scroll-more-wheel.js';
 
 const SCROLL_STEPS = SCROLL_MORE.SCROLL_STEPS;
-const PULL_THRESHOLD = SCROLL_MORE.PULL_THRESHOLD;
 const MAX_HINT_DURATION = SCROLL_MORE.MAX_HINT_DURATION;
 
 /**
@@ -58,7 +59,7 @@ export function isAtMax(count) {
  * Initialise the scroll-more feature on a board.
  *
  * @param {Object}      opts
- * @param {HTMLElement} opts.boardEl    - The .board element (kept for API compat, unused)
+ * @param {HTMLElement} opts.boardEl    - The .board element
  * @param {HTMLElement} opts.listEl     - The .departures element
  * @param {Function}    opts.onLoadMore - Callback(newCount) to fetch more departures
  * @returns {{ destroy: Function, reset: Function, indicatorEl: HTMLElement, getTemporaryCount: Function, updateTranslations: Function }}
@@ -75,14 +76,6 @@ export function initScrollMore({ boardEl, listEl, onLoadMore }) {
 
   /** Whether a load-more fetch is currently in flight */
   let loading = false;
-
-  /** Active pointer tracking state */
-  let pointerActive = false;
-  let startY = 0;
-  /** Raw (un-resisted) pull distance for threshold comparison */
-  let rawPullDistance = 0;
-  /** Whether load-more threshold was reached during this gesture */
-  let thresholdTriggered = false;
 
   /** Timer for the max-reached hint auto-dismiss */
   let maxHintTimer = null;
@@ -184,12 +177,12 @@ export function initScrollMore({ boardEl, listEl, onLoadMore }) {
     }
   }
 
-  // ── Pointer (touch + mouse) handlers ───────────────────────────────
+  // ── Gesture gates shared by pointer and wheel ──────────────────────
 
   /**
    * Returns true when the board fits in the viewport or the page is
-   * scrolled near the bottom — the only cases where a pull-up should
-   * trigger load-more.
+   * scrolled near the bottom — the only cases where a pull-up or wheel
+   * scroll should trigger load-more.
    */
   function isNearBottom() {
     const boardRect = boardEl.getBoundingClientRect();
@@ -199,94 +192,26 @@ export function initScrollMore({ boardEl, listEl, onLoadMore }) {
     return docHeight - scrollBottom < 60;
   }
 
-  function onPointerDown(e) {
-    if (e.button && e.button !== 0) return;
-    if (document.body.classList.contains('options-open')) return;
-    if (!isNearBottom()) return;
-
-    pointerActive = true;
-    startY = e.touches ? e.touches[0].clientY : e.clientY;
-    rawPullDistance = 0;
-    thresholdTriggered = false;
-
-    if (!e.touches && e.cancelable) e.preventDefault();
+  function isBlocked() {
+    return document.body.classList.contains('options-open');
   }
 
-  function onPointerMove(e) {
-    if (!pointerActive) return;
+  const pointer = createPointerGesture({
+    boardEl,
+    indicatorEl: indicator,
+    isNearBottom,
+    isBlocked,
+    onTrigger: triggerLoadMore,
+  });
 
-    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-    const rawDelta = clientY - startY;
+  const wheel = createWheelGesture({
+    isNearBottom,
+    isBlocked,
+    onTrigger: triggerLoadMore,
+  });
 
-    if (rawDelta >= 0) {
-      // Downward — reset tracking
-      rawPullDistance = 0;
-      return;
-    }
-
-    rawPullDistance = Math.abs(rawDelta);
-
-    if (rawPullDistance >= PULL_THRESHOLD && !thresholdTriggered) {
-      thresholdTriggered = true;
-      indicator.classList.add('scroll-more-indicator--triggered');
-    }
-
-    if (e.cancelable && rawPullDistance > 10) {
-      e.preventDefault();
-    }
-  }
-
-  function onPointerEnd() {
-    if (!pointerActive) return;
-    pointerActive = false;
-
-    indicator.classList.remove('scroll-more-indicator--triggered');
-
-    if (thresholdTriggered) {
-      triggerLoadMore();
-    }
-
-    rawPullDistance = 0;
-    thresholdTriggered = false;
-  }
-
-  // ── Wheel handler (desktop) ─────────────────────────────────────────
-
-  let wheelAccumulator = 0;
-  let wheelResetTimer = null;
-
-  function onWheel(e) {
-    if (document.body.classList.contains('options-open')) return;
-    if (!isNearBottom()) return;
-    if (e.deltaY <= 0) return;
-
-    const MAX_DELTA_PER_EVENT = SCROLL_MORE.WHEEL_THRESHOLD / 2;
-    wheelAccumulator += Math.min(e.deltaY, MAX_DELTA_PER_EVENT);
-
-    if (wheelResetTimer) clearTimeout(wheelResetTimer);
-    wheelResetTimer = setTimeout(() => {
-      wheelAccumulator = 0;
-      wheelResetTimer = null;
-    }, SCROLL_MORE.WHEEL_RESET_MS);
-
-    if (wheelAccumulator >= SCROLL_MORE.WHEEL_THRESHOLD) {
-      wheelAccumulator = 0;
-      triggerLoadMore();
-    }
-  }
-
-  // ── Bind events ────────────────────────────────────────────────────
-
-  boardEl.addEventListener('touchstart', onPointerDown, { passive: true });
-  boardEl.addEventListener('touchmove', onPointerMove, { passive: false });
-  boardEl.addEventListener('touchend', onPointerEnd, { passive: true });
-  boardEl.addEventListener('touchcancel', onPointerEnd, { passive: true });
-
-  boardEl.addEventListener('mousedown', onPointerDown, { passive: false });
-  window.addEventListener('mousemove', onPointerMove);
-  window.addEventListener('mouseup', onPointerEnd);
-
-  window.addEventListener('wheel', onWheel, { passive: true });
+  pointer.bind();
+  wheel.bind();
 
   // ── Public API ─────────────────────────────────────────────────────
 
@@ -294,13 +219,12 @@ export function initScrollMore({ boardEl, listEl, onLoadMore }) {
     tempCount = null;
     loading = false;
     lastLoadMoreAt = 0;
-    pointerActive = false;
-    rawPullDistance = 0;
-    thresholdTriggered = false;
     if (maxHintTimer) {
       clearTimeout(maxHintTimer);
       maxHintTimer = null;
     }
+    pointer.reset();
+    wheel.reset();
     updateIndicator();
   }
 
@@ -313,16 +237,9 @@ export function initScrollMore({ boardEl, listEl, onLoadMore }) {
   }
 
   function destroy() {
-    boardEl.removeEventListener('touchstart', onPointerDown);
-    boardEl.removeEventListener('touchmove', onPointerMove);
-    boardEl.removeEventListener('touchend', onPointerEnd);
-    boardEl.removeEventListener('touchcancel', onPointerEnd);
-    boardEl.removeEventListener('mousedown', onPointerDown);
-    window.removeEventListener('mousemove', onPointerMove);
-    window.removeEventListener('mouseup', onPointerEnd);
-    window.removeEventListener('wheel', onWheel);
+    pointer.destroy();
+    wheel.destroy();
     if (maxHintTimer) clearTimeout(maxHintTimer);
-    if (wheelResetTimer) clearTimeout(wheelResetTimer);
     indicator.remove();
     _activeInstance = null;
   }

@@ -83,17 +83,3 @@ export function updateFavoriteButton(btn, stopId, modes) {
 export function clearList(listEl) {
   while (listEl.firstChild) listEl.removeChild(listEl.firstChild);
 }
-
-export function findKey(item) {
-  return `${item.destination}::${item.expectedDepartureISO}`;
-}
-
-// Compute minimal diff metadata between old keys and new keys (pure function for testing)
-export function computeDiff(oldKeys, newKeys) {
-  const oldSet = new Set(oldKeys);
-  const newSet = new Set(newKeys);
-  const toAdd = newKeys.filter((k) => !oldSet.has(k));
-  const toRemove = oldKeys.filter((k) => !newSet.has(k));
-  // newOrder is simply newKeys (we'll re-append nodes to match)
-  return { toAdd, toRemove, newOrder: newKeys };
-}

@@ -25,3 +25,6 @@ tmp/
 TASK.md
 todo.txt
 done.txt
+
+# playwright-cli session artifacts
+.playwright-cli/
