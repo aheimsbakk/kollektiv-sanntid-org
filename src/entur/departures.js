@@ -60,6 +60,7 @@ function rawMatchesModes(rawObj, lowerModes) {
  * @param {string}   [opts.apiUrl]        - GraphQL endpoint URL
  * @param {string}   [opts.clientName]    - ET-Client-Name header value
  * @param {Function} [opts.fetchFn=fetch] - Fetch implementation (injectable for tests)
+ * @param {number}   [opts.timeoutMs]     - Per-request timeout in ms
  * @returns {Promise<Array<Object>>}      - Array of normalised departure objects
  * @throws {Error}  On unrecoverable network/parse failures
  */
@@ -71,6 +72,7 @@ export async function fetchDepartures({
   apiUrl = 'https://api.entur.io/journey-planner/v3/graphql',
   clientName = 'personal-js-app',
   fetchFn = fetch,
+  timeoutMs = undefined,
 }) {
   if (!stopId) throw new Error('stopId required');
   if (!apiUrl) throw new Error('apiUrl required');
@@ -85,7 +87,14 @@ export async function fetchDepartures({
   for (const variant of variants) {
     const { query, variables } = buildQuery(stopId, numDepartures, variant.opts);
     try {
-      ({ json, resp } = await postAndParse(apiUrl, clientName, fetchFn, query, variables));
+      ({ json, resp } = await postAndParse(
+        apiUrl,
+        clientName,
+        fetchFn,
+        query,
+        variables,
+        timeoutMs
+      ));
 
       // If GraphQL returned an errors array, this variant's AST was rejected —
       // continue to the next form.
@@ -101,6 +110,9 @@ export async function fetchDepartures({
       // Propagate SyntaxErrors (non-JSON / parse failures) immediately — these
       // indicate a real network or proxy problem, not a query shape issue.
       if (err instanceof SyntaxError) throw err;
+      // A timed-out request will fail identically for every variant — retrying
+      // 14 forms would stall the loop for minutes. Surface the abort instead.
+      if (err?.name === 'AbortError') throw err;
       // For any other error, try the next variant.
       continue;
     }

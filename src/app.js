@@ -181,9 +181,7 @@ async function init() {
   // Mount footer outside the board so pull-to-scroll displacement doesn't affect it
   document.body.appendChild(board.footer);
   applyTextSize(DEFAULTS.TEXT_SIZE || 'medium');
-  try {
-    document.title = DEFAULTS.STATION_NAME || document.title;
-  } catch (_) {}
+  document.title = DEFAULTS.STATION_NAME || document.title;
 
   // 10. Initialise scroll-more (pull-to-load-more departures)
   const scrollMore = initScrollMore({

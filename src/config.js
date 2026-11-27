@@ -1,6 +1,6 @@
 // Version is defined here and in src/sw.js (service worker)
 // Both must be kept in sync - use scripts/bump-version.sh to update both
-export const VERSION = '1.42.0';
+export const VERSION = '1.43.0';
 
 // Brand name used in the options panel title and HTML <title>.
 // Intentionally not translated — this is a proper name.
@@ -20,7 +20,13 @@ export const DEFAULTS = {
   CLIENT_NAME: 'kollektiv-sanntid-org',
   API_URL: 'https://api.entur.io/journey-planner/v3/graphql',
   GITHUB_URL: 'https://github.com/aheimsbakk/kollektiv-sanntid-org/#kollektivsanntidorg',
+  TEXT_SIZE: 'medium',
 };
+
+// Abort any external API request that has not completed after this many
+// milliseconds. Without a timeout a hung Entur request stalls the refresh
+// loop forever and the board silently stops updating (RULES §12).
+export const NETWORK_TIMEOUT_MS = 10_000;
 
 // Default favorite station encoded as base64 share link (minimal 3-element format)
 // Used when user has no favorites stored. Set to null to disable.
@@ -77,15 +83,6 @@ export const UI_EMOJIS = {
   footerReadme: '📘', // GitHub README link
   compass: '🧭', // GPS nearby-stops button (top-left toolbar)
   map: '🗺️', // OpenStreetMap button (top-left toolbar, below compass)
-};
-
-// Cancellation display wrapper
-// When a departure is cancelled (item.cancellation === true), the entire
-// departure line will be wrapped with these HTML tags to apply strikethrough styling.
-// The styling is defined in CSS via .departure-cancelled class.
-export const CANCELLATION_WRAPPER = {
-  open: '<span class="departure-cancelled">',
-  close: '</span>',
 };
 
 // Platform/Quay display symbols

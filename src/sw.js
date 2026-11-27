@@ -1,4 +1,4 @@
-const VERSION = '1.42.0';
+const VERSION = '1.43.0';
 const CACHE_NAME = `departures-v${VERSION}`;
 const ASSETS = [
   './',
@@ -33,6 +33,8 @@ const ASSETS = [
   './app/gps-bar.js',
   './app/sw-updater.js',
   './app/scroll-more.js',
+  './app/scroll-more-pointer.js',
+  './app/scroll-more-wheel.js',
   './config.js',
   './entur/index.js',
   './entur/modes.js',
@@ -51,10 +53,12 @@ const ASSETS = [
   './time.js',
   './ui/ui.js',
   './ui/footer.js',
+  './ui/favorites-store.js',
   './ui/departure.js',
   './ui/header.js',
   './ui/options.js',
   './ui/options/index.js',
+  './ui/options/autocomplete-list.js',
   './ui/options/settings-store.js',
   './ui/options/transport-modes.js',
   './ui/options/station-autocomplete.js',

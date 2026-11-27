@@ -20,7 +20,12 @@ import {
   isStationInFavorites,
 } from '../ui/station-dropdown.js';
 import { saveSettings, applyTextSize } from './settings.js';
-import { doRefresh, startRefreshLoop, setNumDeparturesOverride } from './fetch-loop.js';
+import {
+  doRefresh,
+  startRefreshLoop,
+  setNumDeparturesOverride,
+  invalidateRender,
+} from './fetch-loop.js';
 
 /**
  * Wire all user-action handlers and return them as a plain object.
@@ -66,6 +71,9 @@ export function wireHandlers(
    * @param {boolean} addToFavorites  - When true, upserts into the favorites list and refreshes the dropdown
    */
   function applyStation(station, addToFavorites) {
+    // Invalidate first: an in-flight fetch for the previous station must not
+    // render over the switch (see fetch-loop.js generation guard).
+    invalidateRender();
     DEFAULTS.STATION_NAME = station.name;
     DEFAULTS.STOP_ID = station.stopId;
     if (Array.isArray(station.modes)) {
@@ -183,6 +191,7 @@ export function wireHandlers(
    * @param {Object} newOpts - New settings values (mirrors DEFAULTS shape)
    */
   function onApplySettings(newOpts) {
+    invalidateRender();
     DEFAULTS.STATION_NAME = newOpts.STATION_NAME;
     DEFAULTS.STOP_ID = newOpts.STOP_ID || null;
     DEFAULTS.NUM_DEPARTURES = newOpts.NUM_DEPARTURES;

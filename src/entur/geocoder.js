@@ -5,7 +5,8 @@
  * geocoder REST API.
  */
 
-import { getContentType } from './http.js';
+import { getContentType, createTimeoutSignal } from './http.js';
+import { NETWORK_TIMEOUT_MS } from '../config.js';
 
 /**
  * Look up the NSR stop-place ID for a station by name using the Entur geocoder.
@@ -16,6 +17,7 @@ import { getContentType } from './http.js';
  * @param {string}   [opts.clientName]
  * @param {Function} [opts.fetchFn]
  * @param {string}   [opts.geocodeUrl]
+ * @param {number}   [opts.timeoutMs=NETWORK_TIMEOUT_MS] - Abort the request after this many ms
  * @returns {Promise<string|null>}
  */
 export async function lookupStopId({
@@ -23,11 +25,18 @@ export async function lookupStopId({
   clientName = 'personal-js-app',
   fetchFn = fetch,
   geocodeUrl = 'https://api.entur.io/geocoder/v1/autocomplete',
+  timeoutMs = NETWORK_TIMEOUT_MS,
 }) {
   if (!stationName) throw new Error('stationName required');
 
   const url = `${geocodeUrl}?text=${encodeURIComponent(stationName)}&lang=no`;
-  const r = await fetchFn(url, { headers: { 'ET-Client-Name': clientName } });
+  const { signal, done } = createTimeoutSignal(timeoutMs);
+  let r;
+  try {
+    r = await fetchFn(url, { headers: { 'ET-Client-Name': clientName }, signal });
+  } finally {
+    done();
+  }
 
   if (!r) return null;
   if (typeof r.ok !== 'undefined' && r.ok === false) return null;
@@ -66,6 +75,7 @@ export async function lookupStopId({
  * @param {string}        [opts.clientName]
  * @param {string}        [opts.geocodeUrl]
  * @param {AbortSignal}   [opts.signal]      - Optional AbortSignal to cancel the fetch
+ * @param {number}        [opts.timeoutMs=NETWORK_TIMEOUT_MS] - Abort the request after this many ms
  * @returns {Promise<Array<{ id: string|null, title: string, raw: Object }>>}
  */
 export async function searchStations({
@@ -75,6 +85,7 @@ export async function searchStations({
   clientName = 'personal-js-app',
   geocodeUrl = 'https://api.entur.io/geocoder/v1/autocomplete',
   signal = undefined,
+  timeoutMs = NETWORK_TIMEOUT_MS,
 }) {
   if (!text || String(text).trim().length < 1) return [];
 
@@ -82,9 +93,9 @@ export async function searchStations({
   const fetchSize = Math.max(50, limit * 10);
   const url = `${geocodeUrl}?text=${encodeURIComponent(text)}&lang=no&size=${fetchSize}`;
 
+  const timeout = createTimeoutSignal(timeoutMs, signal);
   try {
-    const fetchOpts = { headers: { 'ET-Client-Name': clientName } };
-    if (signal) fetchOpts.signal = signal;
+    const fetchOpts = { headers: { 'ET-Client-Name': clientName }, signal: timeout.signal };
     const r = await fetchFn(url, fetchOpts);
     if (!r) return [];
     if (typeof r.ok !== 'undefined' && r.ok === false) return [];
@@ -127,5 +138,7 @@ export async function searchStations({
   } catch (err) {
     console.warn('[geocoder] searchStations failed', err);
     return [];
+  } finally {
+    timeout.done();
   }
 }

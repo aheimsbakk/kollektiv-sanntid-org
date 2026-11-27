@@ -20,11 +20,41 @@ const TEXT_SIZE_CLASSES = [
   'text-size-xlarge',
 ];
 
-/** Valid text-size tokens */
-const VALID_TEXT_SIZES = ['tiny', 'small', 'medium', 'large', 'xlarge'];
+/** Valid text-size tokens — single source of truth for all validators */
+export const VALID_TEXT_SIZES = ['tiny', 'small', 'medium', 'large', 'xlarge'];
+
+/** Default text size when nothing valid is stored or selected */
+export const DEFAULT_TEXT_SIZE = 'medium';
+
+/**
+ * Shared numeric bounds for settings validation. Both the bootstrap loader
+ * (this module) and the options panel validator (ui/options/settings-store.js)
+ * must use these so a value written by one path always survives the other
+ * (RULES §17: one owner for the rule, not two diverging copies).
+ */
+export const SETTINGS_BOUNDS = {
+  NUM_DEPARTURES: { min: 1, max: 50 },
+  FETCH_INTERVAL: { min: 20, max: 600 },
+};
+
+/** Storage key owned by this module; importers must not redefine it. */
+export { STORAGE_KEY };
 
 /** Valid transport mode tokens — canonical list from config.js */
 const VALID_MODES = ALL_TRANSPORT_MODES;
+
+/**
+ * Clamp a number into bounds. Returns fallback when the value is not finite.
+ * @param {unknown} value
+ * @param {{min:number,max:number}} bounds
+ * @param {number} fallback
+ * @returns {number}
+ */
+export function clampNumber(value, bounds, fallback) {
+  const num = Number(value);
+  if (!Number.isFinite(num)) return fallback;
+  return Math.min(bounds.max, Math.max(bounds.min, Math.floor(num)));
+}
 
 /**
  * Load persisted settings from localStorage into DEFAULTS.
@@ -48,16 +78,16 @@ export function loadSettings() {
     if (
       typeof parsed.NUM_DEPARTURES === 'number' &&
       Number.isFinite(parsed.NUM_DEPARTURES) &&
-      parsed.NUM_DEPARTURES >= 1 &&
-      parsed.NUM_DEPARTURES <= 50
+      parsed.NUM_DEPARTURES >= SETTINGS_BOUNDS.NUM_DEPARTURES.min &&
+      parsed.NUM_DEPARTURES <= SETTINGS_BOUNDS.NUM_DEPARTURES.max
     ) {
       DEFAULTS.NUM_DEPARTURES = Math.floor(parsed.NUM_DEPARTURES);
     }
     if (
       typeof parsed.FETCH_INTERVAL === 'number' &&
       Number.isFinite(parsed.FETCH_INTERVAL) &&
-      parsed.FETCH_INTERVAL >= 10 &&
-      parsed.FETCH_INTERVAL <= 600
+      parsed.FETCH_INTERVAL >= SETTINGS_BOUNDS.FETCH_INTERVAL.min &&
+      parsed.FETCH_INTERVAL <= SETTINGS_BOUNDS.FETCH_INTERVAL.max
     ) {
       DEFAULTS.FETCH_INTERVAL = Math.floor(parsed.FETCH_INTERVAL);
     }
